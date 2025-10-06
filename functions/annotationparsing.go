@@ -1,13 +1,14 @@
 package functions
 
 import (
-	"github.com/blutspende/go-astm/v3/constants"
-	"github.com/blutspende/go-astm/v3/errmsg"
-	"github.com/blutspende/go-astm/v3/models"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/blutspende/go-astm/v3/constants"
+	"github.com/blutspende/go-astm/v3/errmsg"
+	"github.com/blutspende/go-astm/v3/models"
 )
 
 func ParseAstmFieldAnnotation(input reflect.StructField) (result models.AstmFieldAnnotation, err error) {

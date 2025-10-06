@@ -20,11 +20,12 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		return false, errmsg.ErrLineParsingEmptyInput
 	}
 
-	// Setup inputFields variable to split the inputLine into
+	// Setup inputFields variable to split the inputLine into and split start for header processing
 	var inputFields []string
+	splitStart := 0
 
 	// Handle header special case
-	if inputLine[0] == 'H' {
+	if config.Protocol == astmmodels.ASTM && inputLine[0] == 'H' {
 		// Check if the inputLine is long enough to contain delimiters
 		if len(inputLine) < 5 {
 			return false, errmsg.ErrLineParsingHeaderTooShort
@@ -36,11 +37,25 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		config.Delimiters.Escape = string(inputLine[4])
 		// Place the fix segment into the inputFields
 		inputFields = []string{inputLine[0:1], inputLine[1:5]}
-		// Add the rest of the inputLine split by the field delimiter
-		inputFields = append(inputFields, splitStringWithEscape(inputLine[6:], config.Delimiters.Field, config.Delimiters.Escape)...)
-	} else {
-		// Split the input with the field delimiter
-		inputFields = splitStringWithEscape(inputLine, config.Delimiters.Field, config.Delimiters.Escape)
+		splitStart = 6
+	} else if config.Protocol == astmmodels.HL7 && inputLine[0:3] == "MSH" {
+		// Check if the inputLine is long enough to contain delimiters
+		if len(inputLine) < 8 {
+			return false, errmsg.ErrLineParsingHeaderTooShort
+		}
+		config.Delimiters.Field = inputLine[3:4]        // Default |
+		config.Delimiters.Component = inputLine[4:5]    // Default ^
+		config.Delimiters.Repeat = inputLine[5:6]       // Default ~
+		config.Delimiters.Escape = inputLine[6:7]       // Default \
+		config.Delimiters.SubComponent = inputLine[7:8] // Default &
+		// Place the fix segment into the inputFields
+		inputFields = []string{inputLine[0:3], inputLine[3:8]}
+		splitStart = 9
+	}
+
+	// Split the input with the field delimiter starting from the split start position
+	if len(inputLine) > splitStart {
+		inputFields = append(inputFields, splitStringWithEscape(inputLine[splitStart:], config.Delimiters.Field, config)...)
 	}
 
 	// Check for minimum number of input fields (first two fields are mandatory)
@@ -65,7 +80,8 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	}
 
 	// Check for validity of the sequence number (error only if enforced)
-	if inputFields[1] != strconv.Itoa(sequenceNumber) && inputLine[0] != 'H' && config.EnforceSequenceNumberCheck {
+	if config.Protocol == astmmodels.ASTM && inputFields[1] != strconv.Itoa(sequenceNumber) && inputLine[0] != 'H' && config.EnforceSequenceNumberCheck {
+		//TODO: implement sequence number checking for HL7 too
 		return true, errmsg.ErrLineParsingSequenceNumberMismatch
 	}
 
@@ -108,7 +124,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		if targetFieldAnnotation.IsArray {
 			// |rep1\rep2\rep3|
 			// Field is an array
-			repeats := splitStringWithEscape(inputField, config.Delimiters.Repeat, config.Delimiters.Escape)
+			repeats := splitStringWithEscape(inputField, config.Delimiters.Repeat, config)
 			arrayType := reflect.SliceOf(targetValues[i].Type().Elem())
 			arrayValue := reflect.MakeSlice(arrayType, len(repeats), len(repeats))
 			for j, repeat := range repeats {
@@ -133,7 +149,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		} else if targetFieldAnnotation.IsComponent {
 			// |comp1^comp2^comp3|
 			// Field is a component
-			components := splitStringWithEscape(inputField, config.Delimiters.Component, config.Delimiters.Escape)
+			components := splitStringWithEscape(inputField, config.Delimiters.Component, config)
 			// Not enough components in the inputField
 			if len(components) < targetFieldAnnotation.ComponentPos {
 				// Error if the component is required, skip otherwise
@@ -186,12 +202,7 @@ func parseSubstructure(inputString string, targetStruct interface{}, depth int, 
 		return errmsg.ErrLineParsingInvalidRecursionDepth
 	}
 	// Split the input with the field delimiter
-	var inputFields []string
-	if config.Protocol == astmmodels.ASTM {
-		inputFields = splitStringWithEscape(inputString, delimiter, config.Delimiters.Escape)
-	} else {
-		inputFields = strings.Split(inputString, delimiter)
-	}
+	inputFields := splitStringWithEscape(inputString, delimiter, config)
 
 	// Process the target structure
 	targetTypes, targetValues, _, err := ProcessStructReflection(targetStruct)
@@ -249,7 +260,15 @@ func setField(value string, field reflect.Value, annotation models.AstmFieldAnno
 	// Set the field value
 	switch field.Kind() {
 	case reflect.String:
-		escaped := filterStringEscapeChars(value, config.Delimiters.Escape)
+		escaped := value
+		if config.Protocol == astmmodels.ASTM {
+			escaped = filterStringEscapeChars(value, config.Delimiters.Escape)
+		} else if config.Protocol == astmmodels.HL7 {
+			escaped, err = replaceHL7Escapes(value, config)
+			if err != nil {
+				return err
+			}
+		}
 		if field.Type().ConvertibleTo(reflect.TypeOf("")) {
 			field.Set(reflect.ValueOf(escaped).Convert(field.Type()))
 		} else {
@@ -310,23 +329,27 @@ func setField(value string, field reflect.Value, annotation models.AstmFieldAnno
 	return errmsg.ErrLineParsingUnsupportedDataType
 }
 
-func splitStringWithEscape(input string, delimiter string, escape string) (result []string) {
-	delimiterRune := rune(delimiter[0])
-	escapeRune := rune(escape[0])
+func splitStringWithEscape(input string, delimiter string, config *astmmodels.Configuration) (result []string) {
 	inputRunes := []rune(input)
-	start := 0
-	for i := 0; i < len(inputRunes); i++ {
-		if inputRunes[i] == delimiterRune {
-			result = append(result, string(inputRunes[start:i]))
-			start = i + 1
+	delimiterRune := rune(delimiter[0])
+	if config.Protocol == astmmodels.ASTM {
+		escapeRune := rune(config.Delimiters.Escape[0])
+		start := 0
+		for i := 0; i < len(inputRunes); i++ {
+			if inputRunes[i] == delimiterRune {
+				result = append(result, string(inputRunes[start:i]))
+				start = i + 1
+			}
+			if i == len(inputRunes)-1 {
+				result = append(result, string(inputRunes[start:i+1]))
+			}
+			if inputRunes[i] == escapeRune {
+				i++
+				continue
+			}
 		}
-		if i == len(inputRunes)-1 {
-			result = append(result, string(inputRunes[start:i+1]))
-		}
-		if inputRunes[i] == escapeRune {
-			i++
-			continue
-		}
+	} else if config.Protocol == astmmodels.HL7 {
+		result = strings.Split(input, delimiter)
 	}
 	return result
 }

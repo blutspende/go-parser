@@ -88,18 +88,6 @@ func TestParseLine_ArrayRecord(t *testing.T) {
 	assert.Equal(t, "second3", target.Array[2])
 }
 
-func TestParseLine_HeaderRecord(t *testing.T) {
-	// Arrange
-	input := "H|\\^&|first"
-	target := HeaderRecord{}
-	// Act
-	nameOk, err := ParseLine(input, &target, createStructAnnotation("H"), 0, config)
-	// Assert
-	assert.Nil(t, err)
-	assert.True(t, nameOk)
-	assert.Equal(t, "first", target.First)
-}
-
 func TestParseLine_HeaderDelimiterChange(t *testing.T) {
 	// Arrange
 	input := "H/!*%/first/second1!second2/third1*third2"
@@ -394,7 +382,7 @@ func TestSplitStringWithEscape_NoEscape(t *testing.T) {
 	// Arrange
 	input := "no&|split"
 	// Act
-	result := splitStringWithEscape(input, config.Delimiters.Field, config.Delimiters.Escape)
+	result := splitStringWithEscape(input, config.Delimiters.Field, config)
 	// Assert
 	assert.Len(t, result, 1)
 	assert.Equal(t, "no&|split", result[0])
@@ -404,7 +392,7 @@ func TestSplitStringWithEscape_Mixed(t *testing.T) {
 	// Arrange
 	input := "no&^split^second&&^third"
 	// Act
-	result := splitStringWithEscape(input, config.Delimiters.Component, config.Delimiters.Escape)
+	result := splitStringWithEscape(input, config.Delimiters.Component, config)
 	// Assert
 	assert.Len(t, result, 3)
 	assert.Equal(t, "no&^split", result[0])
@@ -416,7 +404,7 @@ func TestSplitStringWithEscape_EmptyFields(t *testing.T) {
 	// Arrange
 	input := "first||third"
 	// Act
-	result := splitStringWithEscape(input, config.Delimiters.Field, config.Delimiters.Escape)
+	result := splitStringWithEscape(input, config.Delimiters.Field, config)
 	// Assert
 	assert.Len(t, result, 3)
 	assert.Equal(t, "first", result[0])
@@ -428,7 +416,7 @@ func TestSplitStringWithEscape_EmptyInput(t *testing.T) {
 	// Arrange
 	input := ""
 	// Act
-	result := splitStringWithEscape(input, config.Delimiters.Field, config.Delimiters.Escape)
+	result := splitStringWithEscape(input, config.Delimiters.Field, config)
 	// Assert
 	assert.Len(t, result, 0)
 }
@@ -437,7 +425,7 @@ func TestSplitStringWithEscape_Unicode(t *testing.T) {
 	// Arrange
 	input := "first|őáúäö&||third"
 	// Act
-	result := splitStringWithEscape(input, config.Delimiters.Field, config.Delimiters.Escape)
+	result := splitStringWithEscape(input, config.Delimiters.Field, config)
 	// Assert
 	assert.Len(t, result, 3)
 	assert.Equal(t, "first", result[0])
@@ -606,4 +594,100 @@ func TestParseLine_SubSubHl7(t *testing.T) {
 	assert.Equal(t, "sub3", target.Second.Second.Third)
 	assert.Equal(t, "comp3", target.Second.Third)
 	assert.Equal(t, "field3", target.Third)
+}
+
+func TestParseLine_Header_ASTM(t *testing.T) {
+	// Arrange
+	input := `H|\^&|first`
+	target := HeaderRecord{}
+	// Act
+	nameOk, err := ParseLine(input, &target, createStructAnnotation("H"), 1, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.True(t, nameOk)
+	assert.Equal(t, "first", target.First)
+}
+func TestParseLine_HeaderDelimiterParsing_ASTM(t *testing.T) {
+	// Arrange
+	input := "H/!*%"
+	target := HeaderRecord{}
+	// Act
+	nameOk, err := ParseLine(input, &target, createStructAnnotation("H"), 1, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.True(t, nameOk)
+	assert.Equal(t, "/", config.Delimiters.Field)
+	assert.Equal(t, "!", config.Delimiters.Repeat)
+	assert.Equal(t, "*", config.Delimiters.Component)
+	assert.Equal(t, "%", config.Delimiters.Escape)
+	// Teardown
+	teardown()
+}
+func TestParseLine_HeaderTooShort_ASTM(t *testing.T) {
+	// Arrange
+	input := `H|\^`
+	target := HeaderRecord{}
+	// Act
+	_, err := ParseLine(input, &target, createStructAnnotation("H"), 1, config)
+	// Assert
+	assert.EqualError(t, err, errmsg.ErrLineParsingHeaderTooShort.Error())
+}
+
+func TestParseLine_Header_HL7(t *testing.T) {
+	// Arrange
+	input := `MSH|^~\&|first`
+	target := HeaderRecord{}
+	// Act
+	nameOk, err := ParseLine(input, &target, createStructAnnotation("MSH"), 1, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.True(t, nameOk)
+	assert.Equal(t, "first", target.First)
+}
+func TestParseLine_HeaderDelimiterParsing_HL7(t *testing.T) {
+	// Arrange
+	input := "MSH/!*%?"
+	target := HeaderRecord{}
+	// Act
+	nameOk, err := ParseLine(input, &target, createStructAnnotation("MSH"), 1, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.True(t, nameOk)
+	assert.Equal(t, "/", configHL7.Delimiters.Field)
+	assert.Equal(t, "!", configHL7.Delimiters.Component)
+	assert.Equal(t, "*", configHL7.Delimiters.Repeat)
+	assert.Equal(t, "%", configHL7.Delimiters.Escape)
+	assert.Equal(t, "?", configHL7.Delimiters.SubComponent)
+	// Teardown
+	teardown()
+}
+func TestParseLine_HeaderTooShort_HL7(t *testing.T) {
+	// Arrange
+	input := `MSH|^~\`
+	target := HeaderRecord{}
+	// Act
+	_, err := ParseLine(input, &target, createStructAnnotation("MSH"), 1, configHL7)
+	// Assert
+	assert.EqualError(t, err, errmsg.ErrLineParsingHeaderTooShort.Error())
+}
+
+func TestParseLine_Escape_ASTM(t *testing.T) {
+	// Arrange
+	input := `R|1|esc&|ape`
+	target := SimpleRecord{}
+	// Act
+	_, err := ParseLine(input, &target, createStructAnnotation("R"), 1, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "esc|ape", target.First)
+}
+func TestParseLine_Escape_HL7(t *testing.T) {
+	// Arrange
+	input := `REC||esc\F\ape`
+	target := SimpleRecord{}
+	// Act
+	_, err := ParseLine(input, &target, createStructAnnotation("REC"), 1, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "esc|ape", target.First)
 }
