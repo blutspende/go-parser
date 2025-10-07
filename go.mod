@@ -3,9 +3,9 @@ module github.com/blutspende/go-parser
 go 1.24.3
 
 require (
-	github.com/blutspende/bloodlab-common v1.0.0
-	github.com/stretchr/testify v1.10.0
-	golang.org/x/text v0.25.0
+	github.com/blutspende/bloodlab-common v1.0.2
+	github.com/stretchr/testify v1.11.1
+	golang.org/x/text v0.29.0
 )
 
 require (
