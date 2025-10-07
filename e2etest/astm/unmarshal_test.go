@@ -1,4 +1,4 @@
-package e2e
+package astm
 
 import (
 	"testing"
@@ -6,9 +6,9 @@ import (
 
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/bloodlab-common/timezone"
-	"github.com/blutspende/go-astm/v3"
-	"github.com/blutspende/go-astm/v3/errmsg"
-	"github.com/blutspende/go-astm/v3/messages/astm/lis02a2"
+	"github.com/blutspende/go-parser"
+	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/messages/astm/lis02a2"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/encoding/charmap"
 )
@@ -27,7 +27,7 @@ func TestComponentMessage(t *testing.T) {
 	messageString := "C|1|First^Second|First^Second\n"
 	var message ComponentedTestMessage
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "First^Second", message.Componented.Combined)
@@ -49,7 +49,7 @@ func TestNoSequenceMessage(t *testing.T) {
 	var message NoSequenceMessage
 	config.EnforceSequenceNumberCheck = false
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "First", message.NoSeq.First)
@@ -69,7 +69,7 @@ func TestReadMinimalMessage(t *testing.T) {
 	messageString += "L|1|N\n"
 	var message MinimalMessage
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "Bio-Rad", message.Header.SenderNameOrID)
@@ -97,7 +97,7 @@ func TestFullSingleASTMMessage(t *testing.T) {
 	messageString += "L|1|N\n"
 	var message FullSingleASTMMessage
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "Testus", message.Patient.LastName)
@@ -140,7 +140,7 @@ func TestNestedStructure(t *testing.T) {
 	messageString += "L|1|N\r"
 	var message MessagePORC
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	// Patients have been read in an array
@@ -166,7 +166,7 @@ func TestCustomDelimiters(t *testing.T) {
 	messageString += "L|1|N\n"
 	var message MessageCustomDelimiterTest
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	// The delimiter is now "#" instead of "^"; this should have been recognized
@@ -195,7 +195,7 @@ func TestCustomRecord(t *testing.T) {
 	messageString += "L|1|N\r"
 	var message MessageWithOutOfStandardCustomRecord
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, float32(4.14159), message.CustomRecord.Float32Value)
@@ -230,7 +230,7 @@ func TestSubstructureArrayMapping(t *testing.T) {
 	messageString += "!|2|1^2^3\\4^5^6|\r"
 	var message MessageWithSubArrayRecord
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, message.Anonymous.Rec.SubstructureArray, 2)
@@ -274,7 +274,7 @@ func TestEnumEncoding(t *testing.T) {
 	messageString := "E|1|EnumValue1|\r"
 	var message UnmarshalEnumMessage
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, EnumValue1, message.Record.Value)
@@ -311,7 +311,7 @@ func TestComponentAccessOnTime(t *testing.T) {
 	messageString += "L|1|N\r"
 	var message MessageTimeAccess
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	location, err := timezone.EuropeBerlin.GetLocation()
@@ -344,7 +344,7 @@ func TestGermanLanguage_Windows1252(t *testing.T) {
 	config.Encoding = encoding.Windows1252
 	encodedMessageString := helperEncode(charmap.Windows1252, []byte(messageString))
 	// Act
-	err := astm.Unmarshal([]byte(encodedMessageString), &message, config)
+	err := parser.Unmarshal([]byte(encodedMessageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "König", message.Patient.LastName)
@@ -362,7 +362,7 @@ func TestGermanLanguage_ISO8859_1(t *testing.T) {
 	config.Encoding = encoding.ISO8859_1
 	encodedMessageString := helperEncode(charmap.ISO8859_1, []byte(messageString))
 	// Act
-	err := astm.Unmarshal([]byte(encodedMessageString), &message, config)
+	err := parser.Unmarshal([]byte(encodedMessageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "König", message.Patient.LastName)
@@ -378,7 +378,7 @@ func TestTransmissionWithoutLTerminator(t *testing.T) {
 	var message lis02a2.ResultMessage
 	config.Encoding = encoding.Windows1252
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.NotNil(t, err)
 	// Teardown
@@ -437,7 +437,7 @@ func TestMultiMessage(t *testing.T) {
 	messageString := multiMessage()
 	var message lis02a2.ResultMultiMessage
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.NotNil(t, message)
@@ -450,7 +450,7 @@ func TestMultiMessageWithSingleMessageInput(t *testing.T) {
 	messageString := multiMessage()
 	var message lis02a2.ResultMessage
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 }
@@ -464,7 +464,7 @@ func TestFailOnUndisciplinedMultipleCRCRatEndOfLine(t *testing.T) {
 	messageString += "L|1|N\u000d\u000d"
 	var message lis02a2.ResultMessage
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 }
@@ -483,7 +483,7 @@ func TestMultipleMessagesInOne(t *testing.T) {
 	messageString += "L|1|N\u000d\u000d"
 	var message lis02a2.ResultMultiMessage
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, message.ResultMessages, 2)
@@ -496,7 +496,7 @@ func TestNullValuesShouldGiveQualifiedError(t *testing.T) {
 	// Arrange
 	var message lis02a2.ResultMultiMessage
 	// Act
-	err := astm.Unmarshal(nil, &message, config)
+	err := parser.Unmarshal(nil, &message, config)
 	// Assert
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, errmsg.ErrLineProcessingEmptyInput.Error())
@@ -516,7 +516,7 @@ func TestUnmarshalMultipleOrdersAndResultsForOnePatient(t *testing.T) {
 	messageString += "L|1|N\r"
 	var message lis02a2.ResultMessage
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 }
@@ -549,7 +549,7 @@ func TestHoribaYumizenManufacturerRecordWithArray(t *testing.T) {
 	messageString += "L|1|N\n"
 	var message HoribaYumizenMessage
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"CLEANER", "DILUENT", "LYSE"}, message.Manufacturer.Reagents)
@@ -584,7 +584,7 @@ func TestUnmarshalSliceOfOneRecordType(t *testing.T) {
 		} `astm:"M"`
 	}{}
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(message.ImageData))
@@ -646,7 +646,7 @@ func TestYumizenMultiTypeManufacturerInfo(t *testing.T) {
 	var message YumizenResultMessage
 	config.EnforceSequenceNumberCheck = false
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, message.OrderResults, 1)
@@ -687,7 +687,7 @@ R|1|^^^ABOD&|Full&&Interp|B Pos|||||F||brentp||20060306164429|M0002
 L|1|N `
 	var message lis02a2.ResultMessage
 	// Act
-	err := astm.Unmarshal([]byte(messageString), &message, config)
+	err := parser.Unmarshal([]byte(messageString), &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "ABOD|Full&Interp", message.PatientGroups[0].OrderGroups[0].ResultGroups[0].Result.UniversalTestID.ManufacturersTestType)

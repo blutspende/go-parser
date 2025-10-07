@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blutspende/go-astm/v3/models"
-	"github.com/blutspende/go-astm/v3/parserconfig"
+	"github.com/blutspende/go-parser/models"
+	"github.com/blutspende/go-parser/parserconfig"
 )
 
 // Configuration structs for tests

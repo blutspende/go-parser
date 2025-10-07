@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blutspende/go-astm/v3/constants"
-	notationconst "github.com/blutspende/go-astm/v3/enums/notation"
-	"github.com/blutspende/go-astm/v3/errmsg"
-	"github.com/blutspende/go-astm/v3/models"
-	"github.com/blutspende/go-astm/v3/parserconfig"
+	"github.com/blutspende/go-parser/constants"
+	notationconst "github.com/blutspende/go-parser/enums/notation"
+	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/models"
+	"github.com/blutspende/go-parser/parserconfig"
 )
 
 func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int, config *parserconfig.Configuration) (result string, err error) {

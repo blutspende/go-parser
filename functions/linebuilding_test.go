@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blutspende/go-astm/v3/enums/notation"
-	"github.com/blutspende/go-astm/v3/errmsg"
+	"github.com/blutspende/go-parser/enums/notation"
+	"github.com/blutspende/go-parser/errmsg"
 	"github.com/stretchr/testify/assert"
 )
 

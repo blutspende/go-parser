@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blutspende/go-astm/v3/constants"
-	"github.com/blutspende/go-astm/v3/errmsg"
-	"github.com/blutspende/go-astm/v3/models"
+	"github.com/blutspende/go-parser/constants"
+	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/models"
 )
 
 func ParseAstmFieldAnnotation(input reflect.StructField) (result models.AstmFieldAnnotation, err error) {

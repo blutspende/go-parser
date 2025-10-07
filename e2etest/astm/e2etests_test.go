@@ -1,10 +1,10 @@
-package e2e
+package astm
 
 import (
 	"bytes"
 	"testing"
 
-	"github.com/blutspende/go-astm/v3/parserconfig"
+	"github.com/blutspende/go-parser/parserconfig"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
 )

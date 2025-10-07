@@ -2,7 +2,7 @@ package functions
 
 import (
 	"errors"
-	"github.com/blutspende/go-astm/v3/errmsg"
+	"github.com/blutspende/go-parser/errmsg"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

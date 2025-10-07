@@ -1,4 +1,4 @@
-module github.com/blutspende/go-astm/v3
+module github.com/blutspende/go-parser
 
 go 1.24.3
 

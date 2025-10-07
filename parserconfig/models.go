@@ -5,8 +5,8 @@ import (
 
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/bloodlab-common/timezone"
-	"github.com/blutspende/go-astm/v3/enums/lineseparator"
-	"github.com/blutspende/go-astm/v3/enums/notation"
+	"github.com/blutspende/go-parser/enums/lineseparator"
+	"github.com/blutspende/go-parser/enums/notation"
 )
 
 // Configuration struct for the whole process

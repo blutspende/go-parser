@@ -1,8 +1,8 @@
 package functions
 
 import (
-	"github.com/blutspende/go-astm/v3/constants"
-	"github.com/blutspende/go-astm/v3/errmsg"
+	"github.com/blutspende/go-parser/constants"
+	"github.com/blutspende/go-parser/errmsg"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"

@@ -1,4 +1,4 @@
-package e2e
+package astm
 
 import (
 	"fmt"
@@ -7,9 +7,9 @@ import (
 
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/bloodlab-common/timezone"
-	"github.com/blutspende/go-astm/v3"
-	"github.com/blutspende/go-astm/v3/enums/notation"
-	"github.com/blutspende/go-astm/v3/messages/astm/lis02a2"
+	"github.com/blutspende/go-parser"
+	"github.com/blutspende/go-parser/enums/notation"
+	"github.com/blutspende/go-parser/messages/astm/lis02a2"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/encoding/charmap"
 )
@@ -32,7 +32,7 @@ func TestMissingComponent(t *testing.T) {
 		},
 	}
 	// Act
-	lines, err := astm.Marshal(testMessage, config)
+	lines, err := parser.Marshal(testMessage, config)
 	// Assert
 	assert.Nil(t, err)
 	expectedResult := "M|1|First^Second|^Second"
@@ -69,7 +69,7 @@ func TestIllFormattedSubstructured(t *testing.T) {
 	message.Substruct.Well.FirstComp = "struct2-comp1"
 	message.Substruct.Well.SecondComp = "struct2-comp2"
 	// Act
-	lines, err := astm.Marshal(message, config)
+	lines, err := parser.Marshal(message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, lines, 3)
@@ -93,7 +93,7 @@ func TestGenerateSequence(t *testing.T) {
 	msg.Patient[1].LastName = "Secundus'"
 	msg.Patient[1].FirstName = "Secundie"
 	// Act
-	lines, err := astm.Marshal(msg, config)
+	lines, err := parser.Marshal(msg, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, lines, 4)
@@ -135,7 +135,7 @@ func TestNestedStruct(t *testing.T) {
 	msg.PatientResult[1].Result[0].MeasurementValueOfDevice = "present"
 	msg.PatientResult[1].Result[0].Units = "none"
 	// Act
-	lines, err := astm.Marshal(msg, config)
+	lines, err := parser.Marshal(msg, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, lines, 7)
@@ -161,7 +161,7 @@ func TestTimeLocalization(t *testing.T) {
 	timeInBerlin := time.Now().In(europeBerlin)
 	msg.Header.DateAndTime = testTime.UTC()
 	// Act
-	lines, err := astm.Marshal(msg, config)
+	lines, err := parser.Marshal(msg, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, fmt.Sprintf("H|\\^&||||||||||||%s", timeInBerlin.Format("20060102150405")), string(lines[0]))
@@ -184,7 +184,7 @@ func TestEnumMarshal(t *testing.T) {
 	var msg MarshalEnumMessage
 	msg.Record.Field = SomeTestMarshalEnum2
 	// Act
-	lines, err := astm.Marshal(msg, config)
+	lines, err := parser.Marshal(msg, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, lines, 1)
@@ -231,7 +231,7 @@ func TestFieldEnumeration(t *testing.T) {
 	var orq FieldEnumerationMessage
 	orq.Request.ActionCode = "N"
 	// Act
-	lines, err := astm.Marshal(orq, config)
+	lines, err := parser.Marshal(orq, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, lines, 1)
@@ -249,7 +249,7 @@ func TestGermanLanguageDecoder_Windows1252(t *testing.T) {
 	record.Patient.LastName = "Nügendiß"
 	config.Encoding = encoding.Windows1252
 	// Act
-	lines, err := astm.Marshal(record, config)
+	lines, err := parser.Marshal(record, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, lines, 1)
@@ -265,7 +265,7 @@ func TestGermanLanguageDecoder_ISO8859_1(t *testing.T) {
 	record.Patient.LastName = "Nügendiß"
 	config.Encoding = encoding.ISO8859_1
 	// Act
-	lines, err := astm.Marshal(record, config)
+	lines, err := parser.Marshal(record, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, lines, 1)
@@ -281,7 +281,7 @@ func TestMarshalOnlyEmptyHeader(t *testing.T) {
 	config.Encoding = encoding.ASCII
 	config.Notation = notation.Short
 	// Act
-	lines, err := astm.Marshal(message, config)
+	lines, err := parser.Marshal(message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.NotNil(t, lines)
@@ -293,7 +293,7 @@ func TestPointerInput(t *testing.T) {
 	// Arrange
 	var message HeaderMessage
 	// Act
-	_, err := astm.Marshal(&message, config)
+	_, err := parser.Marshal(&message, config)
 	// Assert
 	assert.Nil(t, err)
 }
@@ -303,7 +303,7 @@ func TestQueryMessageNoQueryData(t *testing.T) {
 	var query lis02a2.QueryMessage
 	query.Terminator.TerminatorCode = "N"
 	// Act
-	lines, err := astm.Marshal(query, config)
+	lines, err := parser.Marshal(query, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, lines, 2)
@@ -322,7 +322,7 @@ func TestQueryMessage(t *testing.T) {
 		},
 	}
 	// Act
-	lines, err := astm.Marshal(query, config)
+	lines, err := parser.Marshal(query, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "H|\\^&||||||||||||", string(lines[0]))
@@ -379,7 +379,7 @@ func TestMarshalMultipleOrder(t *testing.T) {
 	}
 	config.Notation = notation.Short
 	// Act
-	lines, err := astm.Marshal(msg, config)
+	lines, err := parser.Marshal(msg, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, lines, 8)
@@ -439,7 +439,7 @@ func TestShorthandOnStandardMessage(t *testing.T) {
 	config.Encoding = encoding.ASCII
 	config.Notation = notation.Short
 	// Act
-	lines, err := astm.Marshal(msg, config)
+	lines, err := parser.Marshal(msg, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, lines, 6)
@@ -496,7 +496,7 @@ func TestEmbeddedStructsAndArrays(t *testing.T) {
 	config.Encoding = encoding.UTF8
 	config.TimeZone = timezone.UTC
 	// Act
-	lines, err := astm.Marshal(message, config)
+	lines, err := parser.Marshal(message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "M|1|REAGENT|CLEANER\\DILUENT\\LYSE|240415I1(^20240902000000^20241202\\240423H1(^20240905000000^20250305\\240411M11^20240828000000^20241028", string(lines[0]))
@@ -528,7 +528,7 @@ func TestEmbeddedStructsAndArraysShortNotation(t *testing.T) {
 	config.TimeZone = timezone.UTC
 	config.Notation = notation.Short
 	// Act
-	lines, err := astm.Marshal(message, config)
+	lines, err := parser.Marshal(message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "M|1|REAGENT|DILUENT\\LYSE", string(lines[0]))
@@ -582,7 +582,7 @@ func TestCustomDecimalLengthAnnotation(t *testing.T) {
 	config.TimeZone = timezone.UTC
 	config.Notation = notation.Short
 	// Act
-	lines, err := astm.Marshal(message, config)
+	lines, err := parser.Marshal(message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "D|1|0.3457|0.4|0.1234567^0.98^0.234^0.345\\0.9900000^0.11^0.223^0.334", string(lines[0]))
@@ -612,7 +612,7 @@ func TestEscapedCharactersMessageMarshal(t *testing.T) {
 	config.Notation = notation.Short
 	config.EscapeOutputStrings = true
 	// Act
-	lines, err := astm.Marshal(message, config)
+	lines, err := parser.Marshal(message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "R|1|^^^ABOD&|Full&&Interp|B Pos|||||F||brentp|||M0002", string(lines[1]))

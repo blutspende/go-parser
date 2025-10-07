@@ -1,9 +1,9 @@
-package astm
+package parser
 
 import (
 	"github.com/blutspende/bloodlab-common/encoding"
-	"github.com/blutspende/go-astm/v3/functions"
-	"github.com/blutspende/go-astm/v3/parserconfig"
+	"github.com/blutspende/go-parser/functions"
+	"github.com/blutspende/go-parser/parserconfig"
 )
 
 func Unmarshal(messageData []byte, targetStruct interface{}, config *parserconfig.Configuration) (err error) {

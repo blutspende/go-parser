@@ -1,12 +1,12 @@
-package astm
+package parser
 
 import (
 	"regexp"
 
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/bloodlab-common/messagetype"
-	"github.com/blutspende/go-astm/v3/functions"
-	"github.com/blutspende/go-astm/v3/parserconfig"
+	"github.com/blutspende/go-parser/functions"
+	"github.com/blutspende/go-parser/parserconfig"
 )
 
 func IdentifyMessage(messageData []byte, config *parserconfig.Configuration) (messageType messagetype.MessageType, err error) {

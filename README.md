@@ -1,7 +1,7 @@
 # go-astm
 Library for handling the ASTM protocol in Go.
 ###### Install
-`go get github.com/blutspende/go-astm/v3`
+`go get github.com/blutspende/go-parser`
 
 # Features
   - Marshalling and unmarshalling of ASTM messages
@@ -118,7 +118,7 @@ The `NewDefaultConfiguration` function returns a copy of the default configurati
 Identifies the type of message without decoding it. Return values are options from `github.com/blutspende/bloodlab-common/messagetype` enum definitions. Currently, there are 3 valid types and unidentified as possible return values.
 It can be used for example as follows:
 ``` go
-messageType, err := astm.IdentifyMessage([]byte(astm), config)
+messageType, err := parser.IdentifyMessage([]byte(astm), config)
 if err != nil {
     log.Fatal(err)
 }
@@ -138,7 +138,7 @@ switch (messageType) {
 The following Go code decodes an ASTM message provided as a string and stores all its information in the message structure.
 ``` go
 var message lis02a2.ResultMessage
-err := astm.Unmarshal([]byte(textdata), &message, config)
+err := parser.Unmarshal([]byte(textdata), &message, config)
 if err != nil {
   log.Fatal(err)		
 }
@@ -146,7 +146,7 @@ if err != nil {
 The Unmarshal can also be used for multiple messages, providing a multi-message structure like `ResultMultiMessage`:
 ``` go
   var message lis02a2.ResultMultiMessage
-  astm.Unmarshal([]byte(textdata), &message, config)
+  parser.Unmarshal([]byte(textdata), &message, config)
   for _, message := range message.ResultMessages {
 	fmt.Printf("%+v", message)
   }
@@ -155,7 +155,7 @@ The Unmarshal can also be used for multiple messages, providing a multi-message 
 ## Writing an ASTM message: Marshal
 Marshal converts an annotated structure to an encoded array of byte arrays. Each element represents a line of the message, and thus has no line break at the end.
 ``` go
-lines, err := astm.Marshal(message, config)
+lines, err := parser.Marshal(message, config)
 if err != nil {
   log.Fatal(err)		
 }
