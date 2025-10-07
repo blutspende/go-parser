@@ -1,0 +1,61 @@
+package hl7v23
+
+import "time"
+
+type GT1 struct {
+	SetId                         string    `hl7:"1" json:"setId,omitempty"`
+	Number                        CX        `hl7:"2" json:"number,omitempty"`
+	Name                          []XPN     `hl7:"3" json:"name,omitempty"`
+	SpouseName                    []XPN     `hl7:"4" json:"spouseName,omitempty"`
+	Address                       []XAD     `hl7:"5" json:"address,omitempty"`
+	PhoneNumberHome               []XTN     `hl7:"6" json:"phoneNumberHome,omitempty"`
+	PhoneNumberBusiness           []XTN     `hl7:"7" json:"phoneNumberBusiness,omitempty"`
+	DateTimeOfBirth               time.Time `hl7:"8,shortdate" json:"dateTimeOfBirth,omitempty"`
+	Sex                           string    `hl7:"9" json:"sex,omitempty"`
+	Type                          string    `hl7:"10" json:"type,omitempty"`
+	Relationship                  string    `hl7:"11" json:"relationship,omitempty"`
+	SSN                           string    `hl7:"12" json:"ssn,omitempty"`
+	DateBegin                     time.Time `hl7:"13,shortdate" json:"dateBegin,omitempty"`
+	DateEnd                       time.Time `hl7:"14,shortdate" json:"dateEnd,omitempty"`
+	Priority                      float32   `hl7:"15" json:"priority,omitempty"`
+	Employer                      []XPN     `hl7:"16" json:"employer,omitempty"`
+	EmployerAddress               []XAD     `hl7:"17" json:"employerAddress,omitempty"`
+	EmployerPhoneNumber           []XTN     `hl7:"18" json:"employerPhoneNumber,omitempty"`
+	EmployeeID                    CX        `hl7:"19" json:"employeeID,omitempty"`
+	EmploymentStatus              string    `hl7:"20" json:"employmentStatus,omitempty"`
+	Organization                  []XON     `hl7:"21" json:"organization,omitempty"`
+	BillingHoldFlag               string    `hl7:"22" json:"billingHoldFlag,omitempty"`
+	CreditRatingCode              CE        `hl7:"23" json:"creditRatingCode,omitempty"`
+	DeathDateAndTime              time.Time `hl7:"24,longdate" json:"deathDateAndTime,omitempty"`
+	DeathFlag                     string    `hl7:"25" json:"deathFlag,omitempty"`
+	ChargeAdjustmentCode          CE        `hl7:"26" json:"chargeAdjustmentCode,omitempty"`
+	HouseholdAnnualIncome         CP        `hl7:"27" json:"householdAnnualIncome,omitempty"`
+	HouseholdSize                 float32   `hl7:"28" json:"householdSize,omitempty"`
+	EmployerIDNumber              []CX      `hl7:"29" json:"employerIDNumber,omitempty"`
+	MaritalStatusCode             string    `hl7:"30" json:"maritalStatusCode,omitempty"`
+	HireEffectiveDate             time.Time `hl7:"31,shortdate" json:"hireEffectiveDate,omitempty"`
+	EmploymentStopDAte            time.Time `hl7:"32,shortdate" json:"employmentStopDAte,omitempty"`
+	LivingDependency              string    `hl7:"33" json:"livingDependency,omitempty"`
+	AmbulatoryStatusCode          string    `hl7:"34" json:"ambulatoryStatusCode,omitempty"`
+	Citizenship                   string    `hl7:"35" json:"citizenship,omitempty"`
+	PrimaryLanguage               CE        `hl7:"36" json:"primaryLanguage,omitempty"`
+	LivingArrangement             string    `hl7:"37" json:"livingArrangement,omitempty"`
+	PublicityIndicator            CE        `hl7:"38" json:"publicityIndicator,omitempty"`
+	ProtectionIndicator           string    `hl7:"39" json:"protectionIndicator,omitempty"`
+	StudentIndicator              string    `hl7:"40" json:"studentIndicator,omitempty"`
+	Religion                      string    `hl7:"41" json:"religion,omitempty"`
+	MothersMaidenName             XPN       `hl7:"42" json:"mothersMaidenName,omitempty"`
+	NationalityCode               CE        `hl7:"43" json:"nationalityCode,omitempty"`
+	EthnicGroup                   string    `hl7:"44" json:"ethnicGroup,omitempty"`
+	ContactPersonsName            []XPN     `hl7:"45" json:"contactPersonsName,omitempty"`
+	ContactPersonsTelephoneNumber []XTN     `hl7:"46" json:"contactPersonsTelephoneNumber,omitempty"`
+	ContactReason                 CE        `hl7:"47" json:"contactReason,omitempty"`
+	ContactRelationshipCode       string    `hl7:"48" json:"contactRelationshipCode,omitempty"`
+	JobTitle                      string    `hl7:"49" json:"jobTitle,omitempty"`
+	JobCode                       JCC       `hl7:"50" json:"jobCode,omitempty"`
+	EmployersOrganizationName     []XON     `hl7:"51" json:"employersOrganizationName,omitempty"`
+	Handicap                      string    `hl7:"52" json:"handicap,omitempty"`
+	JobStatus                     string    `hl7:"53" json:"jobStatus,omitempty"`
+	FinancialClass                FC        `hl7:"54" json:"financialClass,omitempty"`
+	GuarantorRace                 string    `hl7:"55" json:"guarantorRace,omitempty"`
+}

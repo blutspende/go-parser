@@ -3,11 +3,12 @@ package functions
 import (
 	"github.com/blutspende/go-astm/v3/enums/lineseparator"
 	"github.com/blutspende/go-astm/v3/errmsg"
-	"github.com/blutspende/go-astm/v3/models/astmmodels"
+	"github.com/blutspende/go-astm/v3/parserconfig"
+
 	"strings"
 )
 
-func SliceLines(input string, config *astmmodels.Configuration) (output []string, err error) {
+func SliceLines(input string, config *parserconfig.Configuration) (output []string, err error) {
 	// Check for empty input
 	if input == "" {
 		return nil, errmsg.ErrLineProcessingEmptyInput
@@ -63,7 +64,7 @@ func SliceLines(input string, config *astmmodels.Configuration) (output []string
 	return output, nil
 }
 
-func BuildLines(input []string, config *astmmodels.Configuration) (output string) {
+func BuildLines(input []string, config *parserconfig.Configuration) (output string) {
 	linebreak := lineseparator.LF
 	if config.LineSeparator != "" && !config.AutoDetectLineSeparator {
 		linebreak = config.LineSeparator

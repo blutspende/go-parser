@@ -5,20 +5,19 @@ import (
 	"time"
 
 	"github.com/blutspende/go-astm/v3/models"
-	"github.com/blutspende/go-astm/v3/models/astmmodels"
-	"github.com/blutspende/go-astm/v3/utils"
+	"github.com/blutspende/go-astm/v3/parserconfig"
 )
 
 // Configuration structs for tests
-var config *astmmodels.Configuration
-var configHL7 *astmmodels.Configuration
+var config *parserconfig.Configuration
+var configHL7 *parserconfig.Configuration
 
 // Reset configs to default values
 func teardown() {
-	config = utils.NewDefaultConfiguration(astmmodels.ASTM)
-	_ = utils.InitConfig(config)
-	configHL7 = utils.NewDefaultConfiguration(astmmodels.HL7)
-	_ = utils.InitConfig(configHL7)
+	config = parserconfig.NewDefaultConfiguration(parserconfig.ASTM)
+	_ = parserconfig.InitConfig(config)
+	configHL7 = parserconfig.NewDefaultConfiguration(parserconfig.HL7)
+	_ = parserconfig.InitConfig(configHL7)
 }
 
 // Setup mock data for every test

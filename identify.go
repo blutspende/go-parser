@@ -6,13 +6,12 @@ import (
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/bloodlab-common/messagetype"
 	"github.com/blutspende/go-astm/v3/functions"
-	"github.com/blutspende/go-astm/v3/models/astmmodels"
-	"github.com/blutspende/go-astm/v3/utils"
+	"github.com/blutspende/go-astm/v3/parserconfig"
 )
 
-func IdentifyMessage(messageData []byte, config *astmmodels.Configuration) (messageType messagetype.MessageType, err error) {
+func IdentifyMessage(messageData []byte, config *parserconfig.Configuration) (messageType messagetype.MessageType, err error) {
 	// Init configuration
-	err = utils.InitConfig(config)
+	err = parserconfig.InitConfig(config)
 	if err != nil {
 		return "", err
 	}

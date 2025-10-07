@@ -3,13 +3,15 @@ package functions
 import (
 	"errors"
 	"fmt"
+
 	"github.com/blutspende/go-astm/v3/constants"
 	"github.com/blutspende/go-astm/v3/errmsg"
-	"github.com/blutspende/go-astm/v3/models/astmmodels"
+	"github.com/blutspende/go-astm/v3/parserconfig"
+
 	"reflect"
 )
 
-func ParseStruct(inputLines []string, targetStruct interface{}, lineIndex *int, sequenceNumber int, depth int, config *astmmodels.Configuration) (err error) {
+func ParseStruct(inputLines []string, targetStruct interface{}, lineIndex *int, sequenceNumber int, depth int, config *parserconfig.Configuration) (err error) {
 	// Check for maximum depth
 	if depth >= constants.MaxDepth {
 		return errmsg.ErrStructureParsingMaxDepthReached

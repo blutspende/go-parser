@@ -1,4 +1,4 @@
-package astmmodels
+package parserconfig
 
 import (
 	"time"

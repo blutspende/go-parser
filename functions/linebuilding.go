@@ -13,10 +13,10 @@ import (
 	notationconst "github.com/blutspende/go-astm/v3/enums/notation"
 	"github.com/blutspende/go-astm/v3/errmsg"
 	"github.com/blutspende/go-astm/v3/models"
-	"github.com/blutspende/go-astm/v3/models/astmmodels"
+	"github.com/blutspende/go-astm/v3/parserconfig"
 )
 
-func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int, config *astmmodels.Configuration) (result string, err error) {
+func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int, config *parserconfig.Configuration) (result string, err error) {
 	// Process the target structure
 	sourceTypes, sourceValues, sourceTypesLength, err := ProcessStructReflection(sourceStruct)
 	if err != nil {
@@ -141,7 +141,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 	return result, nil
 }
 
-func buildSubstructure(sourceStruct interface{}, config *astmmodels.Configuration) (result string, err error) {
+func buildSubstructure(sourceStruct interface{}, config *parserconfig.Configuration) (result string, err error) {
 	// Process the target structure
 	sourceTypes, sourceValues, sourceTypesLength, err := ProcessStructReflection(sourceStruct)
 	if err != nil {
@@ -204,7 +204,7 @@ func constructResult(fieldMap map[int]string, delimiter string, notation string)
 	return result
 }
 
-func convertField(field reflect.Value, annotation models.AstmFieldAnnotation, config *astmmodels.Configuration) (result string, err error) {
+func convertField(field reflect.Value, annotation models.AstmFieldAnnotation, config *parserconfig.Configuration) (result string, err error) {
 	// Check if the field is a pointer, nil returns empty, otherwise dereference it
 	if field.Kind() == reflect.Ptr {
 		if field.IsNil() {
@@ -272,7 +272,7 @@ func convertField(field reflect.Value, annotation models.AstmFieldAnnotation, co
 	return "", errmsg.ErrLineBuildingUsupportedDataType
 }
 
-func buildStringEscapeChars(input string, config *astmmodels.Configuration) string {
+func buildStringEscapeChars(input string, config *parserconfig.Configuration) string {
 	var builder strings.Builder
 	inputRunes := []rune(input)
 	for i := 0; i < len(inputRunes); i++ {
@@ -287,7 +287,7 @@ func buildStringEscapeChars(input string, config *astmmodels.Configuration) stri
 	return builder.String()
 }
 
-func buildHL7EscapeChars(input string, config *astmmodels.Configuration) string {
+func buildHL7EscapeChars(input string, config *parserconfig.Configuration) string {
 	var builder strings.Builder
 	inputRunes := []rune(input)
 	esc := string(config.Delimiters.Escape[0])

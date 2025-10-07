@@ -11,10 +11,10 @@ import (
 	"github.com/blutspende/go-astm/v3/constants"
 	"github.com/blutspende/go-astm/v3/errmsg"
 	"github.com/blutspende/go-astm/v3/models"
-	"github.com/blutspende/go-astm/v3/models/astmmodels"
+	"github.com/blutspende/go-astm/v3/parserconfig"
 )
 
-func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation models.AstmStructAnnotation, sequenceNumber int, config *astmmodels.Configuration) (nameOk bool, err error) {
+func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation models.AstmStructAnnotation, sequenceNumber int, config *parserconfig.Configuration) (nameOk bool, err error) {
 	// Check for input line length
 	if len(inputLine) == 0 {
 		return false, errmsg.ErrLineParsingEmptyInput
@@ -25,7 +25,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	splitStart := 0
 
 	// Handle header special case
-	if config.Protocol == astmmodels.ASTM && inputLine[0] == 'H' {
+	if config.Protocol == parserconfig.ASTM && inputLine[0] == 'H' {
 		// Check if the inputLine is long enough to contain delimiters
 		if len(inputLine) < 5 {
 			return false, errmsg.ErrLineParsingHeaderTooShort
@@ -38,7 +38,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		// Place the fix segment into the inputFields
 		inputFields = []string{inputLine[0:1], inputLine[1:5]}
 		splitStart = 6
-	} else if config.Protocol == astmmodels.HL7 && inputLine[0:3] == "MSH" {
+	} else if config.Protocol == parserconfig.HL7 && inputLine[0:3] == "MSH" {
 		// Check if the inputLine is long enough to contain delimiters
 		if len(inputLine) < 8 {
 			return false, errmsg.ErrLineParsingHeaderTooShort
@@ -80,7 +80,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	}
 
 	// Check for validity of the sequence number (error only if enforced)
-	if config.Protocol == astmmodels.ASTM && inputFields[1] != strconv.Itoa(sequenceNumber) && inputLine[0] != 'H' && config.EnforceSequenceNumberCheck {
+	if config.Protocol == parserconfig.ASTM && inputFields[1] != strconv.Itoa(sequenceNumber) && inputLine[0] != 'H' && config.EnforceSequenceNumberCheck {
 		//TODO: implement sequence number checking for HL7 too
 		return true, errmsg.ErrLineParsingSequenceNumberMismatch
 	}
@@ -185,9 +185,9 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	return true, nil
 }
 
-func parseSubstructure(inputString string, targetStruct interface{}, depth int, config *astmmodels.Configuration) (err error) {
+func parseSubstructure(inputString string, targetStruct interface{}, depth int, config *parserconfig.Configuration) (err error) {
 	// Check depth limits
-	if (config.Protocol == astmmodels.ASTM && depth > 1) || (config.Protocol == astmmodels.HL7 && depth > 2) {
+	if (config.Protocol == parserconfig.ASTM && depth > 1) || (config.Protocol == parserconfig.HL7 && depth > 2) {
 		return errmsg.ErrLineParsingMaximumRecursionDepthExceeded
 	}
 
@@ -251,7 +251,7 @@ func parseSubstructure(inputString string, targetStruct interface{}, depth int, 
 	return nil
 }
 
-func setField(value string, field reflect.Value, annotation models.AstmFieldAnnotation, config *astmmodels.Configuration) (err error) {
+func setField(value string, field reflect.Value, annotation models.AstmFieldAnnotation, config *parserconfig.Configuration) (err error) {
 	// Ensure the field is settable
 	if !field.CanSet() {
 		// Field is not settable
@@ -261,9 +261,9 @@ func setField(value string, field reflect.Value, annotation models.AstmFieldAnno
 	switch field.Kind() {
 	case reflect.String:
 		escaped := value
-		if config.Protocol == astmmodels.ASTM {
+		if config.Protocol == parserconfig.ASTM {
 			escaped = filterStringEscapeChars(value, config.Delimiters.Escape)
-		} else if config.Protocol == astmmodels.HL7 {
+		} else if config.Protocol == parserconfig.HL7 {
 			escaped, err = replaceHL7Escapes(value, config)
 			if err != nil {
 				return err
@@ -329,10 +329,10 @@ func setField(value string, field reflect.Value, annotation models.AstmFieldAnno
 	return errmsg.ErrLineParsingUnsupportedDataType
 }
 
-func splitStringWithEscape(input string, delimiter string, config *astmmodels.Configuration) (result []string) {
+func splitStringWithEscape(input string, delimiter string, config *parserconfig.Configuration) (result []string) {
 	inputRunes := []rune(input)
 	delimiterRune := rune(delimiter[0])
-	if config.Protocol == astmmodels.ASTM {
+	if config.Protocol == parserconfig.ASTM {
 		escapeRune := rune(config.Delimiters.Escape[0])
 		start := 0
 		for i := 0; i < len(inputRunes); i++ {
@@ -348,7 +348,7 @@ func splitStringWithEscape(input string, delimiter string, config *astmmodels.Co
 				continue
 			}
 		}
-	} else if config.Protocol == astmmodels.HL7 {
+	} else if config.Protocol == parserconfig.HL7 {
 		result = strings.Split(input, delimiter)
 	}
 	return result
@@ -371,7 +371,7 @@ func filterStringEscapeChars(input string, escape string) string {
 	return builder.String()
 }
 
-func replaceHL7Escapes(input string, config *astmmodels.Configuration) (result string, err error) {
+func replaceHL7Escapes(input string, config *parserconfig.Configuration) (result string, err error) {
 	var builder strings.Builder
 	escapeRune := rune(config.Delimiters.Escape[0])
 	inputRunes := []rune(input)

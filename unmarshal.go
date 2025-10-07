@@ -3,13 +3,12 @@ package astm
 import (
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/go-astm/v3/functions"
-	"github.com/blutspende/go-astm/v3/models/astmmodels"
-	"github.com/blutspende/go-astm/v3/utils"
+	"github.com/blutspende/go-astm/v3/parserconfig"
 )
 
-func Unmarshal(messageData []byte, targetStruct interface{}, config *astmmodels.Configuration) (err error) {
+func Unmarshal(messageData []byte, targetStruct interface{}, config *parserconfig.Configuration) (err error) {
 	// Init configuration
-	err = utils.InitConfig(config)
+	err = parserconfig.InitConfig(config)
 	if err != nil {
 		return err
 	}

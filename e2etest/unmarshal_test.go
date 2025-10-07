@@ -8,7 +8,7 @@ import (
 	"github.com/blutspende/bloodlab-common/timezone"
 	"github.com/blutspende/go-astm/v3"
 	"github.com/blutspende/go-astm/v3/errmsg"
-	"github.com/blutspende/go-astm/v3/models/messageformat/lis02a2"
+	"github.com/blutspende/go-astm/v3/messages/astm/lis02a2"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/encoding/charmap"
 )

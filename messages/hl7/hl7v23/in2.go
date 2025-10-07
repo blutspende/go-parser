@@ -1,0 +1,80 @@
+package hl7v23
+
+import "time"
+
+// IN2 - Insurance additional info
+// https://hl7-definition.caristix.com/v2/HL7v2.3/Segments/IN2
+type IN2 struct {
+	InsuredEmployeeID                    []CX        `hl7:"1" json:"insuredEmployeeID,omitempty"`
+	InsuredSSN                           string      `hl7:"2" json:"insuredSSN,omitempty"`
+	InsuredEmployerName                  []XCN       `hl7:"3" json:"insuredEmployerName,omitempty"`
+	EmployerInformationData              string      `hl7:"4" json:"employerInformationData,omitempty"`
+	MailClaimParty                       []string    `hl7:"5" json:"mailClaimParty,omitempty"`
+	MedicareHealthInsCardNumber          string      `hl7:"6" json:"medicareHealthInsCardNumber,omitempty"`
+	MedicalCaseName                      []XPN       `hl7:"7" json:"medicalCaseName,omitempty"`
+	MedicalCaseNumber                    string      `hl7:"8" json:"medicalCaseNumber,omitempty"`
+	ChampusSponsorName                   []XPN       `hl7:"9" json:"champusSponsorName,omitempty"`
+	ChampusID                            string      `hl7:"10" json:"champusID,omitempty"`
+	DependentOfChampusRecipient          CE          `hl7:"11" json:"dependentOfChampusRecipient,omitempty"`
+	ChampusOrganization                  string      `hl7:"12" json:"champusOrganization,omitempty"`
+	ChampusStation                       string      `hl7:"13" json:"champusStation,omitempty"`
+	ChampusService                       string      `hl7:"14" json:"champusService,omitempty"`
+	ChampusRank                          string      `hl7:"15" json:"champusRank,omitempty"`
+	ChampusStatus                        string      `hl7:"16" json:"champusStatus,omitempty"`
+	ChampusRetireDate                    time.Time   `hl7:"17,shortdate" json:"champusRetireDate,omitempty"`
+	ChampusNonAvailCertOnFile            string      `hl7:"18" json:"champusNonAvailCertOnFile,omitempty"`
+	BabyCoverage                         string      `hl7:"19" json:"babyCoverage,omitempty"`
+	CombineBabyBill                      string      `hl7:"20" json:"combineBabyBill,omitempty"`
+	BloodDeductible                      string      `hl7:"21" json:"bloodDeductible,omitempty"`
+	SpecialCoverageApprovalName          []XPN       `hl7:"22" json:"specialCoverageApprovalName,omitempty"`
+	SpecialCoverageApprovalTitle         string      `hl7:"23" json:"specialCoverageApprovalTitle,omitempty"`
+	NonCoveredInsuranceCode              []string    `hl7:"24" json:"nonCoveredInsuranceCode,omitempty"`
+	PayorID                              []CX        `hl7:"25" json:"payorID,omitempty"`
+	PayorSubscriberID                    []CX        `hl7:"26" json:"payorSubscriberID,omitempty"`
+	EligibilitySource                    string      `hl7:"27" json:"eligibilitySource,omitempty"`
+	RoomCoverageType                     []CM_RMC    `hl7:"28" json:"roomCoverageType,omitempty"`
+	PolicyTypeAmount                     []CM_PTA    `hl7:"29" json:"policyTypeAmount,omitempty"`
+	DailyDeductible                      CM_DDI      `hl7:"30" json:"dailyDeductible,omitempty"`
+	LivingDependency                     string      `hl7:"31" json:"livingDependency,omitempty"`
+	AmbulatoryStatus                     string      `hl7:"32" json:"ambulatoryStatus,omitempty"`
+	Citizenship                          string      `hl7:"33" json:"citizenship,omitempty"`
+	PrimaryLanguage                      CE          `hl7:"34" json:"primaryLanguage,omitempty"`
+	LivingArrangement                    string      `hl7:"35" json:"livingArrangement,omitempty"`
+	PublicityIndicator                   CE          `hl7:"36" json:"publicityIndicator,omitempty"`
+	ProtectionIndicator                  string      `hl7:"37" json:"protectionIndicator,omitempty"`
+	StudentIndicator                     string      `hl7:"38" json:"studentIndicator,omitempty"`
+	Religion                             string      `hl7:"39" json:"religion,omitempty"`
+	MothersMaidenName                    XPN         `hl7:"40" json:"mothersMaidenName,omitempty"`
+	NationalityCode                      CE          `hl7:"41" json:"nationalityCode,omitempty"`
+	EthnicGroup                          string      `hl7:"42" json:"ethnicGroup,omitempty"`
+	MaritalStatus                        []string    `hl7:"43" json:"maritalStatus,omitempty"`
+	EmploymentStartDate                  time.Time   `hl7:"44,shortdate" json:"employmentStartDate,omitempty"`
+	EmploymentStopDate                   time.Time   `hl7:"45,shortdate" json:"employmentStopDate,omitempty"`
+	JobTitle                             string      `hl7:"46" json:"jobTitle,omitempty"`
+	JobCode                              JCC         `hl7:"47" json:"jobCode,omitempty"`
+	JobStatus                            string      `hl7:"48" json:"jobStatus,omitempty"`
+	EmployerContactPersonName            []XPN       `hl7:"49" json:"employerContactPersonName,omitempty"`
+	EmployerContactPersonPhone           []XTN       `hl7:"50" json:"employerContactPersonPhone,omitempty"`
+	EmployerContactReason                string      `hl7:"51" json:"employerContactReason,omitempty"`
+	InsuredContactPersonName             []XPN       `hl7:"52" json:"insuredContactPersonName,omitempty"`
+	InsuredContactPersonTelephone        []XTN       `hl7:"53" json:"insuredContactPersonTelephone,omitempty"`
+	InsuredContactPersonReason           []string    `hl7:"54" json:"insuredContactPersonReason,omitempty"`
+	RelationshipToThePatientStartDate    time.Time   `hl7:"55,shortdate" json:"relationshipToThePatientStartDate,omitempty"`
+	RelationshipToThePatientStopDate     []time.Time `hl7:"56,shortdate" json:"relationshipToThePatientStopDate,omitempty"`
+	InsuranceCompanyContactReason        string      `hl7:"57" json:"insuranceCompanyContactReason,omitempty"`
+	InsuranceCompanyContactPhone         XTN         `hl7:"58" json:"insuranceCompanyContactPhone,omitempty"`
+	PolicyScope                          string      `hl7:"59" json:"policyScope,omitempty"`
+	PolicySource                         string      `hl7:"60" json:"policySource,omitempty"`
+	PatientMemberNumber                  CX          `hl7:"61" json:"patientMemberNumber,omitempty"`
+	GuarantorRelationshipToInsured       string      `hl7:"62" json:"guarantorRelationshipToInsured,omitempty"`
+	InsuredsTelephoneNumberHome          []XTN       `hl7:"63" json:"insuredsTelephoneNumberHome,omitempty"`
+	InsuredEmployerTelephoneNumber       []XTN       `hl7:"64" json:"insuredEmployerTelephoneNumber,omitempty"`
+	MilitaryHandicappedProgram           CE          `hl7:"65" json:"militaryHandicappedProgram,omitempty"`
+	SuspendFlag                          string      `hl7:"66" json:"suspendFlag,omitempty"`
+	CopayLimitFlag                       string      `hl7:"67" json:"copayLimitFlag,omitempty"`
+	StoplossLimitFlag                    string      `hl7:"68" json:"stoplossLimitFlag,omitempty"`
+	InsuredOrganizationNameAndID         []XON       `hl7:"69" json:"insuredOrganizationNameAndID,omitempty"`
+	InsuredEmployerOrganizationNameAndID []XON       `hl7:"70" json:"insuredEmployerOrganizationNameAndID,omitempty"`
+	Race                                 string      `hl7:"71" json:"race,omitempty"`
+	PatientRelationshipToInsured         CE          `hl7:"72" json:"patientRelationshipToInsured,omitempty"`
+}

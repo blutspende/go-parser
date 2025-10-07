@@ -4,19 +4,18 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/blutspende/go-astm/v3/models/astmmodels"
-	"github.com/blutspende/go-astm/v3/utils"
+	"github.com/blutspende/go-astm/v3/parserconfig"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
 )
 
 // Configuration struct for tests
-var config *astmmodels.Configuration
+var config *parserconfig.Configuration
 
 // Reset config to default values
 func teardown() {
-	config = utils.NewDefaultConfiguration(astmmodels.ASTM)
-	_ = utils.InitConfig(config)
+	config = parserconfig.NewDefaultConfiguration(parserconfig.ASTM)
+	_ = parserconfig.InitConfig(config)
 }
 
 // Setup default config and run all tests
