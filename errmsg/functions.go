@@ -2,11 +2,6 @@ package errmsg
 
 import "errors"
 
-// Encoding
-var (
-	ErrEncodingInvalidEncoding = errors.New("invalid encoding")
-)
-
 // Lining
 var (
 	ErrLineProcessingEmptyInput       = errors.New("empty input")
