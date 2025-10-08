@@ -1,17 +1,14 @@
 package parser
 
 import (
-	"errors"
 	"regexp"
 
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/bloodlab-common/messagetype"
+	"github.com/blutspende/go-parser/errmsg"
 	"github.com/blutspende/go-parser/functions"
-	"github.com/blutspende/go-parser/models"
 	"github.com/blutspende/go-parser/parserconfig"
 )
-
-var ErrIdentifyMessageWrongProtocol = errors.New("protocol mismatch between function and configuration")
 
 func IdentifyMessageASTM(messageData []byte, config *parserconfig.Configuration) (messageType messagetype.MessageType, err error) {
 	// Init configuration
@@ -21,7 +18,7 @@ func IdentifyMessageASTM(messageData []byte, config *parserconfig.Configuration)
 	}
 	// Check for correct protocol
 	if config.Protocol != parserconfig.ASTM {
-		return "", ErrIdentifyMessageWrongProtocol
+		return "", errmsg.ErrIdentifyMessageWrongProtocol
 	}
 	// Convert encoding to UTF8
 	utf8Data, err := encoding.ConvertFromEncodingToUtf8(messageData, config.Encoding)
@@ -61,11 +58,6 @@ func IdentifyMessageASTM(messageData []byte, config *parserconfig.Configuration)
 	return messagetype.Unidentified, err
 }
 
-type hl7Header struct {
-	messageType     string `hl7:"8"`
-	protocolVersion string `hl7:"11"`
-}
-
 func IdentifyMessageHL7(messageData []byte, config *parserconfig.Configuration) (messageType string, protocolVersion string, err error) {
 	// Init configuration
 	err = parserconfig.InitConfig(config)
@@ -74,7 +66,7 @@ func IdentifyMessageHL7(messageData []byte, config *parserconfig.Configuration) 
 	}
 	// Check for correct protocol
 	if config.Protocol != parserconfig.HL7 {
-		return "", "", ErrIdentifyMessageWrongProtocol
+		return "", "", errmsg.ErrIdentifyMessageWrongProtocol
 	}
 	// Convert encoding to UTF8
 	utf8Data, err := encoding.ConvertFromEncodingToUtf8(messageData, config.Encoding)
@@ -86,17 +78,28 @@ func IdentifyMessageHL7(messageData []byte, config *parserconfig.Configuration) 
 	if err != nil {
 		return "", "", err
 	}
-	// Parse the MSH segment as a single header line
-	var header hl7Header
-	annotation := models.StructAnnotation{
-		StructName: "MSH",
+	// Parse the MSH segment as a single header structure
+	type HeaderMessage struct {
+		Header struct {
+			MessageType     string `hl7:"9"`
+			ProtocolVersion string `hl7:"12"`
+		} `hl7:"MSH"`
 	}
-	_, err = functions.ParseLine(lines[0], header, annotation, 1, config)
+	var headerMsg HeaderMessage
+	lineIndex := 0
+	err = functions.ParseStruct(lines, &headerMsg, &lineIndex, 1, 0, config)
 	if err != nil {
 		return "", "", err
 	}
+	// Check for missing data
+	if headerMsg.Header.MessageType == "" {
+		return "", "", errmsg.ErrIdentifyMessageMissingMessageType
+	}
+	if headerMsg.Header.ProtocolVersion == "" {
+		return "", "", errmsg.ErrIdentifyMessageMissingProtocolVersion
+	}
 	// Save the protocol version to the config
-	config.ProtocolVersion = header.protocolVersion
+	config.ProtocolVersion = headerMsg.Header.ProtocolVersion
 	// Return the extracted message type and protocol version from the header struct
-	return header.messageType, header.protocolVersion, nil
+	return headerMsg.Header.MessageType, headerMsg.Header.ProtocolVersion, nil
 }
