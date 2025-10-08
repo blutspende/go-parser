@@ -21,7 +21,7 @@ func BuildStruct(sourceStruct interface{}, sequenceNumber int, depth int, config
 	// Iterate over the inputFields of the sourceStruct struct
 	for i, sourceType := range sourceTypes {
 		// Parse the sourceStruct field sourceFieldAnnotation
-		sourceStructAnnotation, err := ParseAstmStructAnnotation(sourceType)
+		sourceStructAnnotation, err := ParseStructAnnotation(sourceType, config)
 		if err != nil {
 			return nil, err
 		}

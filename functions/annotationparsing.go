@@ -9,24 +9,27 @@ import (
 	"github.com/blutspende/go-parser/constants"
 	"github.com/blutspende/go-parser/errmsg"
 	"github.com/blutspende/go-parser/models"
+	"github.com/blutspende/go-parser/parserconfig"
 )
 
-func ParseAstmFieldAnnotation(input reflect.StructField) (result models.AstmFieldAnnotation, err error) {
-	// Get the "astm" tag value and check if it is empty
-	raw := input.Tag.Get("astm")
-	if raw == "" {
-		return models.AstmFieldAnnotation{}, errmsg.ErrAnnotationParsingMissingAstmAnnotation
-	}
-
-	// Parse the annotation string
-	result, err = parseAstmFieldAnnotationString(raw)
+func ParseFieldAnnotation(input reflect.StructField, config *parserconfig.Configuration) (result models.FieldAnnotation, err error) {
+	// Get the correct annotation key for the protocol
+	key, err := getAnnotationKeyForProtocol(config)
 	if err != nil {
-		return models.AstmFieldAnnotation{}, err
+		return models.FieldAnnotation{}, err
 	}
-
+	// Get the tag value and check if it is empty
+	raw := input.Tag.Get(key)
+	if raw == "" {
+		return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingMissingAnnotation
+	}
+	// Parse the annotation string
+	result, err = parseFieldAnnotationString(raw)
+	if err != nil {
+		return models.FieldAnnotation{}, err
+	}
 	// Determine if the field is an array or not
 	result.IsArray = input.Type.Kind() == reflect.Slice || input.Type.Kind() == reflect.Array
-
 	// Determine if the field is a substructure or not (excluding the time.Time type)
 	var checkType reflect.Type
 	if result.IsArray {
@@ -35,25 +38,22 @@ func ParseAstmFieldAnnotation(input reflect.StructField) (result models.AstmFiel
 		checkType = input.Type
 	}
 	result.IsSubstructure = checkType.Kind() == reflect.Struct && checkType != reflect.TypeOf(time.Time{})
-
 	// Check illegal combinations
 	if result.IsComponent && result.IsArray {
-		return models.AstmFieldAnnotation{}, errmsg.ErrAnnotationParsingIllegalComponentArray
+		return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingIllegalComponentArray
 	}
 	if result.IsComponent && result.IsSubstructure {
-		return models.AstmFieldAnnotation{}, errmsg.ErrAnnotationParsingIllegalComponentSubstructure
+		return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingIllegalComponentSubstructure
 	}
-
 	// All okay, return the result and no error
 	return result, nil
 }
 
-func parseAstmFieldAnnotationString(input string) (result models.AstmFieldAnnotation, err error) {
+func parseFieldAnnotationString(input string) (result models.FieldAnnotation, err error) {
+	// Save the input into the raw
 	result.Raw = input
-
 	// Separate attributes and the field definition
 	fieldDef, attributes := splitByFirst(input, ",")
-
 	// Parse and save attributes
 	result.Attributes, err = parseAttributes(attributes, []string{
 		constants.AttributeRequired,
@@ -61,56 +61,67 @@ func parseAstmFieldAnnotationString(input string) (result models.AstmFieldAnnota
 		constants.AttributeLength,
 	})
 	if err != nil {
-		return models.AstmFieldAnnotation{}, err
+		return models.FieldAnnotation{}, err
 	}
-
 	// Split field and component (if any) and parse them
 	segments := strings.Split(fieldDef, ".")
 	if len(segments) > 2 {
-		return models.AstmFieldAnnotation{}, errmsg.ErrAnnotationParsingInvalidAstmAnnotation
+		return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingInvalidAnnotation
 	}
 	if len(segments) == 2 {
 		result.IsComponent = true
 		result.ComponentPos, err = strconv.Atoi(segments[1])
 		if err != nil {
-			return models.AstmFieldAnnotation{}, errmsg.ErrAnnotationParsingInvalidAstmAnnotation
+			return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingInvalidAnnotation
 		}
 	}
 	result.FieldPos, err = strconv.Atoi(segments[0])
 	if err != nil {
-		return models.AstmFieldAnnotation{}, errmsg.ErrAnnotationParsingInvalidAstmAnnotation
+		return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingInvalidAnnotation
 	}
-
+	// Return the result
 	return result, nil
 }
 
-func ParseAstmStructAnnotation(input reflect.StructField) (result models.AstmStructAnnotation, err error) {
-	// Get the "astm" tag value
-	raw := input.Tag.Get("astm")
+func ParseStructAnnotation(input reflect.StructField, config *parserconfig.Configuration) (result models.StructAnnotation, err error) {
+	// Get the correct annotation key for the protocol
+	key, err := getAnnotationKeyForProtocol(config)
+	if err != nil {
+		return models.StructAnnotation{}, err
+	}
+	// Get the tag value
+	raw := input.Tag.Get(key)
+	// Save the raw annotation
 	result.Raw = raw
-
 	// Determine if the struct is composite (no tag) or not
 	result.IsComposite = raw == ""
-
 	// Determine if the field is an array or not
 	result.IsArray = input.Type.Kind() == reflect.Slice || input.Type.Kind() == reflect.Array
-
 	// Composite has no tag so further parsing is not needed
 	if result.IsComposite {
 		return result, nil
 	}
-
 	// Separate attributes and the struct name, and save the name
 	attributes := ""
 	result.StructName, attributes = splitByFirst(raw, ",")
-
 	// Parse and save attributes
 	result.Attributes, err = parseAttributes(attributes, []string{
 		constants.AttributeOptional,
 		constants.AttributeSubname,
 	})
-
+	// Return the result
 	return result, err
+}
+
+func getAnnotationKeyForProtocol(config *parserconfig.Configuration) (key string, err error) {
+	switch config.Protocol {
+	case parserconfig.ASTM:
+		return "astm", nil
+	case parserconfig.HL7:
+		return "hl7", nil
+	default:
+		return "", errmsg.ErrAnnotationParsingInvalidProtocol
+	}
 }
 
 func parseAttributes(input string, valids []string) (result map[string]string, err error) {
@@ -127,11 +138,11 @@ func parseAttributes(input string, valids []string) (result map[string]string, e
 		// Split each attribute by the colon
 		attributeParts := strings.Split(attribute, ":")
 		if len(attributeParts) > 2 {
-			return nil, errmsg.ErrAnnotationParsingInvalidAstmAttributeFormat
+			return nil, errmsg.ErrAnnotationParsingInvalidAttributeFormat
 		}
 		// Check if the attribute is valid
 		if !isInList(attributeParts[0], valids) {
-			return nil, errmsg.ErrAnnotationParsingInvalidAstmAttribute
+			return nil, errmsg.ErrAnnotationParsingInvalidAttribute
 		}
 		// Save the attribute name and value (if present)
 		if len(attributeParts) == 2 {
@@ -172,22 +183,18 @@ func ProcessStructReflection(inputStruct interface{}) (outputTypes []reflect.Str
 		// inputStruct must be a pointer to a struct
 		return nil, nil, 0, errmsg.ErrAnnotationParsingInvalidInputStruct
 	}
-
 	// Get the underlying struct
 	targetValue := targetPtrValue.Elem()
 	targetType := targetPtrValue.Type().Elem()
-
 	// Allocate the results
 	outputTypes = make([]reflect.StructField, targetValue.NumField())
 	outputValues = make([]reflect.Value, targetType.NumField())
 	length = targetType.NumField()
-
 	// Iterate and save outputTypes and outputValues
 	for i := 0; i < targetType.NumField(); i++ {
 		outputTypes[i] = targetType.Field(i)
 		outputValues[i] = targetValue.Field(i)
 	}
-
 	// Return the results
 	return outputTypes, outputValues, length, nil
 }

@@ -131,7 +131,7 @@ func TestSliceLines_ExplicitCr(t *testing.T) {
 	teardown()
 }
 
-// Lines building
+// Line building
 func TestBuildLines_Default(t *testing.T) {
 	// Arrange
 	input := []string{"first", "second"}

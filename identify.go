@@ -88,7 +88,7 @@ func IdentifyMessageHL7(messageData []byte, config *parserconfig.Configuration) 
 	}
 	// Parse the MSH segment as a single header line
 	var header hl7Header
-	annotation := models.AstmStructAnnotation{
+	annotation := models.StructAnnotation{
 		StructName: "MSH",
 	}
 	_, err = functions.ParseLine(lines[0], header, annotation, 1, config)

@@ -29,8 +29,8 @@ func TestMain(m *testing.M) {
 }
 
 // Structure annotation helper factory
-func createStructAnnotation(name string) models.AstmStructAnnotation {
-	return models.AstmStructAnnotation{
+func createStructAnnotation(name string) models.StructAnnotation {
+	return models.StructAnnotation{
 		StructName: name,
 	}
 }
@@ -48,7 +48,13 @@ type Line struct {
 	Field string `astm:"3"`
 }
 type SingleLineStruct struct {
-	Lines Line `astm:"L"`
+	Line Line `astm:"L"`
+}
+type LineHL7 struct {
+	Field string `hl7:"3"`
+}
+type SingleLineStructHL7 struct {
+	Line LineHL7 `hl7:"LIN"`
 }
 type AnnotatedArrayStruct struct {
 	Lines []Line `astm:"L,optional"`
@@ -97,7 +103,7 @@ type ThreeFieldRecord struct {
 	Third  string `astm:"5"`
 }
 type SimpleRecord struct {
-	First string `astm:"3"`
+	First string `astm:"3" hl7:"3"`
 }
 type UnorderedRecord struct {
 	First  string `astm:"3"`
@@ -141,7 +147,7 @@ type ArrayRecord struct {
 	Array []string `astm:"4"`
 }
 type HeaderRecord struct {
-	First string `astm:"3"`
+	First string `astm:"3" hl7:"3"`
 }
 type HeaderDelimiterChange struct {
 	First string   `astm:"3"`
@@ -251,19 +257,19 @@ type InvalidAttributeValueRecord struct {
 }
 
 type SubSubField struct {
-	First  string `astm:"1"`
-	Second string `astm:"2"`
-	Third  string `astm:"3"`
+	First  string `astm:"1" hl7:"1"`
+	Second string `astm:"2" hl7:"2"`
+	Third  string `astm:"3" hl7:"3"`
 }
 type SubField struct {
-	First  string      `astm:"1"`
-	Second SubSubField `astm:"2"`
-	Third  string      `astm:"3"`
+	First  string      `astm:"1" hl7:"1"`
+	Second SubSubField `astm:"2" hl7:"2"`
+	Third  string      `astm:"3" hl7:"3"`
 }
 type SubSubRecord struct {
-	First  string   `astm:"3"`
-	Second SubField `astm:"4"`
-	Third  string   `astm:"5"`
+	First  string   `astm:"3" hl7:"3"`
+	Second SubField `astm:"4" hl7:"4"`
+	Third  string   `astm:"5" hl7:"5"`
 }
 
 // Structures

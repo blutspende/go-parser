@@ -44,9 +44,9 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 	// Iterate over the inputFields of the targetStruct struct
 	for i := 0; i < sourceTypesLength; i++ {
 		// Parse the sourceStruct field sourceFieldAnnotation
-		sourceFieldAnnotation, err := ParseAstmFieldAnnotation(sourceTypes[i])
+		sourceFieldAnnotation, err := ParseFieldAnnotation(sourceTypes[i], config)
 		if err != nil {
-			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAstmAnnotation) {
+			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
 				// If the annotation is missing, skip this field
 				continue
 			} else {
@@ -93,9 +93,9 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 			// Iterate over the whole inputFields of the targetStruct struct to find the components anywhere
 			for j := 0; j < sourceTypesLength; j++ {
 				// Parse the targetStruct field targetFieldAnnotation
-				currentFieldAnnotation, err := ParseAstmFieldAnnotation(sourceTypes[j])
+				currentFieldAnnotation, err := ParseFieldAnnotation(sourceTypes[j], config)
 				if err != nil {
-					if errors.Is(err, errmsg.ErrAnnotationParsingMissingAstmAnnotation) {
+					if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
 						// If the annotation is missing, skip this field
 						continue
 					} else {
@@ -154,9 +154,9 @@ func buildSubstructure(sourceStruct interface{}, config *parserconfig.Configurat
 	// Iterate over the inputFields of the targetStruct struct
 	for i := 0; i < sourceTypesLength; i++ {
 		// Parse the sourceStruct field sourceFieldAnnotation
-		sourceFieldAnnotation, err := ParseAstmFieldAnnotation(sourceTypes[i])
+		sourceFieldAnnotation, err := ParseFieldAnnotation(sourceTypes[i], config)
 		if err != nil {
-			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAstmAnnotation) {
+			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
 				// If the annotation is missing, skip this field
 				continue
 			} else {
@@ -204,7 +204,7 @@ func constructResult(fieldMap map[int]string, delimiter string, notation string)
 	return result
 }
 
-func convertField(field reflect.Value, annotation models.AstmFieldAnnotation, config *parserconfig.Configuration) (result string, err error) {
+func convertField(field reflect.Value, annotation models.FieldAnnotation, config *parserconfig.Configuration) (result string, err error) {
 	// Check if the field is a pointer, nil returns empty, otherwise dereference it
 	if field.Kind() == reflect.Ptr {
 		if field.IsNil() {

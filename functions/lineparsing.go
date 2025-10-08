@@ -14,7 +14,7 @@ import (
 	"github.com/blutspende/go-parser/parserconfig"
 )
 
-func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation models.AstmStructAnnotation, sequenceNumber int, config *parserconfig.Configuration) (nameOk bool, err error) {
+func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation models.StructAnnotation, sequenceNumber int, config *parserconfig.Configuration) (nameOk bool, err error) {
 	// Check for input line length
 	if len(inputLine) == 0 {
 		return false, errmsg.ErrLineParsingEmptyInput
@@ -94,9 +94,9 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	// Iterate over the inputFields of the targetStruct struct
 	for i, targetType := range targetTypes {
 		// Parse the targetStruct field targetFieldAnnotation
-		targetFieldAnnotation, err := ParseAstmFieldAnnotation(targetType)
+		targetFieldAnnotation, err := ParseFieldAnnotation(targetType, config)
 		if err != nil {
-			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAstmAnnotation) {
+			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
 				// If the annotation is missing, skip this field
 				continue
 			} else {
@@ -213,9 +213,9 @@ func parseSubstructure(inputString string, targetStruct interface{}, depth int, 
 	// Iterate over the inputFields of the targetStruct struct
 	for i, targetType := range targetTypes {
 		// Parse the targetStruct field targetFieldAnnotation
-		targetFieldAnnotation, err := ParseAstmFieldAnnotation(targetType)
+		targetFieldAnnotation, err := ParseFieldAnnotation(targetType, config)
 		if err != nil {
-			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAstmAnnotation) {
+			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
 				// If the annotation is missing, skip this field
 				continue
 			} else {
@@ -251,7 +251,7 @@ func parseSubstructure(inputString string, targetStruct interface{}, depth int, 
 	return nil
 }
 
-func setField(value string, field reflect.Value, annotation models.AstmFieldAnnotation, config *parserconfig.Configuration) (err error) {
+func setField(value string, field reflect.Value, annotation models.FieldAnnotation, config *parserconfig.Configuration) (err error) {
 	// Ensure the field is settable
 	if !field.CanSet() {
 		// Field is not settable

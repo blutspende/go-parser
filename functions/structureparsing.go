@@ -30,7 +30,7 @@ func ParseStruct(inputLines []string, targetStruct interface{}, lineIndex *int, 
 	// Iterate over the inputFields of the targetStruct struct
 	for i, targetType := range targetTypes {
 		// Parse the targetStruct field targetFieldAnnotation
-		targetStructAnnotation, err := ParseAstmStructAnnotation(targetType)
+		targetStructAnnotation, err := ParseStructAnnotation(targetType, config)
 		if err != nil {
 			return err
 		}

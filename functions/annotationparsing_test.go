@@ -1,11 +1,12 @@
 package functions
 
 import (
+	"reflect"
+	"testing"
+
 	"github.com/blutspende/go-parser/constants"
 	"github.com/blutspende/go-parser/errmsg"
 	"github.com/stretchr/testify/assert"
-	"reflect"
-	"testing"
 )
 
 // Field annotation tests
@@ -13,7 +14,7 @@ func TestParseAstmFieldAnnotationString_SingleValue(t *testing.T) {
 	// Arrange
 	input := "4"
 	// Act
-	result, err := parseAstmFieldAnnotationString(input)
+	result, err := parseFieldAnnotationString(input)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "4", result.Raw)
@@ -27,7 +28,7 @@ func TestParseAstmFieldAnnotationString_Componented(t *testing.T) {
 	// Arrange
 	input := "4.1"
 	// Act
-	result, err := parseAstmFieldAnnotationString(input)
+	result, err := parseFieldAnnotationString(input)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "4.1", result.Raw)
@@ -41,7 +42,7 @@ func TestParseAstmFieldAnnotationString_Attributed(t *testing.T) {
 	// Arrange
 	input := "4,required"
 	// Act
-	result, err := parseAstmFieldAnnotationString(input)
+	result, err := parseFieldAnnotationString(input)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "4,required", result.Raw)
@@ -55,7 +56,7 @@ func TestParseAstmFieldAnnotationString_AttributedValue(t *testing.T) {
 	// Arrange
 	input := "4,length:2"
 	// Act
-	result, err := parseAstmFieldAnnotationString(input)
+	result, err := parseFieldAnnotationString(input)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "4,length:2", result.Raw)
@@ -70,7 +71,7 @@ func TestParseAstmFieldAnnotationString_Complex(t *testing.T) {
 	// Arrange
 	input := "3.2,length:4"
 	// Act
-	result, err := parseAstmFieldAnnotationString(input)
+	result, err := parseFieldAnnotationString(input)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "3.2,length:4", result.Raw)
@@ -85,47 +86,47 @@ func TestParseAstmFieldAnnotationString_InvalidAttribute(t *testing.T) {
 	// Arrange
 	input := "4.1,something"
 	// Act
-	_, err := parseAstmFieldAnnotationString(input)
+	_, err := parseFieldAnnotationString(input)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAstmAttribute.Error())
+	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAttribute.Error())
 }
 func TestParseAstmFieldAnnotationString_InvalidAttributeFormat(t *testing.T) {
 	// Arrange
 	input := "4.1,length:2:3"
 	// Act
-	_, err := parseAstmFieldAnnotationString(input)
+	_, err := parseFieldAnnotationString(input)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAstmAttributeFormat.Error())
+	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAttributeFormat.Error())
 }
 func TestParseAstmFieldAnnotationString_InvalidAnnotationTooManyParts(t *testing.T) {
 	// Arrange
 	input := "2.1.2"
 	// Act
-	_, err := parseAstmFieldAnnotationString(input)
+	_, err := parseFieldAnnotationString(input)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAstmAnnotation.Error())
+	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAnnotation.Error())
 }
 func TestParseAstmFieldAnnotationString_InvalidAnnotationTooManyPartsWithAttribute(t *testing.T) {
 	// Arrange
 	input := "4.1.3,required"
 	// Act
-	_, err := parseAstmFieldAnnotationString(input)
+	_, err := parseFieldAnnotationString(input)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAstmAnnotation.Error())
+	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAnnotation.Error())
 }
 func TestParseAstmFieldAnnotationString_InvalidNumber(t *testing.T) {
 	// Arrange
 	input := "4.f"
 	// Act
-	_, err := parseAstmFieldAnnotationString(input)
+	_, err := parseFieldAnnotationString(input)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAstmAnnotation.Error())
+	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAnnotation.Error())
 }
 func TestParseAstmFieldAnnotationString_MultipleAttributes(t *testing.T) {
 	// Arrange
 	input := "4,required,longdate"
 	// Act
-	result, err := parseAstmFieldAnnotationString(input)
+	result, err := parseFieldAnnotationString(input)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "4,required,longdate", result.Raw)
@@ -140,7 +141,7 @@ func TestParseAstmFieldAnnotationString_ValuedMultipleAttributes(t *testing.T) {
 	// Arrange
 	input := "4,length:3,required"
 	// Act
-	result, err := parseAstmFieldAnnotationString(input)
+	result, err := parseFieldAnnotationString(input)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "4,length:3,required", result.Raw)
@@ -157,7 +158,7 @@ func TestParseAstmFieldAnnotation_AnnotatedStruct(t *testing.T) {
 	var input AnnotatedLine
 	field, _ := reflect.TypeOf(input).FieldByName("Field")
 	// Act
-	result, err := ParseAstmFieldAnnotation(field)
+	result, err := ParseFieldAnnotation(field, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "3.2,length:4", result.Raw)
@@ -174,7 +175,7 @@ func TestParseAstmFieldAnnotation_AnnotatedArrayStruct(t *testing.T) {
 	var input AnnotatedArrayLine
 	field, _ := reflect.TypeOf(input).FieldByName("Field")
 	// Act
-	result, err := ParseAstmFieldAnnotation(field)
+	result, err := ParseFieldAnnotation(field, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "3,length:4", result.Raw)
@@ -190,7 +191,7 @@ func TestParseAstmFieldAnnotation_Substructure(t *testing.T) {
 	var input SubstructuredLine
 	field, _ := reflect.TypeOf(input).FieldByName("Field")
 	// Act
-	result, err := ParseAstmFieldAnnotation(field)
+	result, err := ParseFieldAnnotation(field, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "3", result.Raw)
@@ -205,7 +206,7 @@ func TestParseAstmFieldAnnotation_SubstructureArray(t *testing.T) {
 	var input SubstructuredLine
 	field, _ := reflect.TypeOf(input).FieldByName("Array")
 	// Act
-	result, err := ParseAstmFieldAnnotation(field)
+	result, err := ParseFieldAnnotation(field, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "4", result.Raw)
@@ -220,7 +221,7 @@ func TestParseAstmFieldAnnotation_IllegalComponentArray(t *testing.T) {
 	var input IllegalComponentArray
 	field, _ := reflect.TypeOf(input).FieldByName("ComponentArray")
 	// Act
-	_, err := ParseAstmFieldAnnotation(field)
+	_, err := ParseFieldAnnotation(field, config)
 	// Assert
 	assert.EqualError(t, err, errmsg.ErrAnnotationParsingIllegalComponentArray.Error())
 }
@@ -229,7 +230,7 @@ func TestParseAstmFieldAnnotation_IllegalComponentSubstructure(t *testing.T) {
 	var input IllegalComponentSubstructure
 	field, _ := reflect.TypeOf(input).FieldByName("ComponentSubstructure")
 	// Act
-	_, err := ParseAstmFieldAnnotation(field)
+	_, err := ParseFieldAnnotation(field, config)
 	// Assert
 	assert.EqualError(t, err, errmsg.ErrAnnotationParsingIllegalComponentSubstructure.Error())
 }
@@ -238,7 +239,7 @@ func TestParseAstmFieldAnnotation_TimeLine(t *testing.T) {
 	var input TimeLine
 	field, _ := reflect.TypeOf(input).FieldByName("Time")
 	// Act
-	result, err := ParseAstmFieldAnnotation(field)
+	result, err := ParseFieldAnnotation(field, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "3", result.Raw)
@@ -253,18 +254,18 @@ func TestParseAstmFieldAnnotation_InvalidFieldAttribute(t *testing.T) {
 	var input InvalidFieldAttribute
 	field, _ := reflect.TypeOf(input).FieldByName("First")
 	// Act
-	_, err := ParseAstmFieldAnnotation(field)
+	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAstmAttribute.Error())
+	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAttribute.Error())
 }
 
 // Struct annotation tests
 func TestParseAstmStructAnnotation_SingleLineStruct(t *testing.T) {
 	// Arrange
 	var input SingleLineStruct
-	field, _ := reflect.TypeOf(input).FieldByName("Lines")
+	field, _ := reflect.TypeOf(input).FieldByName("Line")
 	// Act
-	result, err := ParseAstmStructAnnotation(field)
+	result, err := ParseStructAnnotation(field, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "L", result.Raw)
@@ -278,7 +279,7 @@ func TestParseAstmStructAnnotation_AnnotatedArrayStruct(t *testing.T) {
 	var input AnnotatedArrayStruct
 	field, _ := reflect.TypeOf(input).FieldByName("Lines")
 	// Act
-	result, err := ParseAstmStructAnnotation(field)
+	result, err := ParseStructAnnotation(field, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "L,optional", result.Raw)
@@ -292,7 +293,7 @@ func TestParseAstmStructAnnotation_CompositeStruct(t *testing.T) {
 	var input CompositeStruct
 	field, _ := reflect.TypeOf(input).FieldByName("Composite")
 	// Act
-	result, err := ParseAstmStructAnnotation(field)
+	result, err := ParseStructAnnotation(field, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "", result.Raw)
@@ -306,7 +307,7 @@ func TestParseAstmStructAnnotation_CompositeArrayStruct(t *testing.T) {
 	var input CompositeArrayStruct
 	field, _ := reflect.TypeOf(input).FieldByName("Composite")
 	// Act
-	result, err := ParseAstmStructAnnotation(field)
+	result, err := ParseStructAnnotation(field, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "", result.Raw)
@@ -320,25 +321,25 @@ func TestParseAstmStructAnnotation_InvalidStructAttribute(t *testing.T) {
 	var input InvalidStructAttribute
 	field, _ := reflect.TypeOf(input).FieldByName("Record")
 	// Act
-	_, err := ParseAstmFieldAnnotation(field)
+	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAstmAttribute.Error())
+	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAttribute.Error())
 }
 func TestParseAstmStructAnnotation_TooManyStructNameAttributeValues(t *testing.T) {
 	// Arrange
 	var input TooManyStructNameAttributeValues
 	field, _ := reflect.TypeOf(input).FieldByName("Record")
 	// Act
-	_, err := ParseAstmFieldAnnotation(field)
+	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAstmAttributeFormat.Error())
+	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidAttributeFormat.Error())
 }
 func TestParseAstmStructAnnotation_SubnameAttribute(t *testing.T) {
 	// Arrange
 	var input SubnameAttribute
 	field, _ := reflect.TypeOf(input).FieldByName("Record")
 	// Act
-	result, err := ParseAstmStructAnnotation(field)
+	result, err := ParseStructAnnotation(field, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "R,subname:SUBNAME", result.Raw)
@@ -382,4 +383,58 @@ func TestProcessStructReflection_SimpleRecordPointer(t *testing.T) {
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, 3, length)
+}
+
+// HL7 specific tests
+func TestParseAstmFieldAnnotation_LineHL7(t *testing.T) {
+	// Arrange
+	var input LineHL7
+	field, _ := reflect.TypeOf(input).FieldByName("Field")
+	// Act
+	result, err := ParseFieldAnnotation(field, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "3", result.Raw)
+	assert.Equal(t, 3, result.FieldPos)
+	assert.Equal(t, false, result.IsArray)
+	assert.Equal(t, false, result.IsComponent)
+	assert.Equal(t, 0, result.ComponentPos)
+	assert.Equal(t, false, result.IsSubstructure)
+}
+func TestParseAstmFieldAnnotation_LineHL7_WrongProtocol(t *testing.T) {
+	// Arrange
+	var input LineHL7
+	field, _ := reflect.TypeOf(input).FieldByName("Field")
+	// Act
+	result, err := ParseFieldAnnotation(field, config)
+	// Assert
+	assert.EqualError(t, err, errmsg.ErrAnnotationParsingMissingAnnotation.Error())
+	assert.Equal(t, "", result.Raw)
+}
+func TestParseAstmFieldAnnotation_LineHL7_InvalidProtocol(t *testing.T) {
+	// Arrange
+	var input LineHL7
+	field, _ := reflect.TypeOf(input).FieldByName("Field")
+	configHL7.Protocol = "X"
+	// Act
+	result, err := ParseFieldAnnotation(field, configHL7)
+	// Assert
+	assert.EqualError(t, err, errmsg.ErrAnnotationParsingInvalidProtocol.Error())
+	assert.Equal(t, "", result.Raw)
+	// Teardown
+	teardown()
+}
+func TestParseAstmStructAnnotation_SingleLineStructHL7(t *testing.T) {
+	// Arrange
+	var input SingleLineStructHL7
+	field, _ := reflect.TypeOf(input).FieldByName("Line")
+	// Act
+	result, err := ParseStructAnnotation(field, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "LIN", result.Raw)
+	assert.Equal(t, false, result.IsComposite)
+	assert.Equal(t, false, result.IsArray)
+	assert.Equal(t, "LIN", result.StructName)
+	assert.Empty(t, result.Attributes)
 }

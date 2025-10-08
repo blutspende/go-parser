@@ -1,7 +1,8 @@
 package models
 
-// Annotation types for ASTM fields and structures
-type AstmFieldAnnotation struct {
+// Annotation types for fields and structures
+
+type FieldAnnotation struct {
 	Raw            string
 	FieldPos       int
 	IsArray        bool
@@ -10,7 +11,8 @@ type AstmFieldAnnotation struct {
 	IsSubstructure bool
 	Attributes     map[string]string
 }
-type AstmStructAnnotation struct {
+
+type StructAnnotation struct {
 	Raw         string
 	StructName  string
 	IsComposite bool

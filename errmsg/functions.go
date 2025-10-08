@@ -11,13 +11,14 @@ var (
 
 // AnnotationParsing
 var (
-	ErrAnnotationParsingMissingAstmAnnotation        = errors.New("astm annotation missing")
-	ErrAnnotationParsingInvalidAstmAnnotation        = errors.New("invalid astm annotation")
-	ErrAnnotationParsingInvalidAstmAttribute         = errors.New("invalid astm attribute")
-	ErrAnnotationParsingInvalidAstmAttributeFormat   = errors.New("invalid astm attribute format")
+	ErrAnnotationParsingMissingAnnotation            = errors.New("annotation missing")
+	ErrAnnotationParsingInvalidAnnotation            = errors.New("invalid annotation")
+	ErrAnnotationParsingInvalidAttribute             = errors.New("invalid attribute")
+	ErrAnnotationParsingInvalidAttributeFormat       = errors.New("invalid attribute format")
 	ErrAnnotationParsingInvalidInputStruct           = errors.New("invalid input struct")
 	ErrAnnotationParsingIllegalComponentArray        = errors.New("component array is not allowed")
 	ErrAnnotationParsingIllegalComponentSubstructure = errors.New("component substructure is not allowed")
+	ErrAnnotationParsingInvalidProtocol              = errors.New("invalid protocol")
 )
 
 // LineParsing
