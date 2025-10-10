@@ -104,8 +104,8 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 			}
 		}
 
-		// Check for fieldPos not being lower than 3 (first 2 are reserved for line name and sequence number)
-		if targetFieldAnnotation.FieldPos < 3 {
+		// In ASTM the first 2 are reserved for line name and sequence number
+		if config.Protocol == parserconfig.ASTM && targetFieldAnnotation.FieldPos < 3 {
 			return true, errmsg.ErrLineParsingReservedFieldPosReference
 		}
 

@@ -59,6 +59,7 @@ func parseFieldAnnotationString(input string) (result models.FieldAnnotation, er
 		constants.AttributeRequired,
 		constants.AttributeLongdate,
 		constants.AttributeLength,
+		constants.AttributeSequence,
 	})
 	if err != nil {
 		return models.FieldAnnotation{}, err

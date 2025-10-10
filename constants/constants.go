@@ -9,3 +9,4 @@ const AttributeOptional string = "optional" // record-annotation: by default all
 const AttributeLongdate string = "longdate" // Indicating that the date should be formatted as date and time (output only)
 const AttributeLength string = "length"     // used for specifying the decimal length of float fields - astm:"1,length:2" (output only)
 const AttributeSubname string = "subname"   // used for specifying a subname for a record - astm:"M,subname:MATRIX"
+const AttributeSequence string = "sequence" // used for marking a field for the sequence number in hl7
