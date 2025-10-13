@@ -5,15 +5,16 @@ import "time"
 // OBR - Observation request segment
 // https://hl7-definition.caristix.com/v2/HL7v2.3/Segments/OBR
 type OBR struct {
-	ObservationRequest                  string    `hl7:"2" json:"observationRequest,omitempty"`
-	PlacerOrderNumber                   EI        `hl7:"3" json:"placerOrderNumber,omitempty"`
-	FillerOrderNumber                   EI        `hl7:"4" json:"fillerOrderNumber,omitempty"`
-	UniversalServiceIdentifier          CE        `hl7:"5" json:"universalServiceIdentifier,omitempty"`
-	Priority                            string    `hl7:"6" json:"priority,omitempty"`
-	RequestedDateTime                   time.Time `hl7:"7" json:"requestedDateTime,omitempty"`
-	ObservationDateTime                 time.Time `hl7:"8" json:"observationDateTime,omitempty"`
-	ObservationEndDateTime              time.Time `hl7:"9" json:"observationEndDateTime,omitempty"`
-	CollectionVolume                    CQ        `hl7:"10"json:"collectionVolume,omitempty"`
+	ObservationRequest         string `hl7:"2" json:"observationRequest,omitempty"`
+	PlacerOrderNumber          EI     `hl7:"3" json:"placerOrderNumber,omitempty"`
+	FillerOrderNumber          EI     `hl7:"4" json:"fillerOrderNumber,omitempty"`
+	UniversalServiceIdentifier CE     `hl7:"5" json:"universalServiceIdentifier,omitempty"`
+	Priority                   string `hl7:"6" json:"priority,omitempty"`
+	// TODO: is longdate really correct here?
+	RequestedDateTime                   time.Time `hl7:"7,longdate" json:"requestedDateTime,omitempty"`
+	ObservationDateTime                 time.Time `hl7:"8,longdate" json:"observationDateTime,omitempty"`
+	ObservationEndDateTime              time.Time `hl7:"9,longdate" json:"observationEndDateTime,omitempty"`
+	CollectionVolume                    CQ        `hl7:"10" json:"collectionVolume,omitempty"`
 	CollectorIdentifier                 []XCN     `hl7:"11" json:"collectorIdentifier,omitempty"`
 	SpecimenActionCode                  string    `hl7:"12" json:"specimenActionCode,omitempty"`
 	DangerCode                          CE        `hl7:"13" json:"dangerCode,omitempty"`

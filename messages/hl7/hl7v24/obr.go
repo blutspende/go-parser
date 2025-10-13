@@ -10,7 +10,7 @@ type OBR struct {
 	FillerOrderNumber                    EI        `hl7:"4" json:"FillerOrderNumber,omitempty"`
 	UniversalServiceIdentifier           CE        `hl7:"5" json:"UniversalServiceIdentifier,omitempty"`
 	Priority                             string    `hl7:"6" json:"Priority,omitempty"`
-	RequestedDateTime                    time.Time `hl7:"7" json:"RequestedDateTime,omitempty"`
+	RequestedDateTime                    time.Time `hl7:"7,longdate" json:"RequestedDateTime,omitempty"`
 	ObservationDateTime                  time.Time `hl7:"8" json:"ObservationDateTime,omitempty"`
 	ObservationEndDateTime               time.Time `hl7:"9" json:"ObservationEndDateTime,omitempty"`
 	CollectionVolume                     CQ        `hl7:"10" json:"CollectionVolume,omitempty"`

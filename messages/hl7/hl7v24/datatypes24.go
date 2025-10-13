@@ -102,10 +102,11 @@ type PI struct {
 // HL7 v2.4 - SN - Structured Numeric
 // https://hl7-definition.caristix.com/v2/HL7v2.4/DataTypes/SN
 type SN struct {
+	// TODO: figure out why it was all "1"s in the original
 	Comparator        string  `hl7:"1" json:"Comparator,omitempty"`
-	Num1              float32 `hl7:"1" json:"Num1,omitempty"`
-	SeparatorOrSuffix string  `hl7:"1" json:"SeparatorOrSuffix,omitempty"`
-	Num2              float32 `hl7:"1" json:"Num2,omitempty"`
+	Num1              float32 `hl7:"2" json:"Num1,omitempty"`
+	SeparatorOrSuffix string  `hl7:"3" json:"SeparatorOrSuffix,omitempty"`
+	Num2              float32 `hl7:"4" json:"Num2,omitempty"`
 }
 
 // HL7 v2.4 - VID - Version Identifier

@@ -13,7 +13,7 @@ type ORC struct {
 	ResponseFlag                  string    `hl7:"7" json:"ResponseFlag,omitempty"`
 	QuantityTiming                []TQ      `hl7:"8" json:"QuantityTiming,omitempty"`
 	ParentOrder                   EIP       `hl7:"9" json:"ParentOrder,omitempty"`
-	DateTimeOfTransaction         time.Time `hl7:"10" json:"DateTimeOfTransaction,omitempty"`
+	DateTimeOfTransaction         time.Time `hl7:"10,longdate" json:"DateTimeOfTransaction,omitempty"`
 	EnteredBy                     []XCN     `hl7:"11" json:"EnteredBy,omitempty"`
 	VerifiedBy                    []XCN     `hl7:"12" json:"VerifiedBy,omitempty"`
 	OrderingProvider              []XCN     `hl7:"13" json:"OrderingProvider,omitempty"`

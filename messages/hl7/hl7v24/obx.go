@@ -23,5 +23,5 @@ type OBX struct {
 	ResponsibleObserver          XCN       `hl7:"17" json:"ResponsibleObserver,omitempty"`
 	ObservationMethod            []CE      `hl7:"18" json:"ObservationMethod,omitempty"`
 	EquipmentInstanceIdentifier  EI        `hl7:"19" json:"EquipmentInstanceIdentifier,omitempty"`
-	DateTimeOfTheAnalysis        time.Time `hl7:"20" json:"DateTimeOfTheAnalysis,omitempty"`
+	DateTimeOfTheAnalysis        time.Time `hl7:"20,longdate" json:"DateTimeOfTheAnalysis,omitempty"`
 }

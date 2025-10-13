@@ -31,5 +31,6 @@ type OUL_R21 struct {
 		}
 		ClinicalTrialIdentification []CTI `hl7:"CTI,optional" json:"ClinicalTrialIdentification,omitempty"`
 	}
-	ContinuationPointer DSC `hl7:"MSH" json:"ContinuationPointer,omitempty"`
+	// TODO: why on earth was this "MSH" and also not optional?
+	ContinuationPointer DSC `hl7:"DSC,optional" json:"ContinuationPointer,omitempty"`
 }
