@@ -29,16 +29,22 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 	// Create an array to store already processed component fields to allow any sparse placement
 	processedComponentFields := make([]int, 0)
 
-	// Add line name
+	// Handle fixed values (line name, header delimiters, ASTM auto sequence)
 	fieldMap[1] = lineTypeName
-	// If it's a header, add the other delimiters
-	if lineTypeName == "H" {
-		fieldMap[2] = config.Delimiters.Repeat +
-			config.Delimiters.Component +
-			config.Delimiters.Escape
-	} else {
-		// If it's not a header add the sequence number
-		fieldMap[2] = strconv.Itoa(sequenceNumber)
+	if config.Protocol == parserconfig.ASTM {
+		if lineTypeName == "H" {
+			fieldMap[2] = config.Delimiters.Repeat +
+				config.Delimiters.Component +
+				config.Delimiters.Escape
+		} else {
+			fieldMap[2] = strconv.Itoa(sequenceNumber)
+		}
+	}
+	if config.Protocol == parserconfig.HL7 && lineTypeName == "MSH" {
+		fieldMap[2] = config.Delimiters.Component +
+			config.Delimiters.Repeat +
+			config.Delimiters.Escape +
+			config.Delimiters.SubComponent
 	}
 
 	// Iterate over the inputFields of the targetStruct struct
@@ -54,9 +60,15 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 			}
 		}
 
-		// Check for fieldPos not being lower than 3 (first 2 are reserved for line name and sequence number)
-		if sourceFieldAnnotation.FieldPos < 3 {
+		// ASTM reserved: 1-name, 2-sequence number; HL7 reserved: 1-name
+		if (config.Protocol == parserconfig.ASTM && sourceFieldAnnotation.FieldPos < 3) || (config.Protocol == parserconfig.HL7 && sourceFieldAnnotation.FieldPos < 2) {
 			return "", errmsg.ErrLineBuildingReservedFieldPosReference
+		}
+
+		// Copy the sequence number into the field with the sequence annotation - HL7 case
+		_, sequenceAnnotation := sourceFieldAnnotation.Attributes[constants.AttributeSequence]
+		if config.Protocol == parserconfig.HL7 && sequenceAnnotation {
+			sourceValues[i] = reflect.ValueOf(sequenceNumber)
 		}
 
 		fieldValueString := ""

@@ -618,3 +618,55 @@ func TestBuildHL7EscapeChars_AllDelimiters(t *testing.T) {
 	// Assert
 	assert.Equal(t, `esc\X0D\\F\\R\\S\\T\\E\ape`, result)
 }
+
+func TestBuildLine_ReservedFieldRecordHL7(t *testing.T) {
+	// Arrange
+	source := ReservedFieldRecordHL7{}
+	// Act
+	result, err := BuildLine(source, "T", 1, configHL7)
+	// Assert
+	assert.EqualError(t, err, errmsg.ErrLineBuildingReservedFieldPosReference.Error())
+	assert.Equal(t, "", result)
+}
+
+func TestBuildLine_HeaderRecordHL7(t *testing.T) {
+	// Arrange
+	source := HeaderRecord{
+		First: "first",
+	}
+	// Act
+	result, err := BuildLine(source, "MSH", 0, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "MSH|^~\\&|first", result)
+}
+func TestBuildLine_HeaderRecordCustomDelimitersHL7(t *testing.T) {
+	// Arrange
+	source := HeaderRecord{
+		First: "first",
+	}
+	configHL7.Delimiters.Field = "/"
+	configHL7.Delimiters.Component = "*"
+	configHL7.Delimiters.Repeat = "!"
+	configHL7.Delimiters.Escape = "%"
+	configHL7.Delimiters.SubComponent = "?"
+	// Act
+	result, err := BuildLine(source, "MSH", 0, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "MSH/*!%?/first", result)
+	// Teardown
+	teardown()
+}
+
+func TestBuildLine_SequenceHL7(t *testing.T) {
+	// Arrange
+	source := SequenceHl7{
+		Data: "data",
+	}
+	// Act
+	result, err := BuildLine(source, "SEC", 4, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "SEC||4|data", result)
+}
