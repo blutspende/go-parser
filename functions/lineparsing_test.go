@@ -363,6 +363,34 @@ func TestParseLine_ShortDateKeepTimeZone(t *testing.T) {
 	teardown()
 }
 
+func TestParseLine_ShortDateLongFormatAutoUtcNoConfig(t *testing.T) {
+	// Arrange
+	input := "T|1|20060306164429"
+	target := ShortDateRecord{}
+	// Act
+	_, err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
+	// Assert
+	assert.Nil(t, err)
+	expectedTime := time.Date(2006, 03, 06, 16, 44, 29, 0, config.TimeLocation).UTC()
+	assert.Equal(t, expectedTime, target.Time)
+}
+
+// TODO: question if config should override the UTC auto-conversion or not
+func TestParseLine_ShortDateLongFormatAutoUtcWithConfig(t *testing.T) {
+	// Arrange
+	input := "T|1|20060306164429"
+	target := ShortDateRecord{}
+	config.KeepShortDateTimeZone = true
+	// Act
+	_, err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
+	// Assert
+	assert.Nil(t, err)
+	expectedTime := time.Date(2006, 03, 06, 16, 44, 29, 0, config.TimeLocation).UTC()
+	assert.Equal(t, expectedTime, target.Time)
+	// Teardown
+	teardown()
+}
+
 func TestParseLine_ShortDateDontKeepTimeZone(t *testing.T) {
 	// Arrange
 	input := "T|1|20060304"
@@ -690,4 +718,41 @@ func TestParseLine_Escape_HL7(t *testing.T) {
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "esc|ape", target.First)
+}
+
+func TestParseLine_ReservedFieldRecordHl7(t *testing.T) {
+	// Arrange
+	input := "REC|two|three"
+	target := ReservedFieldRecordHL7{}
+	// Act
+	nameOk, err := ParseLine(input, &target, createStructAnnotation("REC"), 1, configHL7)
+	// Assert
+	assert.True(t, nameOk)
+	assert.EqualError(t, err, errmsg.ErrLineParsingReservedFieldPosReference.Error())
+}
+
+func TestParseLine_NotReservedFieldRecordHl7(t *testing.T) {
+	// Arrange
+	input := "REC|two|three"
+	target := NotReservedFieldRecordHL7{}
+	// Act
+	nameOk, err := ParseLine(input, &target, createStructAnnotation("REC"), 1, configHL7)
+	// Assert
+	assert.True(t, nameOk)
+	assert.Nil(t, err)
+	assert.Equal(t, "two", target.Two)
+	assert.Equal(t, "three", target.Three)
+}
+
+func TestParseLine_SequenceHl7(t *testing.T) {
+	// Arrange
+	input := "REC||2|data"
+	target := SequenceHl7{}
+	// Act
+	nameOk, err := ParseLine(input, &target, createStructAnnotation("REC"), 2, configHL7)
+	// Assert
+	assert.True(t, nameOk)
+	assert.Nil(t, err)
+	assert.Equal(t, 2, target.Sequence)
+	assert.Equal(t, "data", target.Data)
 }

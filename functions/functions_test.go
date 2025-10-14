@@ -272,6 +272,20 @@ type SubSubRecord struct {
 	Third  string   `astm:"5" hl7:"5"`
 }
 
+type ReservedFieldRecordHL7 struct {
+	One   string `hl7:"1"`
+	Two   string `hl7:"2"`
+	Three string `hl7:"3"`
+}
+type NotReservedFieldRecordHL7 struct {
+	Two   string `hl7:"2"`
+	Three string `hl7:"3"`
+}
+type SequenceHl7 struct {
+	Sequence int    `hl7:"3,sequence"`
+	Data     string `hl7:"4"`
+}
+
 // Structures
 type SingleRecordStruct struct {
 	FirstRecord ThreeFieldRecord `astm:"R"`

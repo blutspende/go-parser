@@ -25,6 +25,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	splitStart := 0
 
 	// Handle header special case
+	isHeader := false
 	if config.Protocol == parserconfig.ASTM && inputLine[0] == 'H' {
 		// Check if the inputLine is long enough to contain delimiters
 		if len(inputLine) < 5 {
@@ -38,6 +39,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		// Place the fix segment into the inputFields
 		inputFields = []string{inputLine[0:1], inputLine[1:5]}
 		splitStart = 6
+		isHeader = true
 	} else if config.Protocol == parserconfig.HL7 && inputLine[0:3] == "MSH" {
 		// Check if the inputLine is long enough to contain delimiters
 		if len(inputLine) < 8 {
@@ -51,6 +53,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		// Place the fix segment into the inputFields
 		inputFields = []string{inputLine[0:3], inputLine[3:8]}
 		splitStart = 9
+		isHeader = true
 	}
 
 	// Split the input with the field delimiter starting from the split start position
@@ -79,9 +82,8 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		}
 	}
 
-	// Check for validity of the sequence number (error only if enforced)
-	if config.Protocol == parserconfig.ASTM && inputFields[1] != strconv.Itoa(sequenceNumber) && inputLine[0] != 'H' && config.EnforceSequenceNumberCheck {
-		//TODO: implement sequence number checking for HL7 too
+	// Check for validity of the sequence number if enforced - ASTM case
+	if config.EnforceSequenceNumberCheck && config.Protocol == parserconfig.ASTM && inputFields[1] != strconv.Itoa(sequenceNumber) && !isHeader {
 		return true, errmsg.ErrLineParsingSequenceNumberMismatch
 	}
 
@@ -104,9 +106,15 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 			}
 		}
 
-		// In ASTM the first 2 are reserved for line name and sequence number
-		if config.Protocol == parserconfig.ASTM && targetFieldAnnotation.FieldPos < 3 {
+		// ASTM reserved: 1-name, 2-sequence number; HL7 reserved: 1-name
+		if (config.Protocol == parserconfig.ASTM && targetFieldAnnotation.FieldPos < 3) || (config.Protocol == parserconfig.HL7 && targetFieldAnnotation.FieldPos < 2) {
 			return true, errmsg.ErrLineParsingReservedFieldPosReference
+		}
+
+		// Check for validity of the sequence number if enforced - HL7 case
+		_, sequenceAnnotation := targetFieldAnnotation.Attributes[constants.AttributeSequence]
+		if config.EnforceSequenceNumberCheck && config.Protocol == parserconfig.HL7 && sequenceAnnotation && inputFields[targetFieldAnnotation.FieldPos-1] != strconv.Itoa(sequenceNumber) {
+			return true, errmsg.ErrLineParsingSequenceNumberMismatch
 		}
 
 		// Not enough inputFields or empty inputField
@@ -299,12 +307,15 @@ func setField(value string, field reflect.Value, annotation models.FieldAnnotati
 	// Check for time.Time type (it reflects as a Struct)
 	case reflect.Struct:
 		if field.Type() == reflect.TypeOf(time.Time{}) {
-			timeFormat := ""
+			var timeFormat string
+			var isShort bool
 			switch len(value) {
 			case 8:
 				timeFormat = "20060102" // YYYYMMDD
+				isShort = true
 			case 14:
 				timeFormat = "20060102150405" // YYYYMMDDHHMMSS
+				isShort = false
 			default:
 				return errmsg.ErrLineParsingInvalidDateFormat
 			}
@@ -312,11 +323,13 @@ func setField(value string, field reflect.Value, annotation models.FieldAnnotati
 			if err != nil {
 				return errmsg.ErrLineParsingDataParsingError
 			}
-			if _, exists := annotation.Attributes[constants.AttributeLongdate]; !exists && config.KeepShortDateTimeZone {
-				// Keep the short date time zone
+			// Determine if the time zone should be kept or set to UTC
+			_, hasLongdateAnnotation := annotation.Attributes[constants.AttributeLongdate]
+			keepTimeZone := isShort && config.KeepShortDateTimeZone && !hasLongdateAnnotation
+			// Adjust the time zone if needed
+			if keepTimeZone {
 				timeInLocation = timeInLocation.In(config.TimeLocation)
 			} else {
-				// Set the time to UTC
 				timeInLocation = timeInLocation.UTC()
 			}
 			field.Set(reflect.ValueOf(timeInLocation))
