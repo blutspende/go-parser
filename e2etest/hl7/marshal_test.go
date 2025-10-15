@@ -3,7 +3,9 @@ package hl7
 import (
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/bloodlab-common/timezone"
+	"github.com/blutspende/bloodlab-common/utils"
 	"github.com/blutspende/go-parser"
+	"github.com/blutspende/go-parser/enums/notation"
 
 	"testing"
 	"time"
@@ -12,120 +14,196 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMarshalMSH(t *testing.T) {
-	// Arrange
-	mshData := "MSH|^~\\&|HL7_Host|HL7_Office|CIT|LAB|20110926125155||ORM^O01|20110926125155|P|2.3|0||ER|ER||8859/1|\u000d"
-	filedata := mshData
-	var err error
-	var message hl7v23.ORM_O01
-	// TODO: remove cross testing
-	err = parser.Unmarshal([]byte(filedata), &message, config)
-	config.Encoding = encoding.ASCII
-	// Act
-	var marshalledMessageBytes [][]byte
-	marshalledMessageBytes, err = parser.Marshal(message, config)
-	// Assert
-	assert.Nil(t, err)
-	assert.Equal(t, mshData, string(marshalledMessageBytes[0]))
-	// Teardown
-	teardown()
-}
-
 func TestMarshalFromStruct(t *testing.T) {
 	// Arrange
-	mshData := "MSH|^~\\&|HL7_Host|HL7_Office|CIT|LAB|20230203080903||ORM^O01|CID586246|P|2.3|0||ER|SU||8859/1|\u000d"
-	trigger := hl7v23.ORM_O01{}
-	msh := hl7v23.MSH{}
-	msh.ReceivingApplication = hl7v23.HD{NamespaceId: "CIT"}
-	msh.ReceivingFacility = hl7v23.HD{NamespaceId: "LAB"}
-	msh.SendingApplication = hl7v23.HD{NamespaceId: "HL7_Host"}
-	msh.SendingFacility = hl7v23.HD{NamespaceId: "HL7_Office"}
-	msh.DateTimeOfMessage, _ = time.Parse("20060102150405", "20230203080903")
-	msh.MessageType = "ORM"
-	msh.MessageTriggerEvent = "O01"
-	msh.MessageControlID = "CID586246"
-	msh.ProcessingID = "P"
-	msh.VersionID = "2.3"
-	msh.SequenceNumber = 0
-	msh.AcceptAcknowledgementType = "ER"
-	msh.ApplicationAcknowledgementType = "SU"
-	msh.CharacterSet = []string{"8859/1"}
-	trigger.MSH = msh
-
-	trigger.Order = append(trigger.Order, hl7v23.Order{})
-	{
-		orc := &trigger.Order[0].CommonOrderSegment
-		{
-			orc.OrderControl = "NW"
-			orc.FillerOrderNumber.EntityIdentifier = "23071012"
-			orc.DateTimeOfTransaction = time.Now()
-			orc.OrderingProvider.ID = "AKB"
-		}
-		orb := &trigger.Order[0].OrderDetail.OrderDetailSegment.ObservationRequestSegment
-		{
-			orb.ObservationRequest = "1"
-			orb.FillerOrderNumber.EntityIdentifier = "FIL4345"
-			orb.UniversalServiceIdentifier.Identifier = "DNA-A"
-			orb.UniversalServiceIdentifier.Text = "Loki A am DNA Strang"
-			orb.RequestedDateTime = time.Now()
-		}
+	dt, _ := time.Parse("20060102150405", "20230203080903")
+	source := hl7v23.ORM_O01{
+		MSH: hl7v23.MSH{
+			ReceivingApplication:           hl7v23.HD{NamespaceId: "CIT"},
+			ReceivingFacility:              hl7v23.HD{NamespaceId: "LAB"},
+			SendingApplication:             hl7v23.HD{NamespaceId: "HL7_Host"},
+			SendingFacility:                hl7v23.HD{NamespaceId: "HL7_Office"},
+			DateTimeOfMessage:              dt,
+			MessageType:                    "ORM",
+			MessageTriggerEvent:            "O01",
+			MessageControlID:               "CID586246",
+			ProcessingID:                   "P",
+			VersionID:                      "2.3",
+			SequenceNumber:                 0,
+			AcceptAcknowledgementType:      "ER",
+			ApplicationAcknowledgementType: "SU",
+			CharacterSet:                   []string{"8859/1"},
+		},
+		Order: []hl7v23.Order{
+			{
+				CommonOrderSegment: hl7v23.ORC{
+					OrderControl: "NW",
+					FillerOrderNumber: hl7v23.EI{
+						EntityIdentifier: "23071012",
+					},
+					DateTimeOfTransaction: dt,
+					OrderingProvider: hl7v23.XCN{
+						ID: "AKB",
+					},
+				},
+				OrderDetail: hl7v23.OrderDetail{
+					OrderDetailSegment: hl7v23.OrderDetailSegment{
+						ObservationRequestSegment: hl7v23.OBR{
+							ObservationRequest: "1",
+							FillerOrderNumber: hl7v23.EI{
+								EntityIdentifier: "FIL4345",
+							},
+							UniversalServiceIdentifier: hl7v23.CE{
+								Identifier: "DNA-A",
+								Text:       "Loki A am DNA Strang",
+							},
+							RequestedDateTime: dt,
+						},
+					},
+				},
+			},
+			{
+				CommonOrderSegment: hl7v23.ORC{
+					OrderControl: "NW",
+					FillerOrderNumber: hl7v23.EI{
+						EntityIdentifier: "23071012",
+					},
+					DateTimeOfTransaction: dt,
+					OrderingProvider: hl7v23.XCN{
+						ID: "AKB",
+					},
+				},
+				OrderDetail: hl7v23.OrderDetail{
+					OrderDetailSegment: hl7v23.OrderDetailSegment{
+						ObservationRequestSegment: hl7v23.OBR{
+							ObservationRequest: "2",
+							FillerOrderNumber: hl7v23.EI{
+								EntityIdentifier: "FIL4345",
+							},
+							UniversalServiceIdentifier: hl7v23.CE{
+								Identifier: "DNA-DRQB",
+								Text:       "DRQB Loki",
+							},
+							RequestedDateTime: dt,
+						},
+					},
+				},
+			},
+		},
+		Patient: hl7v23.Patient{
+			PatientIdentification: hl7v23.PID{
+				InternalID: []hl7v23.CX{
+					{
+						Id: "01020304",
+					},
+				},
+				Name: hl7v23.XPN{
+					FamilyName: "Nachnamäh",
+					GivenName:  "Vörname",
+				},
+				Sex: "U",
+			},
+			PatientVisit: hl7v23.PatientVisit{
+				PatientVisit: hl7v23.PV1{
+					VisitNumber: hl7v23.CX{
+						Id: "VID001",
+					},
+					PatientClass: "S",
+				},
+			},
+		},
 	}
-	trigger.Order = append(trigger.Order, hl7v23.Order{})
-	{
-		orc := &trigger.Order[1].CommonOrderSegment
-		{
-			orc.OrderControl = "NW"
-			orc.PlacerOrderNumber.EntityIdentifier = "23071012"
-			orc.DateTimeOfTransaction = time.Now()
-			orc.OrderingProvider.ID = "AKB"
-		}
-		orb := &trigger.Order[1].OrderDetail.OrderDetailSegment.ObservationRequestSegment
-		{
-			orb.ObservationRequest = "2"
-			orb.PlacerOrderNumber.EntityIdentifier = "FIL4345"
-			orb.UniversalServiceIdentifier.Identifier = "DNA-DRQB"
-			orb.UniversalServiceIdentifier.Text = "DRQB Loki"
-			orb.RequestedDateTime = time.Now()
-		}
-	}
-	pid := &trigger.Patient.PatientIdentification
-	{
-		pid.InternalID = append(pid.InternalID, hl7v23.CX{})
-		pid.InternalID[0].Id = "01020304"
-		pid.Name.FamilyName = "Nachnamäh"
-		pid.Name.GivenName = "Vörname"
-		pid.Sex = "U"
-	}
-	pv1 := &trigger.Patient.PatientVisit.PatientVisit
-	{
-		pv1.VisitNumber.Id = "VID001"
-		pv1.PatientClass = "S"
-	}
+	expected := `MSH|^~\&|HL7_Host|HL7_Office|CIT|LAB|20230203080903||ORM^O01|CID586246|P|2.3|0||ER|SU||8859/1
+PID|0||01020304||Nachnamäh^Vörname|||U
+PD1
+PV1||S|||||||||||||||||VID001|||||||||||||0.000|0.000|||||||||||||0.000|0.000|0.000|0.000
+PV2||||||||||0.000|0.000|||||||||0.000|||^^0.000
+GT1|||||||||||||||0.000||||||||||||0.000^^0.000^0.000|0.000
+ORC|NW||23071012||||0^^^^^^^^^&&&&&&0||20230203080903|||AKB
+OBR|1||FIL4345|DNA-A^Loki A am DNA Strang||20230203080903|||0||||||||||||||0||||||||||||||0
+RQD|||||0.000
+RQ1
+RQ1||0.000|0.000|||||||0.000||0.000|||||0.000
+ODS
+ODT
+BLG|||0
+ORC|NW||23071012||||0^^^^^^^^^&&&&&&0||20230203080903|||AKB
+OBR|2||FIL4345|DNA-DRQB^DRQB Loki||20230203080903|||0||||||||||||||0||||||||||||||0
+RQD|||||0.000
+RQ1
+RQ1||0.000|0.000|||||||0.000||0.000|||||0.000
+ODS
+ODT
+BLG|||0`
 	config.Encoding = encoding.ASCII
 	config.TimeZone = timezone.UTC
+	config.Notation = notation.Short
 	// Act
-	marshalledMessageBytes, err := parser.Marshal(trigger, config)
+	marshaled, err := parser.Marshal(source, config)
+	result := string(utils.ConvertBytes2Dto1D(marshaled))
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, mshData, string(marshalledMessageBytes[0]))
+	assert.Equal(t, expected, result)
 	// Teardown
 	teardown()
 }
 
 func TestMarshalPID(t *testing.T) {
 	// Arrange
-	mshData := "MSH|^~\\&|HL7_Host|HL7_Office|CIT|LAB|20110926125155||ORM^O01|20110926125155|P|2.3|0||ER|ER||8859/1|\u000d"
-	pidData := "PID|1|a^b~^c|00100M56016||Smith^Harry||19500412|M\u000d"
-	filedata := mshData + pidData
-	var message hl7v23.ORM_O01
-	// TODO: remove cross testing
-	err := parser.Unmarshal([]byte(filedata), &message, config)
+	dt, _ := time.Parse("20060102150405", "20110926125155")
+	dob, _ := time.Parse("20060102", "19500412")
+	source := hl7v23.ORM_O01{
+		MSH: hl7v23.MSH{
+			ReceivingApplication:           hl7v23.HD{NamespaceId: "CIT"},
+			ReceivingFacility:              hl7v23.HD{NamespaceId: "LAB"},
+			SendingApplication:             hl7v23.HD{NamespaceId: "HL7_Host"},
+			SendingFacility:                hl7v23.HD{NamespaceId: "HL7_Office"},
+			DateTimeOfMessage:              dt.UTC(),
+			MessageType:                    "ORM",
+			MessageTriggerEvent:            "O01",
+			MessageControlID:               "CID586246",
+			ProcessingID:                   "P",
+			VersionID:                      "2.3",
+			SequenceNumber:                 0,
+			AcceptAcknowledgementType:      "ER",
+			ApplicationAcknowledgementType: "ER",
+			CharacterSet:                   []string{"8859/1"},
+		},
+		Patient: hl7v23.Patient{
+			PatientIdentification: hl7v23.PID{
+				ID: 1,
+				InternalID: []hl7v23.CX{
+					{
+						Id:         "a",
+						CheckDigit: "b",
+					},
+					{
+						CheckDigit: "c",
+					},
+				},
+				AlternateID: []hl7v23.CX{
+					{
+						Id: "00100M56016",
+					},
+				},
+				Name: hl7v23.XPN{
+					FamilyName: "Smith",
+					GivenName:  "Harry",
+				},
+				DOB: dob,
+				Sex: "M",
+			},
+		},
+	}
+	expected0 := "MSH|^~\\&|HL7_Host|HL7_Office|CIT|LAB|20110926145155||ORM^O01|CID586246|P|2.3|0||ER|ER||8859/1"
+	expected1 := "PID|1||a^b~^c|00100M56016|Smith^Harry||19500412|M"
 	config.Encoding = encoding.ASCII
 	// Act
-	marshalledMessageBytes, err := parser.Marshal(message, config)
+	result, err := parser.Marshal(source, config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, pidData, string(marshalledMessageBytes[1]))
+	assert.Equal(t, expected0, string(result[0]))
+	assert.Equal(t, expected1, string(result[1]))
 	// Teardown
 	teardown()
 }

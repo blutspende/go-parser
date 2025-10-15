@@ -45,8 +45,8 @@ type Patient struct {
 	PatientIdentification     PID          `hl7:"PID,optional" json:"patientIdentification,omitempty"`
 	PatientDemographics       PD1          `hl7:"PD1,optional" json:"patientDemographics,omitempty"`
 	NotesAndComments          []NTE        `hl7:"NTE,optional" json:"notesAndComments,omitempty"`
-	PatientVisit              PatientVisit `hl7:",optional" json:"patientVisit,omitempty"`
-	Insurance                 []Insurance  `hl7:",optional" json:"insurance,omitempty"`
+	PatientVisit              PatientVisit `json:"patientVisit,omitempty"`
+	Insurance                 []Insurance  `json:"insurance,omitempty"`
 	Guarantor                 GT1          `hl7:"GT1,optional" json:"guarantor,omitempty"`
 	PatientAllergyInformation []AL1        `hl7:"AL1,optional" json:"patientAllergyInformation,omitempty"`
 }

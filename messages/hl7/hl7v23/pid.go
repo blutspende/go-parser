@@ -29,7 +29,7 @@ type PID struct {
 	EthnicGroup             string    `hl7:"23" json:"ethnicGroup,omitempty"`
 	BirthPlace              string    `hl7:"24" json:"birthPlace,omitempty"`
 	MultipleBirthIndicator  string    `hl7:"25" json:"multipleBirthIndicator,omitempty"`
-	BirthOrder              int       `hl7:"26" json:"birthOrder,omitempty"`
+	BirthOrder              *int      `hl7:"26" json:"birthOrder,omitempty"`
 	Citizenship             []string  `hl7:"27" json:"citizenship,omitempty"`
 	VeteransMilitaryStatus  CE        `hl7:"28" json:"veteransMilitaryStatus,omitempty"`
 	NationalityCode         CE        `hl7:"29" json:"nationalityCode,omitempty"`
