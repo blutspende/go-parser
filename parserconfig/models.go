@@ -83,8 +83,8 @@ var DefaultDelimitersASTM = Delimiters{
 }
 var DefaultDelimitersHL7 = Delimiters{
 	Field:        `|`,
-	Repeat:       `~`,
 	Component:    `^`,
-	SubComponent: `&`,
+	Repeat:       `~`,
 	Escape:       `\`,
+	SubComponent: `&`,
 }

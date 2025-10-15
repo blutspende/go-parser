@@ -79,7 +79,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 				convertedValue := ""
 				if sourceFieldAnnotation.IsSubstructure {
 					// If the field is a substructure use buildSubstructure to process it
-					convertedValue, err = buildSubstructure(elementValue.Interface(), config)
+					convertedValue, err = buildSubstructure(elementValue.Interface(), 1, config)
 					if err != nil {
 						return "", err
 					}
@@ -131,7 +131,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 			processedComponentFields = append(processedComponentFields, sourceFieldAnnotation.FieldPos)
 		} else if sourceFieldAnnotation.IsSubstructure {
 			// If the field is a substructure use buildSubstructure to process it
-			fieldValueString, err = buildSubstructure(sourceValues[i].Interface(), config)
+			fieldValueString, err = buildSubstructure(sourceValues[i].Interface(), 1, config)
 			if err != nil {
 				return "", err
 			}
@@ -153,7 +153,12 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 	return result, nil
 }
 
-func buildSubstructure(sourceStruct interface{}, config *parserconfig.Configuration) (result string, err error) {
+func buildSubstructure(sourceStruct interface{}, depth int, config *parserconfig.Configuration) (result string, err error) {
+	// Check depth limits
+	if (config.Protocol == parserconfig.ASTM && depth > 1) || (config.Protocol == parserconfig.HL7 && depth > 2) {
+		return "", errmsg.ErrLineBuildingMaximumRecursionDepthExceeded
+	}
+
 	// Process the target structure
 	sourceTypes, sourceValues, sourceTypesLength, err := ProcessStructReflection(sourceStruct)
 	if err != nil {
@@ -175,17 +180,36 @@ func buildSubstructure(sourceStruct interface{}, config *parserconfig.Configurat
 				return "", err
 			}
 		}
-		// Convert the component directly
-		componentValueString, err := convertField(sourceValues[i], sourceFieldAnnotation, config)
+
+		// Recurse if the source is also a struct
+		var componentValueString string
+		if sourceValues[i].Kind() == reflect.Struct && sourceFieldAnnotation.IsSubstructure {
+			componentValueString, err = buildSubstructure(sourceValues[i].Addr().Interface(), depth+1, config)
+		} else {
+			// Convert the component directly
+			componentValueString, err = convertField(sourceValues[i], sourceFieldAnnotation, config)
+		}
 		if err != nil {
 			return "", err
 		}
+
 		// Store the component value in the map using FieldPos as the key
 		componentMap[sourceFieldAnnotation.FieldPos] = componentValueString
 	}
 
+	// Determine depth dependent delimiter
+	delimiter := ""
+	switch depth {
+	case 1:
+		delimiter = config.Delimiters.Component
+	case 2:
+		delimiter = config.Delimiters.SubComponent
+	default:
+		return "", errmsg.ErrLineBuildingInvalidRecursionDepth
+	}
+
 	// Construct the result string
-	result = constructResult(componentMap, config.Delimiters.Component, config.Notation)
+	result = constructResult(componentMap, delimiter, config.Notation)
 
 	// Return result with no error
 	return result, nil

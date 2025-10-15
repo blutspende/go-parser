@@ -50,8 +50,10 @@ var (
 
 // LineBuilding
 var (
-	ErrLineBuildingInvalidDateFormat           = errors.New("invalid date format")
-	ErrLineBuildingUsupportedDataType          = errors.New("unsupported data type")
-	ErrLineBuildingReservedFieldPosReference   = errors.New("field position 1 and 2 are reserved")
-	ErrLineBuildingInvalidLengthAttributeValue = errors.New("invalid length attribute value")
+	ErrLineBuildingInvalidDateFormat             = errors.New("invalid date format")
+	ErrLineBuildingUsupportedDataType            = errors.New("unsupported data type")
+	ErrLineBuildingReservedFieldPosReference     = errors.New("field position 1 and 2 are reserved")
+	ErrLineBuildingInvalidLengthAttributeValue   = errors.New("invalid length attribute value")
+	ErrLineBuildingMaximumRecursionDepthExceeded = errors.New("line building maximum recursion depth exceeded")
+	ErrLineBuildingInvalidRecursionDepth         = errors.New("invalid recursion depth")
 )

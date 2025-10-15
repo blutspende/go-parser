@@ -670,3 +670,35 @@ func TestBuildLine_SequenceHL7(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "SEC||4|data", result)
 }
+
+func TestBuildLine_SubSub_ASTM(t *testing.T) {
+	// Arrange
+	source := SubSubRecord{}
+	// Act
+	_, err := BuildLine(source, "SUB", 1, config)
+	// Assert
+	assert.EqualError(t, err, errmsg.ErrLineBuildingMaximumRecursionDepthExceeded.Error())
+}
+
+func TestBuildLine_SubSub_HL7(t *testing.T) {
+	// Arrange
+	source := SubSubRecord{
+		First: "field1",
+		Second: SubField{
+			First: "comp1",
+			Second: SubSubField{
+				First:  "sub1",
+				Second: "sub2",
+				Third:  "sub3",
+			},
+			Third: "comp3",
+		},
+		Third: "field3",
+	}
+	expected := "SUB||field1|comp1^sub1&sub2&sub3^comp3|field3"
+	// Act
+	result, err := BuildLine(source, "SUB", 1, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, expected, result)
+}
