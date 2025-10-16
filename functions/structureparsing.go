@@ -112,6 +112,8 @@ func ParseStruct(inputLines []string, targetStruct interface{}, lineIndex *int, 
 						*lineIndex--
 						continue
 					} else {
+						// TODO: test the optionality
+						//return nil
 						return fmt.Errorf("%w @ln %d", errmsg.ErrStructureParsingLineTypeNameMismatch, *lineIndex)
 					}
 				}

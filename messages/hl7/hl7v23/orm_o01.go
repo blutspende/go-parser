@@ -20,7 +20,8 @@ type OrderDetail struct {
 	OrderDetailSegment OrderDetailSegment `json:"orderDetailSegment,omitempty"`
 	NotesAndComments   []NTE              `hl7:"NTE,optional" json:"notesAndComments,omitempty"`
 	Diagnosis          []DG1              `hl7:"DG1,optional" json:"diagnosis,omitempty"`
-	Observation        []Observation      `hl7:"Observation,optional" json:"observation,omitempty"`
+	// TODO: what is this "Observation" annotation? This is an array of a substructure, and should not have a segment name
+	Observation []Observation `hl7:"Observation,optional" json:"observation,omitempty"`
 }
 
 type Order struct {
@@ -37,14 +38,15 @@ type Insurance struct {
 }
 
 type PatientVisit struct {
-	PatientVisit          PV1 `hl7:"PV1" json:"patientVisit,omitempty"`
+	PatientVisit          PV1 `hl7:"PV1,optional" json:"patientVisit,omitempty"`
 	AdditionalInformation PV2 `hl7:"PV2,optional" json:"additionalInformation,omitempty"`
 }
 
 type Patient struct {
-	PatientIdentification     PID          `hl7:"PID,optional" json:"patientIdentification,omitempty"`
-	PatientDemographics       PD1          `hl7:"PD1,optional" json:"patientDemographics,omitempty"`
-	NotesAndComments          []NTE        `hl7:"NTE,optional" json:"notesAndComments,omitempty"`
+	PatientIdentification PID   `hl7:"PID,optional" json:"patientIdentification,omitempty"`
+	PatientDemographics   PD1   `hl7:"PD1,optional" json:"patientDemographics,omitempty"`
+	NotesAndComments      []NTE `hl7:"NTE,optional" json:"notesAndComments,omitempty"`
+	// TODO: how could this be optional?
 	PatientVisit              PatientVisit `json:"patientVisit,omitempty"`
 	Insurance                 []Insurance  `json:"insurance,omitempty"`
 	Guarantor                 GT1          `hl7:"GT1,optional" json:"guarantor,omitempty"`
