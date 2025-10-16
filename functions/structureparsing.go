@@ -87,11 +87,17 @@ func ParseStruct(inputLines []string, targetStruct interface{}, lineIndex *int, 
 				// Non-composite target: there is a single line to parse
 				// Make sure there are enough input lines
 				if *lineIndex >= len(inputLines) {
-					// Skip if the structure is optional, error otherwise
+					// Skip if the structure is optional, return otherwise
 					if _, exists := targetStructAnnotation.Attributes[constants.AttributeOptional]; exists {
 						continue
 					} else {
-						return errmsg.ErrStructureParsingInputLinesDepleted
+						// Error if completeness is enforced
+						// TODO: decide on the optionality
+						if config.EnforceMessageCompleteness {
+							return errmsg.ErrStructureParsingInputLinesDepleted
+						} else {
+							return nil
+						}
 					}
 				}
 				// Determine sequence number: first element inherits from the parent call, the rest is 1
@@ -112,8 +118,6 @@ func ParseStruct(inputLines []string, targetStruct interface{}, lineIndex *int, 
 						*lineIndex--
 						continue
 					} else {
-						// TODO: test the optionality
-						//return nil
 						return fmt.Errorf("%w @ln %d", errmsg.ErrStructureParsingLineTypeNameMismatch, *lineIndex)
 					}
 				}

@@ -23,6 +23,7 @@ type Configuration struct {
 	RoundLastDecimal           bool
 	KeepShortDateTimeZone      bool
 	EscapeOutputStrings        bool
+	EnforceMessageCompleteness bool
 	Delimiters                 Delimiters
 	TimeLocation               *time.Location
 }
@@ -40,6 +41,7 @@ var DefaultConfigurationASTM = Configuration{
 	RoundLastDecimal:           true,
 	KeepShortDateTimeZone:      true,
 	EscapeOutputStrings:        false,
+	EnforceMessageCompleteness: true,
 	Delimiters:                 DefaultDelimitersASTM,
 	TimeLocation:               nil,
 }
@@ -57,6 +59,7 @@ var DefaultConfigurationHL7 = Configuration{
 	RoundLastDecimal:           true,
 	KeepShortDateTimeZone:      true,
 	EscapeOutputStrings:        true,
+	EnforceMessageCompleteness: false,
 	Delimiters:                 DefaultDelimitersHL7,
 	TimeLocation:               nil,
 }
