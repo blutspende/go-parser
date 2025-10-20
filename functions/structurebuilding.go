@@ -31,7 +31,7 @@ func BuildStruct(sourceStruct interface{}, sequenceNumber int, depth int, config
 		// Source is an array it is iterated
 		if sourceStructAnnotation.IsArray {
 			for j := 0; j < sourceValues[i].Len(); j++ {
-				if sourceStructAnnotation.IsComposite {
+				if sourceStructAnnotation.IsGroup {
 					// Composite source: recursively build the composite structure
 					subResult, err := BuildStruct(sourceValues[i].Index(j).Addr().Interface(), j+1, depth+1, config)
 					if err != nil {
@@ -40,7 +40,7 @@ func BuildStruct(sourceStruct interface{}, sequenceNumber int, depth int, config
 					result = append(result, subResult...)
 				} else {
 					// Non-composite source: build the single line
-					lineResult, err := BuildLine(sourceValues[i].Index(j).Addr().Interface(), sourceStructAnnotation.StructName, j+1, config)
+					lineResult, err := BuildLine(sourceValues[i].Index(j).Addr().Interface(), sourceStructAnnotation.Tag, j+1, config)
 					if err != nil {
 						return nil, err
 					}
@@ -49,7 +49,7 @@ func BuildStruct(sourceStruct interface{}, sequenceNumber int, depth int, config
 			}
 		} else {
 			// Source is a single element
-			if sourceStructAnnotation.IsComposite {
+			if sourceStructAnnotation.IsGroup {
 				// Composite source: recursively build the composite structure
 				subResult, err := BuildStruct(sourceValue, sequenceNumber, depth+1, config)
 				if err != nil {
@@ -63,7 +63,7 @@ func BuildStruct(sourceStruct interface{}, sequenceNumber int, depth int, config
 					seqNum = sequenceNumber
 				}
 				// Non-composite source: build the single line
-				lineResult, err := BuildLine(sourceValue, sourceStructAnnotation.StructName, seqNum, config)
+				lineResult, err := BuildLine(sourceValue, sourceStructAnnotation.Tag, seqNum, config)
 				if err != nil {
 					return nil, err
 				}

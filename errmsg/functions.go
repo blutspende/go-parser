@@ -11,14 +11,12 @@ var (
 
 // AnnotationParsing
 var (
-	ErrAnnotationParsingMissingAnnotation            = errors.New("annotation missing")
-	ErrAnnotationParsingInvalidAnnotation            = errors.New("invalid annotation")
-	ErrAnnotationParsingInvalidAttribute             = errors.New("invalid attribute")
-	ErrAnnotationParsingInvalidAttributeFormat       = errors.New("invalid attribute format")
-	ErrAnnotationParsingInvalidInputStruct           = errors.New("invalid input struct")
-	ErrAnnotationParsingIllegalComponentArray        = errors.New("component array is not allowed")
-	ErrAnnotationParsingIllegalComponentSubstructure = errors.New("component substructure is not allowed")
-	ErrAnnotationParsingInvalidProtocol              = errors.New("invalid protocol")
+	ErrAnnotationParsingInvalidProtocol    = errors.New("invalid protocol")
+	ErrAnnotationParsingMissingAnnotation  = errors.New("annotation missing")
+	ErrAnnotationParsingInvalidElement     = errors.New("invalid annotation element")
+	ErrAnnotationParsingInvalidElementKey  = errors.New("invalid annotation element key")
+	ErrAnnotationParsingIllegal            = errors.New("illegal annotation combination")
+	ErrAnnotationParsingInvalidInputStruct = errors.New("invalid input struct type")
 )
 
 // LineParsing
@@ -26,7 +24,6 @@ var (
 	ErrLineParsingEmptyInput                    = errors.New("empty input")
 	ErrLineParsingHeaderTooShort                = errors.New("header too short")
 	ErrLineParsingMandatoryInputFieldsMissing   = errors.New("mandatory input fields missing")
-	ErrLineParsingLineTypeNameMismatch          = errors.New("line type name mismatch")
 	ErrLineParsingSequenceNumberMismatch        = errors.New("sequence number mismatch")
 	ErrLineParsingRequiredInputFieldMissing     = errors.New("required input field missing")
 	ErrLineParsingInputComponentsMissing        = errors.New("input components missing")

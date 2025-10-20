@@ -13,9 +13,9 @@ type FieldAnnotation struct {
 }
 
 type StructAnnotation struct {
-	Raw         string
-	StructName  string
-	IsComposite bool
-	IsArray     bool
-	Attributes  map[string]string
+	Raw        string
+	Tag        string
+	IsGroup    bool
+	IsArray    bool
+	Attributes map[string]string
 }

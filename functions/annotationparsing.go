@@ -1,7 +1,9 @@
 package functions
 
 import (
+	"fmt"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -12,21 +14,100 @@ import (
 	"github.com/blutspende/go-parser/parserconfig"
 )
 
+func getAnnotationKeyForProtocol(config *parserconfig.Configuration) (key string, err error) {
+	switch config.Protocol {
+	case parserconfig.ASTM:
+		return "astm", nil
+	case parserconfig.HL7:
+		return "hl7", nil
+	default:
+		return "", errmsg.ErrAnnotationParsingInvalidProtocol
+	}
+}
+
+func ParseStructAnnotation(input reflect.StructField, config *parserconfig.Configuration) (result models.StructAnnotation, err error) {
+	// Get the correct annotation key for the protocol
+	key, err := getAnnotationKeyForProtocol(config)
+	if err != nil {
+		return models.StructAnnotation{}, err
+	}
+	// Extract and save the raw value
+	result.Raw = input.Tag.Get(key)
+	if result.Raw == "" {
+		return models.StructAnnotation{}, errmsg.ErrAnnotationParsingMissingAnnotation
+	}
+	// Parse the annotation
+	elements, err := parseAnnotationElements(result.Raw, ";", "=", []string{
+		constants.AnnotationElementGroup,
+		constants.AnnotationElementTag,
+		constants.AnnotationElementAttribute,
+	})
+	// Extract if the struct is a group
+	_, result.IsGroup = elements[constants.AnnotationElementGroup]
+	// Extract the tag if present
+	var hasTag bool
+	result.Tag, hasTag = elements[constants.AnnotationElementTag]
+	// Check for illegal combinations
+	if result.IsGroup == hasTag {
+		return models.StructAnnotation{}, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingIllegal, "structure must be either a group or have a tag")
+	}
+	// Determine if the field is an array or not
+	result.IsArray = input.Type.Kind() == reflect.Slice || input.Type.Kind() == reflect.Array
+	// Extract attributes if any
+	if attributes, hasAttributes := elements[constants.AnnotationElementAttribute]; hasAttributes {
+		// Parse and save attributes
+		result.Attributes, err = parseAnnotationElements(attributes, ",", ":", []string{
+			constants.AttributeOptional,
+			constants.AttributeSubname,
+		})
+		if err != nil {
+			return models.StructAnnotation{}, err
+		}
+	}
+	// Return the result with no error
+	return result, nil
+}
+
 func ParseFieldAnnotation(input reflect.StructField, config *parserconfig.Configuration) (result models.FieldAnnotation, err error) {
 	// Get the correct annotation key for the protocol
 	key, err := getAnnotationKeyForProtocol(config)
 	if err != nil {
 		return models.FieldAnnotation{}, err
 	}
-	// Get the tag value and check if it is empty
-	raw := input.Tag.Get(key)
-	if raw == "" {
+	// Extract and save the raw value
+	result.Raw = input.Tag.Get(key)
+	if result.Raw == "" {
 		return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingMissingAnnotation
 	}
-	// Parse the annotation string
-	result, err = parseFieldAnnotationString(raw)
-	if err != nil {
-		return models.FieldAnnotation{}, err
+	// Parse the annotation
+	elements, err := parseAnnotationElements(result.Raw, ";", "=", []string{
+		constants.AnnotationElementPosition,
+		constants.AnnotationElementAttribute,
+	})
+	// Extract and parse the position
+	if posString, hasPos := elements[constants.AnnotationElementTag]; hasPos {
+		// Prepare the error for any parsing issue
+		errParse := fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingInvalidElement, posString)
+		// Split field and component (if any)
+		segments := strings.Split(posString, ".")
+		if len(segments) > 2 {
+			return models.FieldAnnotation{}, errParse
+		}
+		// Parse component position if present
+		if len(segments) == 2 {
+			result.IsComponent = true
+			result.ComponentPos, err = strconv.Atoi(segments[1])
+			if err != nil {
+				return models.FieldAnnotation{}, errParse
+			}
+		}
+		// Parse field position
+		result.FieldPos, err = strconv.Atoi(segments[0])
+		if err != nil {
+			return models.FieldAnnotation{}, errParse
+		}
+	} else {
+		return models.FieldAnnotation{}, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingIllegal, "field must have a position")
 	}
 	// Determine if the field is an array or not
 	result.IsArray = input.Type.Kind() == reflect.Slice || input.Type.Kind() == reflect.Array
@@ -40,92 +121,29 @@ func ParseFieldAnnotation(input reflect.StructField, config *parserconfig.Config
 	result.IsSubstructure = checkType.Kind() == reflect.Struct && checkType != reflect.TypeOf(time.Time{})
 	// Check illegal combinations
 	if result.IsComponent && result.IsArray {
-		return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingIllegalComponentArray
+		return models.FieldAnnotation{}, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingIllegal, "field can not be component and array")
 	}
 	if result.IsComponent && result.IsSubstructure {
-		return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingIllegalComponentSubstructure
+		return models.FieldAnnotation{}, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingIllegal, "field can not be component and substructure")
 	}
-	// All okay, return the result and no error
-	return result, nil
-}
-
-func parseFieldAnnotationString(input string) (result models.FieldAnnotation, err error) {
-	// Save the input into the raw
-	result.Raw = input
-	// Separate attributes and the field definition
-	fieldDef, attributes := splitByFirst(input, ",")
-	// Parse and save attributes
-	result.Attributes, err = parseAttributes(attributes, []string{
-		constants.AttributeRequired,
-		constants.AttributeLongdate,
-		constants.AttributeLength,
-		constants.AttributeSequence,
-	})
-	if err != nil {
-		return models.FieldAnnotation{}, err
-	}
-	// Split field and component (if any) and parse them
-	segments := strings.Split(fieldDef, ".")
-	if len(segments) > 2 {
-		return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingInvalidAnnotation
-	}
-	if len(segments) == 2 {
-		result.IsComponent = true
-		result.ComponentPos, err = strconv.Atoi(segments[1])
+	// Extract attributes if any
+	if attributes, hasAttributes := elements[constants.AnnotationElementAttribute]; hasAttributes {
+		// Parse and save attributes
+		result.Attributes, err = parseAnnotationElements(attributes, ",", ":", []string{
+			constants.AttributeRequired,
+			constants.AttributeLongdate,
+			constants.AttributeLength,
+			constants.AttributeSequence,
+		})
 		if err != nil {
-			return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingInvalidAnnotation
+			return models.FieldAnnotation{}, err
 		}
 	}
-	result.FieldPos, err = strconv.Atoi(segments[0])
-	if err != nil {
-		return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingInvalidAnnotation
-	}
-	// Return the result
+	// Return the result with no error
 	return result, nil
 }
 
-func ParseStructAnnotation(input reflect.StructField, config *parserconfig.Configuration) (result models.StructAnnotation, err error) {
-	// Get the correct annotation key for the protocol
-	key, err := getAnnotationKeyForProtocol(config)
-	if err != nil {
-		return models.StructAnnotation{}, err
-	}
-	// Get the tag value
-	raw := input.Tag.Get(key)
-	// Save the raw annotation
-	result.Raw = raw
-	// Determine if the struct is composite (no tag) or not
-	result.IsComposite = raw == ""
-	// Determine if the field is an array or not
-	result.IsArray = input.Type.Kind() == reflect.Slice || input.Type.Kind() == reflect.Array
-	// Composite has no tag so further parsing is not needed
-	if result.IsComposite {
-		return result, nil
-	}
-	// Separate attributes and the struct name, and save the name
-	attributes := ""
-	result.StructName, attributes = splitByFirst(raw, ",")
-	// Parse and save attributes
-	result.Attributes, err = parseAttributes(attributes, []string{
-		constants.AttributeOptional,
-		constants.AttributeSubname,
-	})
-	// Return the result
-	return result, err
-}
-
-func getAnnotationKeyForProtocol(config *parserconfig.Configuration) (key string, err error) {
-	switch config.Protocol {
-	case parserconfig.ASTM:
-		return "astm", nil
-	case parserconfig.HL7:
-		return "hl7", nil
-	default:
-		return "", errmsg.ErrAnnotationParsingInvalidProtocol
-	}
-}
-
-func parseAttributes(input string, valids []string) (result map[string]string, err error) {
+func parseAnnotationElements(input, elemSep, partSep string, valids []string) (result map[string]string, err error) {
 	// Initialize the result map
 	result = make(map[string]string)
 	// Check for empty input (if empty still return a usable empty map)
@@ -133,17 +151,17 @@ func parseAttributes(input string, valids []string) (result map[string]string, e
 		return result, nil
 	}
 	// Split the input string by commas
-	attributes := strings.Split(input, ",")
+	attributes := strings.Split(input, elemSep)
 	// Iterate over the attributes and parse them
 	for _, attribute := range attributes {
 		// Split each attribute by the colon
-		attributeParts := strings.Split(attribute, ":")
+		attributeParts := strings.Split(attribute, partSep)
 		if len(attributeParts) > 2 {
-			return nil, errmsg.ErrAnnotationParsingInvalidAttributeFormat
+			return nil, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingInvalidElement, input)
 		}
-		// Check if the attribute is valid
-		if !isInList(attributeParts[0], valids) {
-			return nil, errmsg.ErrAnnotationParsingInvalidAttribute
+		// Check if the attribute is valid (empty valids means: anything goes)
+		if len(valids) > 0 && !slices.Contains(valids, attributeParts[0]) {
+			return nil, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingInvalidElementKey, attributeParts[0])
 		}
 		// Save the attribute name and value (if present)
 		if len(attributeParts) == 2 {
@@ -154,22 +172,6 @@ func parseAttributes(input string, valids []string) (result map[string]string, e
 	}
 	// Return the result map and no error
 	return result, nil
-}
-
-func splitByFirst(input string, delimiter string) (before string, after string) {
-	index := strings.Index(input, delimiter) // Find the first occurrence of the comma
-	if index == -1 {
-		return input, "" // No comma, return whole string and empty second part
-	}
-	return input[:index], input[index+1:] // Split at the first comma
-}
-func isInList(target string, list []string) bool {
-	set := make(map[string]struct{})
-	for _, item := range list {
-		set[item] = struct{}{}
-	}
-	_, exists := set[target]
-	return exists
 }
 
 func ProcessStructReflection(inputStruct interface{}) (outputTypes []reflect.StructField, outputValues []reflect.Value, length int, err error) {

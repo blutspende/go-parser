@@ -68,7 +68,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 
 	// Check for mach of name and subname
 	// Note: name checking is always enforced, but instead of error it is returned in the nameOk variable
-	if inputFields[0] != recordAnnotation.StructName {
+	if inputFields[0] != recordAnnotation.Tag {
 		return false, nil
 	}
 	if subname, exists := recordAnnotation.Attributes[constants.AttributeSubname]; exists {
@@ -325,7 +325,8 @@ func setField(value string, field reflect.Value, annotation models.FieldAnnotati
 			}
 			// Determine if the time zone should be kept or set to UTC
 			_, hasLongdateAnnotation := annotation.Attributes[constants.AttributeLongdate]
-			keepTimeZone := isShort && config.KeepShortDateTimeZone && !hasLongdateAnnotation
+			// TODO: test this better
+			keepTimeZone := isShort || (config.KeepShortDateTimeZone && !hasLongdateAnnotation)
 			// Adjust the time zone if needed
 			if keepTimeZone {
 				timeInLocation = timeInLocation.In(config.TimeLocation)
@@ -414,8 +415,7 @@ func replaceHL7Escapes(input string, config *parserconfig.Configuration) (result
 				if regexp.MustCompile("^X[0-9A-F]{2}$").MatchString(escapeSeq) {
 					charNumStr := escapeSeq[1:]
 					charInt, _ := strconv.ParseInt(charNumStr, 16, 32)
-					charStr := string(rune(charInt))
-					builder.WriteString(charStr)
+					builder.WriteRune(rune(charInt))
 				} else {
 					return "", errmsg.ErrLineParsingUnknownEscapeSequence
 				}

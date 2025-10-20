@@ -49,7 +49,7 @@ func ParseStruct(inputLines []string, targetStruct interface{}, lineIndex *int, 
 				elem := reflect.New(targetValues[i].Type().Elem()).Elem()
 
 				nameOk := true
-				if targetStructAnnotation.IsComposite {
+				if targetStructAnnotation.IsGroup {
 					// Composite target: recursively parse the composite structure
 					err = ParseStruct(inputLines, elem.Addr().Interface(), lineIndex, seq, depth+1, config)
 					// If the error is a line type name mismatch, it means the end of the array
@@ -77,7 +77,7 @@ func ParseStruct(inputLines []string, targetStruct interface{}, lineIndex *int, 
 			}
 		} else {
 			// Single element structure
-			if targetStructAnnotation.IsComposite {
+			if targetStructAnnotation.IsGroup {
 				// Composite target: go further down the rabbit hole
 				err = ParseStruct(inputLines, targetValue, lineIndex, 1, depth+1, config)
 				if err != nil {

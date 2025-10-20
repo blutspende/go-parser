@@ -10,3 +10,9 @@ const AttributeLongdate string = "longdate" // Indicating that the date should b
 const AttributeLength string = "length"     // used for specifying the decimal length of float fields - astm:"1,length:2" (output only)
 const AttributeSubname string = "subname"   // used for specifying a subname for a record - astm:"M,subname:MATRIX"
 const AttributeSequence string = "sequence" // used for marking a field for the sequence number in hl7
+
+// Annotation element types
+const AnnotationElementGroup string = "GROUP"
+const AnnotationElementTag string = "TAG"
+const AnnotationElementPosition string = "POS"
+const AnnotationElementAttribute string = "ATR"
