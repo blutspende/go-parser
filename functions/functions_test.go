@@ -31,69 +31,25 @@ func TestMain(m *testing.M) {
 // Structure annotation helper factory
 func createStructAnnotation(name string) models.StructAnnotation {
 	return models.StructAnnotation{
-		StructName: name,
+		Tag: name,
 	}
 }
 
 // Common test structures
 
 // Annotation records
-type AnnotatedLine struct {
-	Field string `astm:"3.2,length:4"`
+type Record struct {
+	Field string `astm:"POS=3" hl7:"POS=3"`
 }
-type AnnotatedArrayLine struct {
-	Field []string `astm:"3,length:4"`
+type ComplexRecord struct {
+	Field string `astm:"POS=3.2;ATR=length:4"`
 }
-type Line struct {
-	Field string `astm:"3"`
-}
-type SingleLineStruct struct {
-	Line Line `astm:"L"`
-}
-type LineHL7 struct {
-	Field string `hl7:"3"`
-}
-type SingleLineStructHL7 struct {
-	Line LineHL7 `hl7:"LIN"`
-}
-type AnnotatedArrayStruct struct {
-	Lines []Line `astm:"L,optional"`
-}
-type CompositeStruct struct {
-	Composite AnnotatedArrayStruct
-}
-type CompositeArrayStruct struct {
-	Composite []AnnotatedArrayStruct
+type Group struct {
+	Record Record `astm:"TAG=R" hl7:"TAG=REC"`
 }
 type Substructure struct {
-	FirstComponent  string `astm:"1"`
-	SecondComponent string `astm:"2"`
-}
-type IllegalComponentArray struct {
-	ComponentArray []string `astm:"3.1"`
-}
-type IllegalComponentSubstructure struct {
-	ComponentSubstructure Substructure `astm:"3.1"`
-}
-type SubstructuredLine struct {
-	Field Substructure   `astm:"3"`
-	Array []Substructure `astm:"4"`
-}
-type TimeLine struct {
-	Time time.Time `astm:"3"`
-}
-
-type InvalidFieldAttribute struct {
-	First string `astm:"3,invalid"`
-}
-type InvalidStructAttribute struct {
-	Record Line `astm:"R,invalid"`
-}
-type TooManyStructNameAttributeValues struct {
-	Record Line `astm:"R,subname:ONE:TWO"`
-}
-type SubnameAttribute struct {
-	Record Line `astm:"R,subname:SUBNAME"`
+	FirstComponent  string `astm:"POS=1" hl7:"POS=1"`
+	SecondComponent string `astm:"POS=2" hl7:"POS=2"`
 }
 
 // Single line records

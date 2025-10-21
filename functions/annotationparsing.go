@@ -25,49 +25,6 @@ func getAnnotationKeyForProtocol(config *parserconfig.Configuration) (key string
 	}
 }
 
-func ParseStructAnnotation(input reflect.StructField, config *parserconfig.Configuration) (result models.StructAnnotation, err error) {
-	// Get the correct annotation key for the protocol
-	key, err := getAnnotationKeyForProtocol(config)
-	if err != nil {
-		return models.StructAnnotation{}, err
-	}
-	// Extract and save the raw value
-	result.Raw = input.Tag.Get(key)
-	if result.Raw == "" {
-		return models.StructAnnotation{}, errmsg.ErrAnnotationParsingMissingAnnotation
-	}
-	// Parse the annotation
-	elements, err := parseAnnotationElements(result.Raw, ";", "=", []string{
-		constants.AnnotationElementGroup,
-		constants.AnnotationElementTag,
-		constants.AnnotationElementAttribute,
-	})
-	// Extract if the struct is a group
-	_, result.IsGroup = elements[constants.AnnotationElementGroup]
-	// Extract the tag if present
-	var hasTag bool
-	result.Tag, hasTag = elements[constants.AnnotationElementTag]
-	// Check for illegal combinations
-	if result.IsGroup == hasTag {
-		return models.StructAnnotation{}, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingIllegal, "structure must be either a group or have a tag")
-	}
-	// Determine if the field is an array or not
-	result.IsArray = input.Type.Kind() == reflect.Slice || input.Type.Kind() == reflect.Array
-	// Extract attributes if any
-	if attributes, hasAttributes := elements[constants.AnnotationElementAttribute]; hasAttributes {
-		// Parse and save attributes
-		result.Attributes, err = parseAnnotationElements(attributes, ",", ":", []string{
-			constants.AttributeOptional,
-			constants.AttributeSubname,
-		})
-		if err != nil {
-			return models.StructAnnotation{}, err
-		}
-	}
-	// Return the result with no error
-	return result, nil
-}
-
 func ParseFieldAnnotation(input reflect.StructField, config *parserconfig.Configuration) (result models.FieldAnnotation, err error) {
 	// Get the correct annotation key for the protocol
 	key, err := getAnnotationKeyForProtocol(config)
@@ -84,8 +41,11 @@ func ParseFieldAnnotation(input reflect.StructField, config *parserconfig.Config
 		constants.AnnotationElementPosition,
 		constants.AnnotationElementAttribute,
 	})
+	if err != nil {
+		return models.FieldAnnotation{}, err
+	}
 	// Extract and parse the position
-	if posString, hasPos := elements[constants.AnnotationElementTag]; hasPos {
+	if posString, hasPos := elements[constants.AnnotationElementPosition]; hasPos {
 		// Prepare the error for any parsing issue
 		errParse := fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingInvalidElement, posString)
 		// Split field and component (if any)
@@ -137,6 +97,52 @@ func ParseFieldAnnotation(input reflect.StructField, config *parserconfig.Config
 		})
 		if err != nil {
 			return models.FieldAnnotation{}, err
+		}
+	}
+	// Return the result with no error
+	return result, nil
+}
+
+func ParseStructAnnotation(input reflect.StructField, config *parserconfig.Configuration) (result models.StructAnnotation, err error) {
+	// Get the correct annotation key for the protocol
+	key, err := getAnnotationKeyForProtocol(config)
+	if err != nil {
+		return models.StructAnnotation{}, err
+	}
+	// Extract and save the raw value
+	result.Raw = input.Tag.Get(key)
+	if result.Raw == "" {
+		return models.StructAnnotation{}, errmsg.ErrAnnotationParsingMissingAnnotation
+	}
+	// Parse the annotation
+	elements, err := parseAnnotationElements(result.Raw, ";", "=", []string{
+		constants.AnnotationElementGroup,
+		constants.AnnotationElementTag,
+		constants.AnnotationElementAttribute,
+	})
+	if err != nil {
+		return models.StructAnnotation{}, err
+	}
+	// Extract if the struct is a group
+	_, result.IsGroup = elements[constants.AnnotationElementGroup]
+	// Extract the tag if present
+	var hasTag bool
+	result.Tag, hasTag = elements[constants.AnnotationElementTag]
+	// Check for illegal combinations
+	if result.IsGroup == hasTag {
+		return models.StructAnnotation{}, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingIllegal, "structure must be either a group or have a tag")
+	}
+	// Determine if the field is an array or not
+	result.IsArray = input.Type.Kind() == reflect.Slice || input.Type.Kind() == reflect.Array
+	// Extract attributes if any
+	if attributes, hasAttributes := elements[constants.AnnotationElementAttribute]; hasAttributes {
+		// Parse and save attributes
+		result.Attributes, err = parseAnnotationElements(attributes, ",", ":", []string{
+			constants.AttributeOptional,
+			constants.AttributeSubname,
+		})
+		if err != nil {
+			return models.StructAnnotation{}, err
 		}
 	}
 	// Return the result with no error
