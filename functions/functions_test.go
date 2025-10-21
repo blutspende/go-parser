@@ -52,248 +52,247 @@ type Substructure struct {
 	SecondComponent string `astm:"POS=2" hl7:"POS=2"`
 }
 
-// Single line records
+// Records
 type ThreeFieldRecord struct {
-	First  string `astm:"3"`
-	Second string `astm:"4"`
-	Third  string `astm:"5"`
+	First  string `astm:"POS=3"`
+	Second string `astm:"POS=4"`
+	Third  string `astm:"POS=5"`
 }
 type SimpleRecord struct {
-	First string `astm:"3" hl7:"3"`
+	First string `astm:"POS=3" hl7:"POS=3"`
 }
 type UnorderedRecord struct {
-	First  string `astm:"3"`
-	Third  string `astm:"5"`
-	Second string `astm:"4"`
+	First  string `astm:"POS=3"`
+	Third  string `astm:"POS=5"`
+	Second string `astm:"POS=4"`
 }
 type MultitypeRecord struct {
-	String  string    `astm:"3"`
-	Int     int       `astm:"4"`
-	Float32 float32   `astm:"5"`
-	Float64 float64   `astm:"6"`
-	Date    time.Time `astm:"7"`
+	String  string    `astm:"POS=3"`
+	Int     int       `astm:"POS=4"`
+	Float32 float32   `astm:"POS=5"`
+	Float64 float64   `astm:"POS=6"`
+	Date    time.Time `astm:"POS=7"`
 }
 type DateLengthRecord struct {
-	ShortDate time.Time `astm:"3"`
-	LongDate  time.Time `astm:"4,longdate"`
+	ShortDate time.Time `astm:"POS=3"`
+	LongDate  time.Time `astm:"POS=4;ATR=longdate"`
 }
 type FloatLengthRecord struct {
-	Default    float64 `astm:"3"`
-	Length0    float64 `astm:"4,length:0"`
-	Length4    float64 `astm:"5,length:4"`
-	LengthFull float64 `astm:"6,length:-1"`
+	Default    float64 `astm:"POS=3"`
+	Length0    float64 `astm:"POS=4;ATR=length:0"`
+	Length4    float64 `astm:"POS=5;ATR=length:4"`
+	LengthFull float64 `astm:"POS=6;ATR=length:-1"`
 }
 type MultitypePointerRecord struct {
-	String  *string    `astm:"3"`
-	Int     *int       `astm:"4"`
-	Float32 *float32   `astm:"5"`
-	Float64 *float64   `astm:"6"`
-	Date    *time.Time `astm:"7"`
+	String  *string    `astm:"POS=3"`
+	Int     *int       `astm:"POS=4"`
+	Float32 *float32   `astm:"POS=5"`
+	Float64 *float64   `astm:"POS=6"`
+	Date    *time.Time `astm:"POS=7"`
 }
 type ComponentedRecord struct {
-	First       string `astm:"3"`
-	SecondComp1 string `astm:"4.1"`
-	SecondComp2 string `astm:"4.2"`
-	ThirdComp1  string `astm:"5.1"`
-	ThirdComp2  string `astm:"5.2"`
-	ThirdComp3  string `astm:"5.3"`
+	First       string `astm:"POS=3"`
+	SecondComp1 string `astm:"POS=4.1"`
+	SecondComp2 string `astm:"POS=4.2"`
+	ThirdComp1  string `astm:"POS=5.1"`
+	ThirdComp2  string `astm:"POS=5.2"`
+	ThirdComp3  string `astm:"POS=5.3"`
 }
 type ArrayRecord struct {
-	First string   `astm:"3"`
-	Array []string `astm:"4"`
+	First string   `astm:"POS=3"`
+	Array []string `astm:"POS=4"`
 }
 type HeaderRecord struct {
-	First string `astm:"3" hl7:"3"`
+	First string `astm:"POS=3" hl7:"POS=3"`
 }
 type HeaderDelimiterChange struct {
-	First string   `astm:"3"`
-	Array []string `astm:"4"`
-	Comp1 string   `astm:"5.1"`
-	Comp2 string   `astm:"5.2"`
+	First string   `astm:"POS=3"`
+	Array []string `astm:"POS=4"`
+	Comp1 string   `astm:"POS=5.1"`
+	Comp2 string   `astm:"POS=5.2"`
 }
 type RequiredFieldRecord struct {
-	First  string `astm:"3"`
-	Second string `astm:"4,required"`
-	Third  string `astm:"5"`
+	First  string `astm:"POS=3"`
+	Second string `astm:"POS=4;ATR=required"`
+	Third  string `astm:"POS=5"`
 }
 type RequiredComponentRecord struct {
-	First  string `astm:"3.1"`
-	Second string `astm:"3.2,required"`
-	Third  string `astm:"3.3"`
+	First  string `astm:"POS=3.1"`
+	Second string `astm:"POS=3.2;ATR=required"`
+	Third  string `astm:"POS=3.3"`
 }
 type RecordType1 struct {
-	First  string `astm:"3"`
-	Second int    `astm:"4"`
+	First  string `astm:"POS=3"`
+	Second int    `astm:"POS=4"`
 }
 type RecordType2 struct {
-	First  int    `astm:"3"`
-	Second string `astm:"4"`
+	First  int    `astm:"POS=3"`
+	Second string `astm:"POS=4"`
 }
 type SubnameRecordType1 struct {
-	Subname string `astm:"3"`
-	First   string `astm:"4"`
-	Second  int    `astm:"5"`
+	Subname string `astm:"POS=3"`
+	First   string `astm:"POS=4"`
+	Second  int    `astm:"POS=5"`
 }
 type SubnameRecordType2 struct {
-	Subname string `astm:"3"`
-	First   int    `astm:"4"`
-	Second  string `astm:"5"`
+	Subname string `astm:"POS=3"`
+	First   int    `astm:"POS=4"`
+	Second  string `astm:"POS=5"`
 }
 type EnumString string
 type EnumRecord struct {
-	Enum EnumString `astm:"3"`
+	Enum EnumString `astm:"POS=3"`
 }
 type ReservedFieldRecord struct {
-	TypeName  string `astm:"1"`
-	SeqNumber string `astm:"2"`
+	TypeName  string `astm:"POS=1"`
+	SeqNumber string `astm:"POS=2"`
 }
 type SparseFieldRecord struct {
-	Field3 string `astm:"3"`
-	Field5 string `astm:"5"`
+	Field3 string `astm:"POS=3"`
+	Field5 string `astm:"POS=5"`
 }
 type SubstructureField struct {
-	FirstComponent  string `astm:"1"`
-	SecondComponent string `astm:"2"`
-	ThirdComponent  string `astm:"3"`
+	FirstComponent  string `astm:"POS=1"`
+	SecondComponent string `astm:"POS=2"`
+	ThirdComponent  string `astm:"POS=3"`
 }
 type SubstructureRecord struct {
-	First  string            `astm:"3"`
-	Second SubstructureField `astm:"4"`
-	Third  string            `astm:"5"`
+	First  string            `astm:"POS=3"`
+	Second SubstructureField `astm:"POS=4"`
+	Third  string            `astm:"POS=5"`
 }
 type SubstructureArrayRecord struct {
-	First  string              `astm:"3"`
-	Second []SubstructureField `astm:"4"`
-	Third  string              `astm:"5"`
+	First  string              `astm:"POS=3"`
+	Second []SubstructureField `astm:"POS=4"`
+	Third  string              `astm:"POS=5"`
 }
 type SparseSubstructureField struct {
-	Component1 string `astm:"1"`
-	Component3 string `astm:"3"`
-	Component6 string `astm:"6"`
+	Component1 string `astm:"POS=1"`
+	Component3 string `astm:"POS=3"`
+	Component6 string `astm:"POS=6"`
 }
 type SparseSubstructureRecord struct {
-	First  string                  `astm:"3"`
-	Second SparseSubstructureField `astm:"4"`
+	First  string                  `astm:"POS=3"`
+	Second SparseSubstructureField `astm:"POS=4"`
 }
 type TimeRecord struct {
-	Time time.Time `astm:"3,longdate"`
+	Time time.Time `astm:"POS=3;ATR=longdate"`
 }
 type ShortDateRecord struct {
-	Time time.Time `astm:"3"`
+	Time time.Time `astm:"POS=3"`
 }
 type WrongComponentOrderRecord struct {
-	First string `astm:"3"`
-	Comp2 string `astm:"4.2"`
-	Comp1 string `astm:"4.1"`
-	Comp3 string `astm:"4.3"`
+	First string `astm:"POS=3"`
+	Comp2 string `astm:"POS=4.2"`
+	Comp1 string `astm:"POS=4.1"`
+	Comp3 string `astm:"POS=4.3"`
 }
 type WrongComponentPlacementRecord struct {
-	Field1 string `astm:"3"`
-	Comp1  string `astm:"4.1"`
-	Field2 string `astm:"5"`
-	Comp2  string `astm:"4.2"`
+	Field1 string `astm:"POS=3"`
+	Comp1  string `astm:"POS=4.1"`
+	Field2 string `astm:"POS=5"`
+	Comp2  string `astm:"POS=4.2"`
 }
 type MultipleWrongComponentPlacementRecord struct {
-	Field3 string `astm:"3"`
-	Comp41 string `astm:"4.1"`
-	Field5 string `astm:"5"`
-	Comp62 string `astm:"6.2"`
-	Comp42 string `astm:"4.2"`
-	Field7 string `astm:"7"`
-	Comp61 string `astm:"6.1"`
-	Field8 string `astm:"8"`
+	Field3 string `astm:"POS=3"`
+	Comp41 string `astm:"POS=4.1"`
+	Field5 string `astm:"POS=5"`
+	Comp62 string `astm:"POS=6.2"`
+	Comp42 string `astm:"POS=4.2"`
+	Field7 string `astm:"POS=7"`
+	Comp61 string `astm:"POS=6.1"`
+	Field8 string `astm:"POS=8"`
 }
 type MissingAnnotationRecord struct {
-	Field3  string `astm:"3"`
+	Field3  string `astm:"POS=3"`
 	Missing string
-	Field4  string `astm:"4"`
+	Field4  string `astm:"POS=4"`
 }
 type InvalidAttributeValueRecord struct {
-	First float64 `astm:"3,length:one"`
+	First float64 `astm:"POS=3;ATR=length:one"`
 }
 
 type SubSubField struct {
-	First  string `astm:"1" hl7:"1"`
-	Second string `astm:"2" hl7:"2"`
-	Third  string `astm:"3" hl7:"3"`
+	First  string `astm:"POS=1" hl7:"POS=1"`
+	Second string `astm:"POS=2" hl7:"POS=2"`
+	Third  string `astm:"POS=3" hl7:"POS=3"`
 }
 type SubField struct {
-	First  string      `astm:"1" hl7:"1"`
-	Second SubSubField `astm:"2" hl7:"2"`
-	Third  string      `astm:"3" hl7:"3"`
+	First  string      `astm:"POS=1" hl7:"POS=1"`
+	Second SubSubField `astm:"POS=2" hl7:"POS=2"`
+	Third  string      `astm:"POS=3" hl7:"POS=3"`
 }
 type SubSubRecord struct {
-	First  string   `astm:"3" hl7:"3"`
-	Second SubField `astm:"4" hl7:"4"`
-	Third  string   `astm:"5" hl7:"5"`
+	First  string   `astm:"POS=3" hl7:"POS=3"`
+	Second SubField `astm:"POS=4" hl7:"POS=4"`
+	Third  string   `astm:"POS=5" hl7:"POS=5"`
 }
-
 type ReservedFieldRecordHL7 struct {
-	One   string `hl7:"1"`
-	Two   string `hl7:"2"`
-	Three string `hl7:"3"`
+	One   string `hl7:"POS=1"`
+	Two   string `hl7:"POS=2"`
+	Three string `hl7:"POS=3"`
 }
 type NotReservedFieldRecordHL7 struct {
-	Two   string `hl7:"2"`
-	Three string `hl7:"3"`
+	Two   string `hl7:"POS=2"`
+	Three string `hl7:"POS=3"`
 }
 type SequenceHl7 struct {
-	Sequence int    `hl7:"3,sequence"`
-	Data     string `hl7:"4"`
+	Sequence int    `hl7:"POS=3;ATR=sequence"`
+	Data     string `hl7:"POS=4"`
 }
 
 // Structures
 type SingleRecordStruct struct {
-	FirstRecord ThreeFieldRecord `astm:"R"`
+	FirstRecord ThreeFieldRecord `astm:"TAG=R"`
 }
 type RecordArrayStruct struct {
-	RecordArray []ThreeFieldRecord `astm:"R"`
+	RecordArray []ThreeFieldRecord `astm:"TAG=R"`
 }
 type CompositeRecordStruct struct {
-	Record1 RecordType1 `astm:"F"`
-	Record2 RecordType2 `astm:"S"`
+	Record1 RecordType1 `astm:"TAG=F"`
+	Record2 RecordType2 `astm:"TAG=S"`
 }
 type CompositeMessage struct {
-	CompositeRecordStruct CompositeRecordStruct
+	CompositeRecordStruct CompositeRecordStruct `astm:"GROUP"`
 }
 type CompositeArrayMessage struct {
-	CompositeRecordArray []CompositeRecordStruct
+	CompositeRecordArray []CompositeRecordStruct `astm:"GROUP"`
 }
 type CompositeArrayAndSingleRecordMessage struct {
-	CompositeRecordArray []CompositeRecordStruct
-	Ending               SimpleRecord `astm:"E"`
+	CompositeRecordArray []CompositeRecordStruct `astm:"GROUP"`
+	Ending               SimpleRecord            `astm:"TAG=E"`
 }
 type OptionalMessage struct {
-	First    SimpleRecord `astm:"F"`
-	Optional SimpleRecord `astm:"S,optional"`
-	Third    SimpleRecord `astm:"T"`
+	First    SimpleRecord `astm:"TAG=F"`
+	Optional SimpleRecord `astm:"TAG=S;ATR=optional"`
+	Third    SimpleRecord `astm:"TAG=T"`
 }
 type OptionalArrayMessage struct {
-	First    SimpleRecord   `astm:"F"`
-	Optional []SimpleRecord `astm:"A,optional"`
-	Last     SimpleRecord   `astm:"L"`
+	First    SimpleRecord   `astm:"TAG=F"`
+	Optional []SimpleRecord `astm:"TAG=A;ATR=optional"`
+	Last     SimpleRecord   `astm:"TAG=L"`
 }
 type OptionalArrayAtTheEndMessage struct {
-	First    SimpleRecord   `astm:"F"`
-	Optional []SimpleRecord `astm:"A,optional"`
+	First    SimpleRecord   `astm:"TAG=F"`
+	Optional []SimpleRecord `astm:"TAG=A;ATR=optional"`
 }
 type OptionalAtTheEndMessage struct {
-	First    SimpleRecord `astm:"F"`
-	Optional SimpleRecord `astm:"O,optional"`
+	First    SimpleRecord `astm:"TAG=F"`
+	Optional SimpleRecord `astm:"TAG=O;ATR=optional"`
 }
 type SubnameMessage struct {
-	Record1 SubnameRecordType1 `astm:"R,subname:FIRST"`
-	Record2 SubnameRecordType2 `astm:"R,subname:SECOND"`
+	Record1 SubnameRecordType1 `astm:"TAG=R;ATR=subname:FIRST"`
+	Record2 SubnameRecordType2 `astm:"TAG=R;ATR=subname:SECOND"`
 }
 type SubnameArrayMessage struct {
-	Array   []SubnameRecordType1 `astm:"R,subname:FIRST"`
-	Record2 SubnameRecordType2   `astm:"R,subname:SECOND"`
+	Array   []SubnameRecordType1 `astm:"TAG=R;ATR=subname:FIRST"`
+	Record2 SubnameRecordType2   `astm:"TAG=R;ATR=subname:SECOND"`
 }
 type SubnameMultiArrayMessage struct {
-	Array1 []SubnameRecordType1 `astm:"R,subname:FIRST"`
-	Array2 []SubnameRecordType2 `astm:"R,subname:SECOND"`
+	Array1 []SubnameRecordType1 `astm:"TAG=R;ATR=subname:FIRST"`
+	Array2 []SubnameRecordType2 `astm:"TAG=R;ATR=subname:SECOND"`
 }
 type SubnameOptionalMessage struct {
-	Record1 SubnameRecordType1 `astm:"R,subname:FIRST,optional"`
-	Record2 SubnameRecordType2 `astm:"R,subname:SECOND"`
+	Record1 SubnameRecordType1 `astm:"TAG=R;ATR=subname:FIRST,optional"`
+	Record2 SubnameRecordType2 `astm:"TAG=R;ATR=subname:SECOND"`
 }
