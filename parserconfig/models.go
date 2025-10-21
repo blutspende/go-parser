@@ -58,7 +58,7 @@ var DefaultConfigurationHL7 = Configuration{
 	DefaultDecimalPrecision:    3,
 	RoundLastDecimal:           true,
 	KeepShortDateTimeZone:      true,
-	EscapeOutputStrings:        true,
+	EscapeOutputStrings:        false,
 	EnforceMessageCompleteness: false,
 	Delimiters:                 DefaultDelimitersHL7,
 	TimeLocation:               nil,

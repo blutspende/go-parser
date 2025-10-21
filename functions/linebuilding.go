@@ -282,9 +282,9 @@ func convertField(field reflect.Value, annotation models.FieldAnnotation, config
 	case reflect.Struct:
 		// Check for time.Time type (it reflects as a Struct)
 		if field.Type() == reflect.TypeOf(time.Time{}) {
-			timeFormat := "20060102"
-			if _, exists := annotation.Attributes[constants.AttributeLongdate]; exists {
-				timeFormat = "20060102150405"
+			timeFormat := "20060102150405"
+			if _, exists := annotation.Attributes[constants.AttributeDate]; exists {
+				timeFormat = "20060102"
 			}
 			// Check if the field is a time.Time
 			timeValue, ok := field.Interface().(time.Time)
@@ -311,39 +311,39 @@ func convertField(field reflect.Value, annotation models.FieldAnnotation, config
 func buildStringEscapeChars(input string, config *parserconfig.Configuration) string {
 	var builder strings.Builder
 	inputRunes := []rune(input)
-	for i := 0; i < len(inputRunes); i++ {
-		if inputRunes[i] == rune(config.Delimiters.Field[0]) ||
-			inputRunes[i] == rune(config.Delimiters.Repeat[0]) ||
-			inputRunes[i] == rune(config.Delimiters.Component[0]) ||
-			inputRunes[i] == rune(config.Delimiters.Escape[0]) {
-			builder.WriteRune(rune(config.Delimiters.Escape[0]))
-		}
-		builder.WriteRune(inputRunes[i])
-	}
-	return builder.String()
-}
-
-func buildHL7EscapeChars(input string, config *parserconfig.Configuration) string {
-	var builder strings.Builder
-	inputRunes := []rune(input)
 	esc := string(config.Delimiters.Escape[0])
-	for i := 0; i < len(inputRunes); i++ {
-		switch inputRunes[i] {
-		case rune(config.Delimiters.Field[0]):
-			builder.WriteString(esc + "F" + esc)
-		case rune(config.Delimiters.Repeat[0]):
-			builder.WriteString(esc + "R" + esc)
-		case rune(config.Delimiters.Component[0]):
-			builder.WriteString(esc + "S" + esc)
-		case rune(config.Delimiters.SubComponent[0]):
-			builder.WriteString(esc + "T" + esc)
-		case rune(config.Delimiters.Escape[0]):
-			builder.WriteString(esc + "E" + esc)
-		case '\r':
-			builder.WriteString(esc + "X0D" + esc)
-		default:
+	if config.Protocol == parserconfig.ASTM {
+		for i := 0; i < len(inputRunes); i++ {
+			if inputRunes[i] == rune(config.Delimiters.Field[0]) ||
+				inputRunes[i] == rune(config.Delimiters.Repeat[0]) ||
+				inputRunes[i] == rune(config.Delimiters.Component[0]) ||
+				inputRunes[i] == rune(config.Delimiters.Escape[0]) {
+				builder.WriteString(esc)
+			}
 			builder.WriteRune(inputRunes[i])
 		}
+	} else if config.Protocol == parserconfig.HL7 {
+		for i := 0; i < len(inputRunes); i++ {
+			switch inputRunes[i] {
+			case rune(config.Delimiters.Field[0]):
+				builder.WriteString(esc + "F" + esc)
+			case rune(config.Delimiters.Repeat[0]):
+				builder.WriteString(esc + "R" + esc)
+			case rune(config.Delimiters.Component[0]):
+				builder.WriteString(esc + "S" + esc)
+			case rune(config.Delimiters.SubComponent[0]):
+				builder.WriteString(esc + "T" + esc)
+			case rune(config.Delimiters.Escape[0]):
+				builder.WriteString(esc + "E" + esc)
+			case '\r':
+				builder.WriteString(esc + "X0D" + esc)
+			default:
+				builder.WriteRune(inputRunes[i])
+			}
+		}
+	} else {
+		// Note: this is an error case, but not handled expecting prior protocol verification
+		return ""
 	}
 	return builder.String()
 }

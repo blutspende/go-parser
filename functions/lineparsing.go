@@ -323,14 +323,11 @@ func setField(value string, field reflect.Value, annotation models.FieldAnnotati
 			if err != nil {
 				return errmsg.ErrLineParsingDataParsingError
 			}
-			// Determine if the time zone should be kept or set to UTC
-			_, hasLongdateAnnotation := annotation.Attributes[constants.AttributeLongdate]
-			// TODO: test this better
-			keepTimeZone := isShort || (config.KeepShortDateTimeZone && !hasLongdateAnnotation)
-			// Adjust the time zone if needed
-			if keepTimeZone {
+			// Keep the short format in local time (if configured so) to preserve the actual day
+			if isShort && config.KeepShortDateTimeZone {
 				timeInLocation = timeInLocation.In(config.TimeLocation)
 			} else {
+				// Convert the long format to UTC
 				timeInLocation = timeInLocation.UTC()
 			}
 			field.Set(reflect.ValueOf(timeInLocation))

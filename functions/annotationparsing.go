@@ -91,7 +91,7 @@ func ParseFieldAnnotation(input reflect.StructField, config *parserconfig.Config
 		// Parse and save attributes
 		result.Attributes, err = parseAnnotationElements(attributes, ",", ":", []string{
 			constants.AttributeRequired,
-			constants.AttributeLongdate,
+			constants.AttributeDate,
 			constants.AttributeLength,
 			constants.AttributeSequence,
 		})

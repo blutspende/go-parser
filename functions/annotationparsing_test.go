@@ -166,7 +166,7 @@ func TestParseFieldAnnotation_InvalidNumber(t *testing.T) {
 func TestParseFieldAnnotation_MultipleAttributes(t *testing.T) {
 	// Arrange
 	type inputType struct {
-		Field float32 `astm:"POS=4;ATR=required,longdate"`
+		Field float32 `astm:"POS=4;ATR=required,date"`
 	}
 	var input inputType
 	field, _ := reflect.TypeOf(input).FieldByName("Field")
@@ -174,13 +174,13 @@ func TestParseFieldAnnotation_MultipleAttributes(t *testing.T) {
 	result, err := ParseFieldAnnotation(field, config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, "POS=4;ATR=required,longdate", result.Raw)
+	assert.Equal(t, "POS=4;ATR=required,date", result.Raw)
 	assert.Equal(t, 4, result.FieldPos)
 	assert.Equal(t, false, result.IsComponent)
 	assert.Equal(t, 0, result.ComponentPos)
 	assert.Equal(t, false, result.IsSubstructure)
 	assert.Contains(t, result.Attributes, constants.AttributeRequired)
-	assert.Contains(t, result.Attributes, constants.AttributeLongdate)
+	assert.Contains(t, result.Attributes, constants.AttributeDate)
 }
 func TestParseFieldAnnotation_ValuedMultipleAttributes(t *testing.T) {
 	// Arrange
@@ -624,7 +624,7 @@ func TestParseAnnotationElements_Attributes(t *testing.T) {
 	// Act
 	result, err := parseAnnotationElements(input, ",", ":", []string{
 		constants.AttributeRequired,
-		constants.AttributeLongdate,
+		constants.AttributeDate,
 		constants.AttributeLength,
 	})
 	// Assert

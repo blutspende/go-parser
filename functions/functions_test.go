@@ -71,11 +71,7 @@ type MultitypeRecord struct {
 	Int     int       `astm:"POS=4"`
 	Float32 float32   `astm:"POS=5"`
 	Float64 float64   `astm:"POS=6"`
-	Date    time.Time `astm:"POS=7"`
-}
-type DateLengthRecord struct {
-	ShortDate time.Time `astm:"POS=3"`
-	LongDate  time.Time `astm:"POS=4;ATR=longdate"`
+	Time    time.Time `astm:"POS=7"`
 }
 type FloatLengthRecord struct {
 	Default    float64 `astm:"POS=3"`
@@ -88,7 +84,7 @@ type MultitypePointerRecord struct {
 	Int     *int       `astm:"POS=4"`
 	Float32 *float32   `astm:"POS=5"`
 	Float64 *float64   `astm:"POS=6"`
-	Date    *time.Time `astm:"POS=7"`
+	Time    *time.Time `astm:"POS=7"`
 }
 type ComponentedRecord struct {
 	First       string `astm:"POS=3"`
@@ -176,10 +172,10 @@ type SparseSubstructureRecord struct {
 	Second SparseSubstructureField `astm:"POS=4"`
 }
 type TimeRecord struct {
-	Time time.Time `astm:"POS=3;ATR=longdate"`
-}
-type ShortDateRecord struct {
 	Time time.Time `astm:"POS=3"`
+}
+type DateRecord struct {
+	Date time.Time `astm:"POS=3;ATR=date"`
 }
 type WrongComponentOrderRecord struct {
 	First string `astm:"POS=3"`
