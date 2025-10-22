@@ -15,12 +15,12 @@ import (
 )
 
 type MissingComponentMessage struct {
-	MissingComponent MissingComponentRecord `astm:"M"`
+	MissingComponent MissingComponentRecord `astm:"TAG=M"`
 }
 type MissingComponentRecord struct {
-	Combined   string `astm:"3"`
-	Component1 string `astm:"4.1"`
-	Component2 string `astm:"4.2"`
+	Combined   string `astm:"POS=3"`
+	Component1 string `astm:"POS=4.1"`
+	Component2 string `astm:"POS=4.2"`
 }
 
 func TestMissingComponent(t *testing.T) {
@@ -40,22 +40,22 @@ func TestMissingComponent(t *testing.T) {
 }
 
 type IllFormattedSubstructure struct {
-	ThirdComp string `astm:"3"`
-	FirstComp string `astm:"1"`
+	ThirdComp string `astm:"POS=3"`
+	FirstComp string `astm:"POS=1"`
 }
 type WellFormattedSubstructure struct {
-	FirstComp  string `astm:"1"`
-	SecondComp string `astm:"2"`
+	FirstComp  string `astm:"POS=1"`
+	SecondComp string `astm:"POS=2"`
 }
 type IllFormatedButLegal struct {
-	Ill        IllFormattedSubstructure  `astm:"3"`
-	Well       WellFormattedSubstructure `astm:"4"`
-	EmptyField string                    `astm:"5"`
+	Ill        IllFormattedSubstructure  `astm:"POS=3"`
+	Well       WellFormattedSubstructure `astm:"POS=4"`
+	EmptyField string                    `astm:"POS=5"`
 }
 type IllFormattedMinimalMessage struct {
-	Header     lis02a2.Header      `astm:"H"`
-	Substruct  IllFormatedButLegal `astm:"?"`
-	Terminator lis02a2.Terminator  `astm:"L"`
+	Header     lis02a2.Header      `astm:"TAG=H"`
+	Substruct  IllFormatedButLegal `astm:"TAG=?"`
+	Terminator lis02a2.Terminator  `astm:"TAG=L"`
 }
 
 func TestIllFormattedSubstructured(t *testing.T) {
@@ -79,9 +79,9 @@ func TestIllFormattedSubstructured(t *testing.T) {
 }
 
 type ArrayMessage struct {
-	Header     lis02a2.Header     `astm:"H"`
-	Patient    []lis02a2.Patient  `astm:"P"`
-	Terminator lis02a2.Terminator `astm:"L"`
+	Header     lis02a2.Header     `astm:"TAG=H"`
+	Patient    []lis02a2.Patient  `astm:"TAG=P"`
+	Terminator lis02a2.Terminator `astm:"TAG=L"`
 }
 
 func TestGenerateSequence(t *testing.T) {
@@ -104,13 +104,13 @@ func TestGenerateSequence(t *testing.T) {
 }
 
 type PatientResult struct {
-	Patient lis02a2.Patient  `astm:"P"`
-	Result  []lis02a2.Result `astm:"R"`
+	Patient lis02a2.Patient  `astm:"TAG=P"`
+	Result  []lis02a2.Result `astm:"TAG=R"`
 }
 type ArrayNestedStructMessage struct {
-	Header        lis02a2.Header `astm:"H"`
-	PatientResult []PatientResult
-	Terminator    lis02a2.Terminator `astm:"L"`
+	Header        lis02a2.Header     `astm:"TAG=H"`
+	PatientResult []PatientResult    `astm:"GROUP"`
+	Terminator    lis02a2.Terminator `astm:"TAG=L"`
 }
 
 func TestNestedStruct(t *testing.T) {
@@ -149,7 +149,7 @@ func TestNestedStruct(t *testing.T) {
 }
 
 type HeaderMessage struct {
-	Header lis02a2.Header `astm:"H"`
+	Header lis02a2.Header `astm:"TAG=H"`
 }
 
 func TestTimeLocalization(t *testing.T) {
@@ -173,10 +173,10 @@ const SomeTestMarshalEnum1 MarshalEnum = "Something"
 const SomeTestMarshalEnum2 MarshalEnum = "SomethingElse"
 
 type MarshalEnumRecord struct {
-	Field MarshalEnum `astm:"3"`
+	Field MarshalEnum `astm:"POS=3"`
 }
 type MarshalEnumMessage struct {
-	Record MarshalEnumRecord `astm:"X"`
+	Record MarshalEnumRecord `astm:"TAG=X"`
 }
 
 func TestEnumMarshal(t *testing.T) {
@@ -192,38 +192,38 @@ func TestEnumMarshal(t *testing.T) {
 }
 
 type SpecimenDonorSubstructure struct {
-	CodeOfSpecimen    string `astm:"1"` // 8.4.4
-	TypeOfSpecimen    string `astm:"2"`
-	CodeOfDonor       string `astm:"3"`
-	TypeOfDonorSample string `astm:"4"`
+	CodeOfSpecimen    string `astm:"POS=1"` // 8.4.4
+	TypeOfSpecimen    string `astm:"POS=2"`
+	CodeOfDonor       string `astm:"POS=3"`
+	TypeOfDonorSample string `astm:"POS=4"`
 }
 type OrderRequestV5 struct {
-	SpecimenID                  string                      `astm:"3" db:"specimen_id"`              // 8.4.3
-	SpecimenDonors              []SpecimenDonorSubstructure `astm:"4"`                               // 8.4.4
-	UniversalTestID             string                      `astm:"5.1" db:"universal_test_id"`      // 8.4.5
-	UniversalTestIDName         string                      `astm:"5.2" db:"universal_test_id_name"` // 8.4.5
-	UniversalTestIDType         string                      `astm:"5.3" db:"universal_test_id_type"` // 8.4.5
-	ManufacturesTestID          string                      `astm:"5.4" db:"manufactures_test_id"`
-	RequestedOrderDateTime      time.Time                   `astm:"7,longdate" db:"requested_order_date_time"`     // 8.4.7
-	SpecimenCollectionDateTime  time.Time                   `astm:"8,longdate" db:"specimen_collection_date_time"` // 8.4.8
-	CollectionEndTime           time.Time                   `astm:"9,longdate" db:"collection_end_time"`           // 8.4.9
-	CollectionVolume            string                      `astm:"10" db:"collection_volume"`                     // 8.4.10
-	CollectorID                 string                      `astm:"11" db:"collector_id"`                          // 8.4.11
-	ActionCode                  string                      `astm:"12" db:"action_code"`                           // 8.4.12
-	DangerCode                  string                      `astm:"13" db:"danger_code"`                           // 8.4.13
-	RelevantClinicalInformation string                      `astm:"14" db:"relevant_clinical_information"`         // 8.4.14
-	DateTimeSpecimenReceived    string                      `astm:"15" db:"date_time_specimen_received"`           // 8.4.15
-	SpecimenTypeSource          string                      `astm:"16" db:"specimen_type_source"`                  // 8.4.16
-	OrderingPhysician           string                      `astm:"17" db:"ordering_physician"`                    // 8.4.17
-	PhysicianTelephone          string                      `astm:"18" db:"physician_telephone"`                   // 8.4.18
-	UserField1                  string                      `astm:"19" db:"user_field_1"`                          // 8.4.19
-	UserField2                  string                      `astm:"20" db:"user_field_2"`                          // 8.4.20
-	LaboratoryField1            string                      `astm:"21" db:"laboratory_field_1"`
-	LaboratoryField2            string                      `astm:"22" db:"laboratory_field_2"`
+	SpecimenID                  string                      `astm:"POS=3" db:"specimen_id"`              // 8.4.3
+	SpecimenDonors              []SpecimenDonorSubstructure `astm:"POS=4"`                               // 8.4.4
+	UniversalTestID             string                      `astm:"POS=5.1" db:"universal_test_id"`      // 8.4.5
+	UniversalTestIDName         string                      `astm:"POS=5.2" db:"universal_test_id_name"` // 8.4.5
+	UniversalTestIDType         string                      `astm:"POS=5.3" db:"universal_test_id_type"` // 8.4.5
+	ManufacturesTestID          string                      `astm:"POS=5.4" db:"manufactures_test_id"`
+	RequestedOrderDateTime      time.Time                   `astm:"POS=7" db:"requested_order_date_time"`      // 8.4.7
+	SpecimenCollectionDateTime  time.Time                   `astm:"POS=8" db:"specimen_collection_date_time"`  // 8.4.8
+	CollectionEndTime           time.Time                   `astm:"POS=9" db:"collection_end_time"`            // 8.4.9
+	CollectionVolume            string                      `astm:"POS=10" db:"collection_volume"`             // 8.4.10
+	CollectorID                 string                      `astm:"POS=11" db:"collector_id"`                  // 8.4.11
+	ActionCode                  string                      `astm:"POS=12" db:"action_code"`                   // 8.4.12
+	DangerCode                  string                      `astm:"POS=13" db:"danger_code"`                   // 8.4.13
+	RelevantClinicalInformation string                      `astm:"POS=14" db:"relevant_clinical_information"` // 8.4.14
+	DateTimeSpecimenReceived    string                      `astm:"POS=15" db:"date_time_specimen_received"`   // 8.4.15
+	SpecimenTypeSource          string                      `astm:"POS=16" db:"specimen_type_source"`          // 8.4.16
+	OrderingPhysician           string                      `astm:"POS=17" db:"ordering_physician"`            // 8.4.17
+	PhysicianTelephone          string                      `astm:"POS=18" db:"physician_telephone"`           // 8.4.18
+	UserField1                  string                      `astm:"POS=19" db:"user_field_1"`                  // 8.4.19
+	UserField2                  string                      `astm:"POS=20" db:"user_field_2"`                  // 8.4.20
+	LaboratoryField1            string                      `astm:"POS=21" db:"laboratory_field_1"`
+	LaboratoryField2            string                      `astm:"POS=22" db:"laboratory_field_2"`
 	CreatedAt                   time.Time                   `db:"created_at"`
 }
 type FieldEnumerationMessage struct {
-	Request OrderRequestV5 `astm:"R"`
+	Request OrderRequestV5 `astm:"TAG=R"`
 }
 
 func TestFieldEnumeration(t *testing.T) {
@@ -239,7 +239,7 @@ func TestFieldEnumeration(t *testing.T) {
 }
 
 type GermanLanguageDecoderMessage struct {
-	Patient lis02a2.Patient `astm:"P"`
+	Patient lis02a2.Patient `astm:"TAG=P"`
 }
 
 func TestGermanLanguageDecoder_Windows1252(t *testing.T) {
@@ -456,9 +456,9 @@ func TestEmbeddedStructsAndArrays(t *testing.T) {
 	// Arrange
 	message := HoribaYumizenMessage{
 		ExtraTests: struct {
-			ArrayOfInt     []int     `astm:"3"`
-			ArrayOfFloat32 []float32 `astm:"4"`
-			ArrayOfFloat64 []float64 `astm:"5"`
+			ArrayOfInt     []int     `astm:"POS=3"`
+			ArrayOfFloat32 []float32 `astm:"POS=4"`
+			ArrayOfFloat64 []float64 `astm:"POS=5"`
 		}(struct {
 			ArrayOfInt     []int
 			ArrayOfFloat32 []float32
@@ -510,9 +510,9 @@ func TestEmbeddedStructsAndArraysShortNotation(t *testing.T) {
 	// Arrange
 	message := HoribaYumizenMessage{
 		ExtraTests: struct {
-			ArrayOfInt     []int     `astm:"3"`
-			ArrayOfFloat32 []float32 `astm:"4"`
-			ArrayOfFloat64 []float64 `astm:"5"`
+			ArrayOfInt     []int     `astm:"POS=3"`
+			ArrayOfFloat32 []float32 `astm:"POS=4"`
+			ArrayOfFloat64 []float64 `astm:"POS=5"`
 		}{
 			ArrayOfInt: []int{1, 2, 3},
 		},
@@ -539,29 +539,29 @@ func TestEmbeddedStructsAndArraysShortNotation(t *testing.T) {
 }
 
 type CustomDecimalLength struct {
-	Float1 float32 `astm:"3,length:4"`
-	Float2 float64 `astm:"4,length:1"`
+	Float1 float32 `astm:"POS=3;ATR=length:4"`
+	Float2 float64 `astm:"POS=4;ATR=length:1"`
 	Floats []struct {
-		EmbeddedFloat1 float32 `astm:"1,length:7"`
-		EmbeddedFloat2 float64 `astm:"2,length:2"`
-		EmbeddedFloat3 float64 `astm:"3"`
-		EmbeddedFloat4 float32 `astm:"4,length:3"`
-	} `astm:"5"`
+		EmbeddedFloat1 float32 `astm:"POS=1;ATR=length:7"`
+		EmbeddedFloat2 float64 `astm:"POS=2;ATR=length:2"`
+		EmbeddedFloat3 float64 `astm:"POS=3"`
+		EmbeddedFloat4 float32 `astm:"POS=4;ATR=length:3"`
+	} `astm:"POS=5"`
 }
 
 func TestCustomDecimalLengthAnnotation(t *testing.T) {
 	// Arrange
 	message := struct {
-		DecimalLength CustomDecimalLength `astm:"D"`
+		DecimalLength CustomDecimalLength `astm:"TAG=D"`
 	}{
 		DecimalLength: CustomDecimalLength{
 			Float1: 0.34567,
 			Float2: 0.40001,
 			Floats: []struct {
-				EmbeddedFloat1 float32 `astm:"1,length:7"`
-				EmbeddedFloat2 float64 `astm:"2,length:2"`
-				EmbeddedFloat3 float64 `astm:"3"`
-				EmbeddedFloat4 float32 `astm:"4,length:3"`
+				EmbeddedFloat1 float32 `astm:"POS=1;ATR=length:7"`
+				EmbeddedFloat2 float64 `astm:"POS=2;ATR=length:2"`
+				EmbeddedFloat3 float64 `astm:"POS=3"`
+				EmbeddedFloat4 float32 `astm:"POS=4;ATR=length:3"`
 			}{
 				{
 					EmbeddedFloat1: 0.123456711,
@@ -591,9 +591,9 @@ func TestCustomDecimalLengthAnnotation(t *testing.T) {
 }
 
 type SimpleResultMessage struct {
-	Header     lis02a2.Header     `astm:"H"`
-	Result     lis02a2.Result     `astm:"R"`
-	Terminator lis02a2.Terminator `astm:"L"`
+	Header     lis02a2.Header     `astm:"TAG=H"`
+	Result     lis02a2.Result     `astm:"TAG=R"`
+	Terminator lis02a2.Terminator `astm:"TAG=L"`
 }
 
 func TestEscapedCharactersMessageMarshal(t *testing.T) {
