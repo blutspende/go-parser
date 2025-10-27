@@ -5,7 +5,7 @@ import "time"
 // HL7 v2.4 - DG1 - Diagnosis
 // https://hl7-definition.caristix.com/v2/HL7v2.4/Segments/DG1
 type DG1 struct {
-	SetID                   int       `hl7:"POS=2;ATR= sequence" json:"SetID ,omitempty"`
+	SetID                   int       `hl7:"POS=2;ATR=sequence" json:"SetID ,omitempty"`
 	DiagnosisCodingMethod   string    `hl7:"POS=3" json:"DiagnosisCodingMethod,omitempty"`
 	DiagnosisCode           CE        `hl7:"POS=4" json:"DiagnosisCode,omitempty"`
 	DiagnosisDescription    string    `hl7:"POS=5" json:"DiagnosisDescription,omitempty"`

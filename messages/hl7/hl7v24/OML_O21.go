@@ -15,30 +15,30 @@ type OML_O21 struct {
 		} `hl7:"GROUP"`
 		Insurance []struct {
 			Insurance                          IN1 `hl7:"TAG=IN1" json:"Insurance,omitempty"`
-			AdditionalInformation              IN2 `hl7:"TAG=IN2;ATR= optional" json:"AdditionalInformation,omitempty"`
-			AdditionalInformationCertification IN3 `hl7:"TAG=IN3;ATR= optional" json:"AdditionalInformationCertification,omitempty"`
+			AdditionalInformation              IN2 `hl7:"TAG=IN2;ATR=optional" json:"AdditionalInformation,omitempty"`
+			AdditionalInformationCertification IN3 `hl7:"TAG=IN3;ATR=optional" json:"AdditionalInformationCertification,omitempty"`
 		} `hl7:"GROUP"`
-		Guarantor                 GT1   `hl7:"TAG=GT1;ATR= optional" json:"Guarantor,omitempty"`
-		PatientAllergyInformation []AL1 `hl7:"TAG=AL1;ATR= optional" json:"PatientAllergyInformation,omitempty"`
+		Guarantor                 GT1   `hl7:"TAG=GT1;ATR=optional" json:"Guarantor,omitempty"`
+		PatientAllergyInformation []AL1 `hl7:"TAG=AL1;ATR=optional" json:"PatientAllergyInformation,omitempty"`
 	} `hl7:"GROUP"`
 	OrderGeneral []struct {
 		Container struct {
 			SpecimenAndContainerDetail SAC   `hl7:"TAG=SAC" json:"SpecimenAndContainerDetail,omitempty"`
-			ObservationResult          []OBX `hl7:"TAG=OBX;ATR= optional" json:"ObservationResult,omitempty"`
+			ObservationResult          []OBX `hl7:"TAG=OBX;ATR=optional" json:"ObservationResult,omitempty"`
 		} `hl7:"GROUP"`
 		Order []struct {
 			CommonOrder        ORC `hl7:"TAG=ORC" json:"CommonOrder,omitempty"`
 			ObservationRequest struct {
 				ObservationRequest OBR `hl7:"TAG=OBR" json:"ObservationRequest,omitempty"`
 				Container          []struct {
-					TestCodeDetail   TCD   `hl7:"TAG=TCD;ATR= optional" json:"TestCodeDetail,omitempty"`
-					NotesAndComments []NTE `hl7:"TAG=NTE;ATR= optional" json:"NotesAndComments,omitempty"`
-					Diagnosis        []DG1 `hl7:"TAG=DG1;ATR= optional" json:"Diagnosis,omitempty"`
+					TestCodeDetail   TCD   `hl7:"TAG=TCD;ATR=optional" json:"TestCodeDetail,omitempty"`
+					NotesAndComments []NTE `hl7:"TAG=NTE;ATR=optional" json:"NotesAndComments,omitempty"`
+					Diagnosis        []DG1 `hl7:"TAG=DG1;ATR=optional" json:"Diagnosis,omitempty"`
 				} `hl7:"GROUP"`
 				Observation []struct {
 					ObservationResult OBX   `hl7:"TAG=OBX" json:"ObservationResult,omitempty"`
-					TestCodeDetail    TCD   `hl7:"TAG=TCD;ATR= optional" json:"TestCodeDetail,omitempty"`
-					NotesAndComments  []NTE `hl7:"TAG=NTE;ATR= optional" json:"NotesAndComments,omitempty"`
+					TestCodeDetail    TCD   `hl7:"TAG=TCD;ATR=optional" json:"TestCodeDetail,omitempty"`
+					NotesAndComments  []NTE `hl7:"TAG=NTE;ATR=optional" json:"NotesAndComments,omitempty"`
 				} `hl7:"GROUP"`
 				PriorResult []struct {
 					PatientPrior struct {
@@ -49,21 +49,21 @@ type OML_O21 struct {
 						PatientVisit          PV1 `hl7:"TAG=PV1" json:"PatientVisit,omitempty"`
 						AdditionalInformation PV2 `hl7:"TAG=PV2;ATR=optional" json:"AdditionalInformation,omitempty"`
 					} `hl7:"GROUP"`
-					PatientAllergyInformation []AL1 `hl7:"TAG=AL1;ATR= optional" json:"PatientAllergyInformation,omitempty"`
+					PatientAllergyInformation []AL1 `hl7:"TAG=AL1;ATR=optional" json:"PatientAllergyInformation,omitempty"`
 					OrderPrior                []struct {
-						CommonOrder        ORC   `hl7:"TAG=ORC;ATR= optional" json:"CommonOrder,omitempty"`
+						CommonOrder        ORC   `hl7:"TAG=ORC;ATR=optional" json:"CommonOrder,omitempty"`
 						ObservationRequest OBR   `hl7:"TAG=OBR" json:"ObservationRequest,omitempty"`
-						NotesAndComments   []NTE `hl7:"TAG=NTE;ATR= optional" json:"NotesAndComments,omitempty"`
+						NotesAndComments   []NTE `hl7:"TAG=NTE;ATR=optional" json:"NotesAndComments,omitempty"`
 						ObservationPrior   []struct {
 							ObservationResult OBX   `hl7:"TAG=OBX" json:"ObservationResult,omitempty"`
-							NotesAndComments  []NTE `hl7:"TAG=NTE;ATR= optional" json:"NotesAndComments,omitempty"`
+							NotesAndComments  []NTE `hl7:"TAG=NTE;ATR=optional" json:"NotesAndComments,omitempty"`
 						} `hl7:"GROUP"`
 					} `hl7:"GROUP"`
 				} `hl7:"GROUP"`
 			} `hl7:"GROUP"`
-			FinancialTransaction        []FT1 `hl7:"TAG=FT1;ATR= optional" json:"FinancialTransaction,omitempty"`
-			ClinicalTrialIdentification []CTI `hl7:"TAG=CTI;ATR= optional" json:"ClinicalTrialIdentification,omitempty"`
-			Billing                     BLG   `hl7:"TAG=BLG;ATR= optional" json:"Billing,omitempty"`
+			FinancialTransaction        []FT1 `hl7:"TAG=FT1;ATR=optional" json:"FinancialTransaction,omitempty"`
+			ClinicalTrialIdentification []CTI `hl7:"TAG=CTI;ATR=optional" json:"ClinicalTrialIdentification,omitempty"`
+			Billing                     BLG   `hl7:"TAG=BLG;ATR=optional" json:"Billing,omitempty"`
 		} `hl7:"GROUP"`
 	} `hl7:"GROUP"`
 }
