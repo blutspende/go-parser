@@ -18,5 +18,5 @@ type PatientResult struct {
 type ORU_R01 struct {
 	MSH                 MSH             `hl7:"TAG=MSH" json:"msh,omitempty"`
 	PatientResult       []PatientResult `hl7:"GROUP" json:"patientResult,omitempty"`
-	ContinuationPointer DSC             `hl7:"TAG=DSC;ATR= optional" json:"continuationPointer,omitempty"`
+	ContinuationPointer DSC             `hl7:"TAG=DSC;ATR=optional" json:"continuationPointer,omitempty"`
 }
