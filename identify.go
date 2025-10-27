@@ -81,9 +81,9 @@ func IdentifyMessageHL7(messageData []byte, config *parserconfig.Configuration) 
 	// Parse the MSH segment as a single header structure
 	type HeaderMessage struct {
 		Header struct {
-			MessageType     string `hl7:"9"`
-			ProtocolVersion string `hl7:"12"`
-		} `hl7:"MSH"`
+			MessageType     string `hl7:"POS=9"`
+			ProtocolVersion string `hl7:"POS=12"`
+		} `hl7:"TAG=MSH"`
 	}
 	var headerMsg HeaderMessage
 	lineIndex := 0

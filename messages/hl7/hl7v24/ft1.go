@@ -3,7 +3,7 @@ package hl7v24
 import "time"
 
 type FT1 struct {
-	SetID                     *int      `hl7:"POS=2;ATR=sequence" json:"SetID,omitempty"`
+	SetID                     int       `hl7:"POS=2;ATR=sequence" json:"SetID,omitempty"`
 	TransactionID             string    `hl7:"POS=3" json:"TransactionID,omitempty"`
 	TransactionBatchID        string    `hl7:"POS=4" json:"TransactionBatchID,omitempty"`
 	TransactionDate           time.Time `hl7:"POS=5" json:"TransactionDate,omitempty"`

@@ -16,7 +16,7 @@ func Test_Parse_MSH_Segment(t *testing.T) {
 	// Arrange
 	fileData := fmt.Sprintf("MSH|^~\\&|HL7_Host^b^c|HL7_Office^^Xyz|CIT^^|LAB|20110926125155||ORM^O01|20110926125155|P|2.3|||ER|ER||8859/1~second_element|<\u000d")
 	type HeaderMessage struct {
-		MSH hl7v23.MSH `hl7:"MSH"`
+		MSH hl7v23.MSH `hl7:"TAG=MSH"`
 	}
 	var message HeaderMessage
 	// Act
@@ -37,7 +37,7 @@ func Test_Parse_MSH_Segment(t *testing.T) {
 	assert.Equal(t, "20110926125155", message.MSH.MessageControlID)
 	assert.Equal(t, "P", message.MSH.ProcessingID)
 	assert.Equal(t, "2.3", message.MSH.VersionID)
-	assert.Equal(t, 0, message.MSH.SequenceNumber)
+	assert.Nil(t, message.MSH.SequenceNumber)
 	assert.Equal(t, "", message.MSH.ContinuationPointer)
 	assert.Equal(t, "ER", message.MSH.AcceptAcknowledgementType)
 	assert.Equal(t, "ER", message.MSH.ApplicationAcknowledgementType)

@@ -5,13 +5,13 @@ import "time"
 // PID - Patient Identification
 // https://hl7-definition.caristix.com/v2/HL7v2.3/Segments/PID
 type PID struct {
-	ID                      *int      `hl7:"POS=2" json:"id,omitempty"`
+	ID                      int       `hl7:"POS=2" json:"id,omitempty"`
 	ExternalID              []CX      `hl7:"POS=3" json:"externalID,omitempty"`
 	InternalID              []CX      `hl7:"POS=4" json:"internalID,omitempty"`
 	AlternateID             []CX      `hl7:"POS=5" json:"alternateID,omitempty"`
 	Name                    XPN       `hl7:"POS=6" json:"name,omitempty"`
 	MothersMaidenName       XPN       `hl7:"POS=7" json:"mothersMaidenName,omitempty"`
-	DOB                     time.Time `hl7:"POS=8" json:"dob,omitempty"`
+	DOB                     time.Time `hl7:"POS=8;ATR=date" json:"dob,omitempty"`
 	Sex                     string    `hl7:"POS=9" json:"sex,omitempty"`
 	Alias                   []XPN     `hl7:"POS=10" json:"alias,omitempty"`
 	Race                    string    `hl7:"POS=11" json:"race,omitempty"`

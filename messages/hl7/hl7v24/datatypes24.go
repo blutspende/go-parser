@@ -345,7 +345,7 @@ type DLD struct {
 }
 
 // HL7 v2.3 - FC - Financial Class
-//https://hl7-definition.caristix.com/v2/HL7v2.3/DataTypes/FC
+// https://hl7-definition.caristix.com/v2/HL7v2.3/DataTypes/FC
 type FC struct {
 	FinancialClass string    `hl7:"POS=1" json:"FinancialClass,omitempty"`
 	EffectiveDate  time.Time `hl7:"POS=2" json:"EffectiveDate,omitempty"`
@@ -376,7 +376,7 @@ type TQ struct {
 }
 
 // CQ - Composite Quantity With Units
-//https://hl7-definition.caristix.com/v2/HL7v2.3/DataTypes/CQ
+// https://hl7-definition.caristix.com/v2/HL7v2.3/DataTypes/CQ
 type CQ struct {
 	Quantity *int   `hl7:"POS=1" json:"Quantity,omitempty"`
 	Units    string `hl7:"POS=2" json:"Units,omitempty"`

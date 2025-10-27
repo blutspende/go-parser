@@ -5,7 +5,7 @@ import "time"
 // HL7 v2.4 - NK1 - Next of kin / associated parties
 // https://hl7-definition.caristix.com/v2/HL7v2.4/Segments/NK1
 type NK1 struct {
-	SetID                                    *int      `hl7:"POS=2" json:"SetID,omitempty"`
+	SetID                                    int       `hl7:"POS=2" json:"SetID,omitempty"`
 	Name                                     []XPN     `hl7:"POS=3" json:"Name,omitempty"`
 	Relationship                             CE        `hl7:"POS=4" json:"Relationship,omitempty"`
 	Address                                  []XAD     `hl7:"POS=5" json:"Address,omitempty"`

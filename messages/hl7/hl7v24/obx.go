@@ -5,7 +5,7 @@ import "time"
 // HL7 v2.4 - OBX - Observation/Result
 // https://hl7-definition.caristix.com/v2/HL7v2.4/Segments/OBX
 type OBX struct {
-	SetID                        *int      `hl7:"POS=2;ATR=sequence" json:"SetID,omitempty"`
+	SetID                        int       `hl7:"POS=2;ATR=sequence" json:"SetID,omitempty"`
 	ValueType                    string    `hl7:"POS=3" json:"ValueType,omitempty"`
 	ObservationIdentifier        CE        `hl7:"POS=4" json:"ObservationIdentifier,omitempty"`
 	ObservationSubID             string    `hl7:"POS=5" json:"ObservationSubID,omitempty"`
