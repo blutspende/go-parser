@@ -54,9 +54,9 @@ type Substructure struct {
 
 // Records
 type ThreeFieldRecord struct {
-	First  string `astm:"POS=3"`
-	Second string `astm:"POS=4"`
-	Third  string `astm:"POS=5"`
+	First  string `astm:"POS=3" hl7:"POS=3"`
+	Second string `astm:"POS=4" hl7:"POS=4"`
+	Third  string `astm:"POS=5" hl7:"POS=5"`
 }
 type SimpleRecord struct {
 	First string `astm:"POS=3" hl7:"POS=3"`

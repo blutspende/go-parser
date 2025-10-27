@@ -115,7 +115,7 @@ func TestMarshalFromStruct(t *testing.T) {
 	}
 	expected := `MSH|^~\&|HL7_Host|HL7_Office|CIT|LAB|20230203080903||ORM^O01|CID586246|P|2.3|||ER|SU||8859/1
 PID|0||01020304||Nachnamäh^Vörname|||U
-PD1
+PD1|
 PV1||S|||||||||||||||||VID001
 PV2|
 GT1|
