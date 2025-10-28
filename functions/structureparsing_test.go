@@ -1,28 +1,27 @@
 package functions
 
 import (
-	"errors"
+	"testing"
+
 	"github.com/blutspende/go-parser/errmsg"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
+// ParseStruct tests - basics
 func TestParseStruct_SingleLineStruct(t *testing.T) {
 	// Arrange
 	input := []string{
 		"R|1|first|second|third",
 	}
 	target := SingleRecordStruct{}
-	lineIndex := 0
 	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
+	err := ParseStruct(input, &target, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "first", target.FirstRecord.First)
 	assert.Equal(t, "second", target.FirstRecord.Second)
 	assert.Equal(t, "third", target.FirstRecord.Third)
 }
-
 func TestParseStruct_RecordArrayStruct(t *testing.T) {
 	// Arrange
 	input := []string{
@@ -30,9 +29,8 @@ func TestParseStruct_RecordArrayStruct(t *testing.T) {
 		"R|2|first2|second2|third2",
 	}
 	target := RecordArrayStruct{}
-	lineIndex := 0
 	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
+	err := ParseStruct(input, &target, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, target.RecordArray, 2)
@@ -43,7 +41,6 @@ func TestParseStruct_RecordArrayStruct(t *testing.T) {
 	assert.Equal(t, "second2", target.RecordArray[1].Second)
 	assert.Equal(t, "third2", target.RecordArray[1].Third)
 }
-
 func TestParseStruct_CompositeMessage(t *testing.T) {
 	// Arrange
 	input := []string{
@@ -51,9 +48,8 @@ func TestParseStruct_CompositeMessage(t *testing.T) {
 		"S|1|21|r2 second",
 	}
 	target := CompositeMessage{}
-	lineIndex := 0
 	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
+	err := ParseStruct(input, &target, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "r1 first", target.CompositeRecordStruct.Record1.First)
@@ -61,7 +57,6 @@ func TestParseStruct_CompositeMessage(t *testing.T) {
 	assert.Equal(t, 21, target.CompositeRecordStruct.Record2.First)
 	assert.Equal(t, "r2 second", target.CompositeRecordStruct.Record2.Second)
 }
-
 func TestParseStruct_CompositeArrayMessage(t *testing.T) {
 	// Arrange
 	input := []string{
@@ -71,9 +66,8 @@ func TestParseStruct_CompositeArrayMessage(t *testing.T) {
 		"S|1|221|a2 r2 second",
 	}
 	target := CompositeArrayMessage{}
-	lineIndex := 0
 	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
+	err := ParseStruct(input, &target, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, target.CompositeRecordArray, 2)
@@ -86,99 +80,6 @@ func TestParseStruct_CompositeArrayMessage(t *testing.T) {
 	assert.Equal(t, 221, target.CompositeRecordArray[1].Record2.First)
 	assert.Equal(t, "a2 r2 second", target.CompositeRecordArray[1].Record2.Second)
 }
-
-func TestParseStruct_OptionalMessage(t *testing.T) {
-	// Arrange
-	input := []string{
-		"F|1|first",
-		"T|1|first",
-	}
-	target := OptionalMessage{}
-	lineIndex := 0
-	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
-	// Assert
-	assert.Nil(t, err)
-	assert.Equal(t, "first", target.First.First)
-	assert.Equal(t, "", target.Optional.First)
-	assert.Equal(t, "first", target.Third.First)
-}
-
-func TestParseStruct_OptionalArrayMessage(t *testing.T) {
-	// Arrange
-	input := []string{
-		"F|1|first",
-		"L|1|first",
-	}
-	target := OptionalArrayMessage{}
-	lineIndex := 0
-	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
-	// Assert
-	assert.Nil(t, err)
-	assert.Equal(t, "first", target.First.First)
-	assert.Len(t, target.Optional, 0)
-	assert.Equal(t, "first", target.Last.First)
-}
-func TestParseStruct_OptionalArrayMessageWithData(t *testing.T) {
-	// Arrange
-	input := []string{
-		"F|1|first",
-		"A|1|first",
-		"A|2|first",
-		"L|1|first",
-	}
-	target := OptionalArrayMessage{}
-	lineIndex := 0
-	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
-	// Assert
-	assert.Nil(t, err)
-	assert.Equal(t, "first", target.First.First)
-	assert.Len(t, target.Optional, 2)
-	assert.Equal(t, "first", target.Last.First)
-}
-func TestParseStruct_OptionalArrayAtTheEndMessageWithMissingOptionalData(t *testing.T) {
-	// Arrange
-	input := []string{
-		"F|1|first",
-	}
-	target := OptionalArrayAtTheEndMessage{}
-	lineIndex := 0
-	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
-	// Assert
-	assert.Nil(t, err)
-	assert.Equal(t, "first", target.First.First)
-	assert.Len(t, target.Optional, 0)
-}
-func TestParseStruct_OptionalAtTheEndMessageWithMissingOptionalData(t *testing.T) {
-	// Arrange
-	input := []string{
-		"F|1|first",
-	}
-	target := OptionalAtTheEndMessage{}
-	lineIndex := 0
-	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
-	// Assert
-	assert.Nil(t, err)
-	assert.Equal(t, "first", target.First.First)
-	assert.Equal(t, "", target.Optional.First)
-}
-func TestParseStruct_UnexpectedLineTypeError(t *testing.T) {
-	// Arrange
-	input := []string{
-		"F|1|r1 first|12",
-		"U|1|21|r2 second",
-	}
-	target := CompositeMessage{}
-	lineIndex := 0
-	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
-	// Assert
-	assert.True(t, errors.Is(err, errmsg.ErrStructureParsingLineTypeNameMismatch))
-}
 func TestParseStruct_EndOfCompositeArray(t *testing.T) {
 	// Arrange
 	input := []string{
@@ -189,10 +90,8 @@ func TestParseStruct_EndOfCompositeArray(t *testing.T) {
 		"E|1|end",
 	}
 	target := CompositeArrayAndSingleRecordMessage{}
-	lineIndex := 0
 	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
-	// Assert
+	err := ParseStruct(input, &target, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "str", target.CompositeRecordArray[0].Record1.First)
@@ -203,20 +102,494 @@ func TestParseStruct_EndOfCompositeArray(t *testing.T) {
 	assert.Equal(t, 1, target.CompositeRecordArray[1].Record1.Second)
 	assert.Equal(t, 1, target.CompositeRecordArray[1].Record2.First)
 	assert.Equal(t, "str", target.CompositeRecordArray[1].Record2.Second)
-	assert.Equal(t, "end", target.Ending.First)
+	assert.Equal(t, "end", target.Ending.Field)
 }
-func TestParseStruct_LinesDepletedError(t *testing.T) {
+
+// ParseStruct tests - optionals
+func TestParseStruct_OptionalRecord(t *testing.T) {
 	// Arrange
-	input := []string{
-		"F|1|r1 first|12",
+	type TargetType struct {
+		First    SimpleRecord `astm:"TAG=F"`
+		Optional SimpleRecord `astm:"TAG=S;ATR=optional"`
+		Third    SimpleRecord `astm:"TAG=T"`
 	}
-	target := CompositeMessage{}
-	lineIndex := 0
+	target := TargetType{}
+	input := []string{
+		"F|1|line1",
+		"T|1|line2",
+	}
 	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
+	err := ParseStruct(input, &target, config)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrStructureParsingInputLinesDepleted.Error())
+	assert.Nil(t, err)
+	assert.Equal(t, "line1", target.First.Field)
+	assert.Equal(t, "", target.Optional.Field)
+	assert.Equal(t, "line2", target.Third.Field)
 }
+func TestParseStruct_OptionalEmptyArray(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		First    SimpleRecord   `astm:"TAG=F"`
+		Optional []SimpleRecord `astm:"TAG=A;ATR=optional"`
+		Last     SimpleRecord   `astm:"TAG=L"`
+	}
+	target := TargetType{}
+	input := []string{
+		"F|1|line1",
+		"L|1|line2",
+	}
+	// Act
+	err := ParseStruct(input, &target, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "line1", target.First.Field)
+	assert.Len(t, target.Optional, 0)
+	assert.Equal(t, "line2", target.Last.Field)
+}
+func TestParseStruct_OptionalArrayWithData(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		First    SimpleRecord   `astm:"TAG=F"`
+		Optional []SimpleRecord `astm:"TAG=A;ATR=optional"`
+		Last     SimpleRecord   `astm:"TAG=L"`
+	}
+	target := TargetType{}
+	input := []string{
+		"F|1|line1",
+		"A|1|line2",
+		"A|2|line3",
+		"L|1|line4",
+	}
+	// Act
+	err := ParseStruct(input, &target, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "line1", target.First.Field)
+	assert.Len(t, target.Optional, 2)
+	assert.Equal(t, "line4", target.Last.Field)
+}
+func TestParseStruct_OptionalEmptyArrayAtEnd(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		First    SimpleRecord   `astm:"TAG=F"`
+		Optional []SimpleRecord `astm:"TAG=A;ATR=optional"`
+	}
+	target := TargetType{}
+	input := []string{
+		"F|1|line1",
+	}
+	// Act
+	err := ParseStruct(input, &target, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "line1", target.First.Field)
+	assert.Len(t, target.Optional, 0)
+}
+func TestParseStruct_OptionalRecordAtTheEnd(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		First    SimpleRecord `astm:"TAG=F"`
+		Optional SimpleRecord `astm:"TAG=O;ATR=optional"`
+	}
+	target := TargetType{}
+	input := []string{
+		"F|1|line1",
+	}
+	// Act
+	err := ParseStruct(input, &target, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "line1", target.First.Field)
+	assert.Equal(t, "", target.Optional.Field)
+}
+func TestParseStruct_OptionalGroupMessage(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Group struct {
+			GroupRecord1 SimpleRecord `hl7:"TAG=GR1"`
+			GroupRecord2 SimpleRecord `hl7:"TAG=GR2"`
+		} `hl7:"GROUP;ATR=optional"`
+		Record2 SimpleRecord `hl7:"TAG=SR2"`
+	}
+	target := TargetType{}
+	input := []string{
+		"SR2||line1",
+	}
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "", target.Group.GroupRecord1.Field)
+	assert.Equal(t, "", target.Group.GroupRecord2.Field)
+	assert.Equal(t, "line1", target.Record2.Field)
+}
+func TestParseStruct_OptionalGroupEndMessage(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Group struct {
+			GroupRecord1 SimpleRecord `hl7:"TAG=GR1"`
+			GroupRecord2 SimpleRecord `hl7:"TAG=GR2"`
+		} `hl7:"GROUP;ATR=optional"`
+	}
+	target := TargetType{}
+	input := []string{
+		"GR1||line1",
+	}
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "line1", target.Group.GroupRecord1.Field)
+	assert.Equal(t, "", target.Group.GroupRecord2.Field)
+}
+func TestParseStruct_EmptyArray(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Array []SimpleRecord `astm:"TAG=A"`
+	}
+	target := TargetType{}
+	var input []string
+	// Act
+	err := ParseStruct(input, &target, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, target.Array, 0)
+}
+func TestParseStruct_EmptyArrayAtEnd(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		First SimpleRecord   `astm:"TAG=F"`
+		Array []SimpleRecord `astm:"TAG=A"`
+	}
+	target := TargetType{}
+	input := []string{
+		"F|1|line1",
+	}
+	// Act
+	err := ParseStruct(input, &target, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "line1", target.First.Field)
+	assert.Len(t, target.Array, 0)
+}
+
+// ParseStruct tests - lines depleted
+func TestParseStruct_LinesDepleted(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Record1 SimpleRecord `astm:"TAG=F"`
+		Record2 SimpleRecord `astm:"TAG=S"`
+	}
+	target := TargetType{}
+	input := []string{
+		"F|1|line1",
+	}
+	config.EnforceMessageCompleteness = true
+	// Act
+	err := ParseStruct(input, &target, config)
+	// Assert
+	assert.ErrorIs(t, err, errmsg.ErrStructureParsingInputLinesDepleted)
+	// Teardown
+	teardown()
+}
+func TestParseStruct_LinesDepletedAllowIncomplete(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Record1 SimpleRecord `astm:"TAG=F"`
+		Record2 SimpleRecord `astm:"TAG=S"`
+	}
+	target := TargetType{}
+	input := []string{
+		"F|1|line1",
+	}
+	config.EnforceMessageCompleteness = false
+	// Act
+	err := ParseStruct(input, &target, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "line1", target.Record1.Field)
+	assert.Equal(t, "", target.Record2.Field)
+	// Teardown
+	teardown()
+}
+func TestParseStruct_LinesDepletedInGroup(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Record1 SimpleRecord `hl7:"TAG=SR1"`
+		Group   struct {
+			GroupRecord1 SimpleRecord `hl7:"TAG=GR1"`
+			GroupRecord2 SimpleRecord `hl7:"TAG=GR2"`
+		} `hl7:"GROUP"`
+	}
+	target := TargetType{}
+	input := []string{
+		"SR1||line1",
+		"GR1||line2",
+	}
+	configHL7.EnforceMessageCompleteness = true
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.ErrorIs(t, err, errmsg.ErrStructureParsingInputLinesDepleted)
+	// Teardown
+	teardown()
+}
+func TestParseStruct_LinesDepletedInGroupAllowIncomplete(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Record1 SimpleRecord `hl7:"TAG=SR1"`
+		Group   struct {
+			GroupRecord1 SimpleRecord `hl7:"TAG=GR1"`
+			GroupRecord2 SimpleRecord `hl7:"TAG=GR2"`
+		} `hl7:"GROUP"`
+		Record2 SimpleRecord `hl7:"TAG=SR2"`
+	}
+	target := TargetType{}
+	input := []string{
+		"SR1||line1",
+		"GR1||line2",
+	}
+	configHL7.EnforceMessageCompleteness = false
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "line1", target.Record1.Field)
+	assert.Equal(t, "line2", target.Group.GroupRecord1.Field)
+	assert.Equal(t, "", target.Group.GroupRecord2.Field)
+	assert.Equal(t, "", target.Record2.Field)
+	// Teardown
+	teardown()
+}
+func TestParseStruct_LinesDepletedAfterOptional(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Record1 SimpleRecord `astm:"TAG=F"`
+		Record2 SimpleRecord `astm:"TAG=O;ATR=optional"`
+		Record3 SimpleRecord `astm:"TAG=L"`
+	}
+	target := TargetType{}
+	input := []string{
+		"F|1|line1",
+	}
+	// Act
+	err := ParseStruct(input, &target, config)
+	// Assert
+	assert.ErrorIs(t, err, errmsg.ErrStructureParsingInputLinesDepleted)
+}
+
+// ParseStruct tests - mismatches
+func TestParseStruct_MismatchedLine(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Record1 SimpleRecord `astm:"TAG=F"`
+		Record2 SimpleRecord `astm:"TAG=S"`
+	}
+	target := TargetType{}
+	input := []string{
+		"F|1|line1",
+		"U|1|line2",
+	}
+	// Act
+	err := ParseStruct(input, &target, config)
+	// Assert
+	assert.ErrorIs(t, err, errmsg.ErrStructureParsingStructureMismatch)
+}
+func TestParseStruct_GroupMissing(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Group struct {
+			GroupRecord1 SimpleRecord `hl7:"TAG=GR1"`
+			GroupRecord2 SimpleRecord `hl7:"TAG=GR2"`
+		} `hl7:"GROUP"`
+		Record2 SimpleRecord `hl7:"TAG=SR2"`
+	}
+	target := TargetType{}
+	input := []string{
+		"SR2||line1",
+	}
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.ErrorIs(t, err, errmsg.ErrStructureParsingStructureMismatch)
+}
+func TestParseStruct_RecordInGroupMissing(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Group struct {
+			GroupRecord1 SimpleRecord `hl7:"TAG=GR1"`
+			GroupRecord2 SimpleRecord `hl7:"TAG=GR2"`
+		} `hl7:"GROUP"`
+		Record2 SimpleRecord `hl7:"TAG=SR2"`
+	}
+	target := TargetType{}
+	input := []string{
+		"GR1||line1",
+		"SR2||line2",
+	}
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.ErrorIs(t, err, errmsg.ErrStructureParsingStructureMismatch)
+}
+
+// ParseStruct tests - group arrays
+func TestParseStruct_GroupArrayWorks(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Group []struct {
+			GroupRecord1 SimpleRecord `hl7:"TAG=GR1"`
+			GroupRecord2 SimpleRecord `hl7:"TAG=GR2"`
+		} `hl7:"GROUP"`
+		Record2 SimpleRecord `hl7:"TAG=SR2"`
+	}
+	target := TargetType{}
+	input := []string{
+		"GR1||line1",
+		"GR2||line2",
+		"GR1||line3",
+		"GR2||line4",
+		"SR2||line5",
+	}
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, target.Group, 2)
+	assert.Equal(t, "line1", target.Group[0].GroupRecord1.Field)
+	assert.Equal(t, "line2", target.Group[0].GroupRecord2.Field)
+	assert.Equal(t, "line3", target.Group[1].GroupRecord1.Field)
+	assert.Equal(t, "line4", target.Group[1].GroupRecord2.Field)
+	assert.Equal(t, "line5", target.Record2.Field)
+}
+func TestParseStruct_GroupArrayOptionalElement(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Group []struct {
+			GroupRecord1 SimpleRecord `hl7:"TAG=GR1"`
+			GroupRecord2 SimpleRecord `hl7:"TAG=GR2;ATR=optional"`
+		} `hl7:"GROUP"`
+		Record2 SimpleRecord `hl7:"TAG=SR2"`
+	}
+	target := TargetType{}
+	input := []string{
+		"GR1||line1",
+		"SR2||line2",
+	}
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, target.Group, 1)
+	assert.Equal(t, "line1", target.Group[0].GroupRecord1.Field)
+	assert.Equal(t, "", target.Group[0].GroupRecord2.Field)
+	assert.Equal(t, "line2", target.Record2.Field)
+}
+func TestParseStruct_GroupArrayOptionalGroup(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Group []struct {
+			GroupRecord1 SimpleRecord `hl7:"TAG=GR1"`
+			GroupRecord2 SimpleRecord `hl7:"TAG=GR2"`
+		} `hl7:"GROUP;ATR=optional"`
+		Record2 SimpleRecord `hl7:"TAG=SR2"`
+	}
+	target := TargetType{}
+	input := []string{
+		"SR2||line1",
+	}
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, target.Group, 0)
+	assert.Equal(t, "line1", target.Record2.Field)
+}
+func TestParseStruct_GroupArrayAllOptionalGroup(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Group []struct {
+			GroupRecord1 SimpleRecord `hl7:"TAG=GR1;ATR=optional"`
+			GroupRecord2 SimpleRecord `hl7:"TAG=GR2;ATR=optional"`
+		} `hl7:"GROUP"`
+		Record2 SimpleRecord `hl7:"TAG=SR2"`
+	}
+	target := TargetType{}
+	input := []string{
+		"SR2||line1",
+	}
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, target.Group, 0)
+	assert.Equal(t, "line1", target.Record2.Field)
+}
+func TestParseStruct_GroupArrayMissing(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Group []struct {
+			GroupRecord1 SimpleRecord `hl7:"TAG=GR1"`
+			GroupRecord2 SimpleRecord `hl7:"TAG=GR2"`
+		} `hl7:"GROUP"`
+		Record2 SimpleRecord `hl7:"TAG=SR2"`
+	}
+	target := TargetType{}
+	input := []string{
+		"SR2||line1",
+	}
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.Nil(t, err) //TODO: should this be an error? 0 element non optional arrays are ok?
+	assert.Len(t, target.Group, 0)
+	assert.Equal(t, "line1", target.Record2.Field)
+}
+func TestParseStruct_GroupArrayOptionalAtEnd(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		Group []struct {
+			GroupRecord1 SimpleRecord `hl7:"TAG=GR1"`
+			GroupRecord2 SimpleRecord `hl7:"TAG=GR2;ATR=optional"`
+		} `hl7:"GROUP"`
+	}
+	target := TargetType{}
+	input := []string{
+		"GR1||line1",
+	}
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, target.Group, 1)
+	assert.Equal(t, "line1", target.Group[0].GroupRecord1.Field)
+	assert.Equal(t, "", target.Group[0].GroupRecord2.Field)
+}
+func TestParseStruct_OptionalNestedGroupArray(t *testing.T) {
+	// Arrange
+	type OptionalNestedArrayMessage struct {
+		GroupLvl1 struct {
+			GroupArrayLvl2 []struct {
+				NestedRecord SimpleRecord `hl7:"TAG=NES"`
+			} `hl7:"GROUP"`
+		} `hl7:"GROUP"`
+		Record2 SimpleRecord `hl7:"TAG=SR2"`
+	}
+	input := []string{
+		"NES||line1",
+		"SR2||line2",
+	}
+	target := OptionalNestedArrayMessage{}
+	// Act
+	err := ParseStruct(input, &target, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, target.GroupLvl1.GroupArrayLvl2, 1)
+	assert.Equal(t, "line1", target.GroupLvl1.GroupArrayLvl2[0].NestedRecord.Field)
+	assert.Equal(t, "line2", target.Record2.Field)
+}
+
+// ParseStruct tests - subname
 func TestParseStruct_SubnameMessage(t *testing.T) {
 	// Arrange
 	input := []string{
@@ -224,9 +597,8 @@ func TestParseStruct_SubnameMessage(t *testing.T) {
 		"R|1|SECOND|21|r2 second",
 	}
 	target := SubnameMessage{}
-	lineIndex := 0
 	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
+	err := ParseStruct(input, &target, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "FIRST", target.Record1.Subname)
@@ -242,9 +614,8 @@ func TestParseStruct_SubnameOptionalMessage(t *testing.T) {
 		"R|1|SECOND|21|r2 second",
 	}
 	target := SubnameOptionalMessage{}
-	lineIndex := 0
 	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
+	err := ParseStruct(input, &target, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "", target.Record1.Subname)
@@ -262,9 +633,8 @@ func TestParseStruct_SubnameArrayMessage(t *testing.T) {
 		"R|1|SECOND|1|second",
 	}
 	target := SubnameArrayMessage{}
-	lineIndex := 0
 	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
+	err := ParseStruct(input, &target, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, target.Array, 2)
@@ -287,10 +657,9 @@ func TestParseStruct_SubnameMultiArrayMessage(t *testing.T) {
 		"R|4|SECOND|222|2 a2 second",
 	}
 	target := SubnameMultiArrayMessage{}
-	lineIndex := 0
 	config.EnforceSequenceNumberCheck = false
 	// Act
-	err := ParseStruct(input, &target, &lineIndex, 1, 0, config)
+	err := ParseStruct(input, &target, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, target.Array1, 2)

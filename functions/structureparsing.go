@@ -1,7 +1,6 @@
 package functions
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/blutspende/go-parser/constants"
@@ -11,20 +10,23 @@ import (
 	"reflect"
 )
 
-func ParseStruct(inputLines []string, targetStruct interface{}, lineIndex *int, sequenceNumber int, depth int, config *parserconfig.Configuration) (err error) {
+func ParseStruct(inputLines []string, targetStruct interface{}, config *parserconfig.Configuration) (err error) {
+	lineIndex := 0
+	_, err = parseStructRecursive(inputLines, targetStruct, &lineIndex, 1, false, 0, config)
+	return
+}
+
+func parseStructRecursive(inputLines []string, targetStruct interface{}, lineIndex *int, sequenceNumber int, optional bool, depth int, config *parserconfig.Configuration) (structMatch bool, err error) {
+	// Assume the whole structure is a mismatches until at leat one matching element is found
+	structMatch = false
 	// Check for maximum depth
 	if depth >= constants.MaxDepth {
-		return errmsg.ErrStructureParsingMaxDepthReached
+		return structMatch, errmsg.ErrStructureParsingMaxDepthReached
 	}
-	// Check for enough input lines
-	if *lineIndex >= len(inputLines) {
-		return errmsg.ErrStructureParsingInputLinesDepleted
-	}
-
 	// Process the target structure
 	targetTypes, targetValues, _, err := ProcessStructReflection(targetStruct)
 	if err != nil {
-		return err
+		return structMatch, err
 	}
 
 	// Iterate over the inputFields of the targetStruct struct
@@ -32,98 +34,109 @@ func ParseStruct(inputLines []string, targetStruct interface{}, lineIndex *int, 
 		// Parse the targetStruct field targetFieldAnnotation
 		targetStructAnnotation, err := ParseStructAnnotation(targetType, config)
 		if err != nil {
-			return err
+			return structMatch, err
 		}
 		// Save the target value pointer
 		targetValue := targetValues[i].Addr().Interface()
+		// Set optionality from target annotation and recursive parameter from above
+		_, targetOptionalAttribute := targetStructAnnotation.Attributes[constants.AttributeOptional]
+		targetOptional := targetOptionalAttribute || optional
+		// Note: arrays are implicitly optional (empty arrays are valid)
+		targetOptional = targetOptional || targetStructAnnotation.IsArray
 
 		// Target is an array it is iterated with conditional break (unknown length)
 		if targetStructAnnotation.IsArray {
 			// Create the array structure
 			sliceType := reflect.SliceOf(targetValues[i].Type().Elem())
 			targetValues[i].Set(reflect.MakeSlice(sliceType, 0, 0))
-
 			// Iterate as long as we have matching input structure and still have input lines
 			for seq := 1; *lineIndex < len(inputLines); seq++ {
 				// Create a new element for the slice to parse into
 				elem := reflect.New(targetValues[i].Type().Elem()).Elem()
-
-				nameOk := true
+				// Match value communicates if the line or substructure can be found at the index in the input lines
+				var localMatch bool
 				if targetStructAnnotation.IsGroup {
 					// Composite target: recursively parse the composite structure
-					err = ParseStruct(inputLines, elem.Addr().Interface(), lineIndex, seq, depth+1, config)
-					// If the error is a line type name mismatch, it means the end of the array
-					// Note: here an error is used to communicate the end of the array, it is not a real error
-					if errors.Is(err, errmsg.ErrStructureParsingLineTypeNameMismatch) {
-						nameOk = false
-					}
+					localMatch, err = parseStructRecursive(inputLines, elem.Addr().Interface(), lineIndex, seq, targetOptional, depth+1, config)
 				} else {
 					// Non-composite target: parse the line into the new element
-					nameOk, err = ParseLine(inputLines[*lineIndex], elem.Addr().Interface(), targetStructAnnotation, seq, config)
-					// Increment the line index
-					*lineIndex++
+					localMatch, err = ParseLine(inputLines[*lineIndex], elem.Addr().Interface(), targetStructAnnotation, seq, config)
+					// If the line matched: increment line index
+					if localMatch {
+						*lineIndex++
+					}
 				}
-				// If the type name is a mismatch, it means the end of the array
-				if !nameOk {
-					err = nil
-					*lineIndex--
-					break
-				}
+				// Handle potential error from both cases
 				if err != nil {
-					return err
+					return structMatch, err
 				}
-				// If no error, add the new element to the slice
+				// Element mismatch means the end of the array
+				if !localMatch {
+					break
+				} else {
+					// Element matched: the structure matches
+					structMatch = true
+				}
+
+				// If matched and no error: add the new element to the slice
 				targetValues[i].Set(reflect.Append(targetValues[i], elem))
 			}
 		} else {
 			// Single element structure
+			// Check for enough input lines
+			if *lineIndex >= len(inputLines) {
+				if targetOptional {
+					// Target is optional: it can be skipped (to allow the loop to find any non-optional remaining)
+					continue
+				} else {
+					if config.EnforceMessageCompleteness {
+						// If not optional and completeness is enforced: error
+						return structMatch, fmt.Errorf("%w: expected [%s]", errmsg.ErrStructureParsingInputLinesDepleted, targetStructAnnotation.Tag)
+					} else {
+						// Completeness is not enforced: just return (nothing more to parse)
+						return structMatch, nil
+					}
+				}
+			}
+			var localMatch bool
 			if targetStructAnnotation.IsGroup {
 				// Composite target: go further down the rabbit hole
-				err = ParseStruct(inputLines, targetValue, lineIndex, 1, depth+1, config)
+				localMatch, err = parseStructRecursive(inputLines, targetValue, lineIndex, 1, targetOptional, depth+1, config)
 				if err != nil {
-					return err
+					return structMatch, err
 				}
 			} else {
 				// Non-composite target: there is a single line to parse
-				// Make sure there are enough input lines
-				if *lineIndex >= len(inputLines) {
-					// Skip if the structure is optional, return otherwise
-					if _, exists := targetStructAnnotation.Attributes[constants.AttributeOptional]; exists {
-						continue
-					} else {
-						// Error if completeness is enforced
-						// TODO: decide on the optionality
-						if config.EnforceMessageCompleteness {
-							return errmsg.ErrStructureParsingInputLinesDepleted
-						} else {
-							return nil
-						}
-					}
-				}
 				// Determine sequence number: first element inherits from the parent call, the rest is 1
 				seq := 1
 				if i == 0 {
 					seq = sequenceNumber
 				}
 				// Parse the line and increment the line index
-				nameOk, err := ParseLine(inputLines[*lineIndex], targetValue, targetStructAnnotation, seq, config)
-				*lineIndex++
+				localMatch, err = ParseLine(inputLines[*lineIndex], targetValue, targetStructAnnotation, seq, config)
 				if err != nil {
-					return err
+					return structMatch, err
 				}
-				// If there is a type name mismatch but the target is optional it can be skipped, otherwise it's an error
-				if !nameOk {
-					if _, exists := targetStructAnnotation.Attributes[constants.AttributeOptional]; exists {
-						err = nil
-						*lineIndex--
-						continue
-					} else {
-						return fmt.Errorf("%w @ln %d", errmsg.ErrStructureParsingLineTypeNameMismatch, *lineIndex)
-					}
+				// If the line matched: increment line index
+				if localMatch {
+					*lineIndex++
 				}
+			}
+			// Element mismatch
+			if !localMatch {
+				if targetOptional {
+					// Target is optional: it can be skipped
+					continue
+				} else {
+					// Target not optional: return with mismatch error
+					return structMatch, fmt.Errorf("%w: @ln %d, expected [%s]", errmsg.ErrStructureParsingStructureMismatch, *lineIndex, targetStructAnnotation.Tag)
+				}
+			} else {
+				// Element matched: the structure matches
+				structMatch = true
 			}
 		}
 	}
-	// Return nil if everything went well
-	return nil
+	// Return the match state and no error
+	return structMatch, nil
 }

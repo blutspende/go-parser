@@ -502,7 +502,7 @@ func TestParseLine_Escape_ASTM(t *testing.T) {
 	_, err := ParseLine(input, &target, createStructAnnotation("R"), 1, config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, "esc|ape", target.First)
+	assert.Equal(t, "esc|ape", target.Field)
 }
 func TestParseLine_Escape_HL7(t *testing.T) {
 	// Arrange
@@ -512,7 +512,7 @@ func TestParseLine_Escape_HL7(t *testing.T) {
 	_, err := ParseLine(input, &target, createStructAnnotation("REC"), 1, configHL7)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, "esc|ape", target.First)
+	assert.Equal(t, "esc|ape", target.Field)
 }
 func TestParseLine_ReservedFieldRecordHl7(t *testing.T) {
 	// Arrange

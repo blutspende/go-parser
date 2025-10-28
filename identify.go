@@ -86,8 +86,7 @@ func IdentifyMessageHL7(messageData []byte, config *parserconfig.Configuration) 
 		} `hl7:"TAG=MSH"`
 	}
 	var headerMsg HeaderMessage
-	lineIndex := 0
-	err = functions.ParseStruct(lines, &headerMsg, &lineIndex, 1, 0, config)
+	err = functions.ParseStruct(lines, &headerMsg, config)
 	if err != nil {
 		return "", "", err
 	}

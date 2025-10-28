@@ -31,5 +31,5 @@ type OUL_R21 struct {
 		} `hl7:"GROUP"`
 		ClinicalTrialIdentification []CTI `hl7:"TAG=CTI;ATR=optional" json:"ClinicalTrialIdentification,omitempty"`
 	} `hl7:"GROUP"`
-	ContinuationPointer DSC `hl7:"TAG=MSH" json:"ContinuationPointer,omitempty"`
+	ContinuationPointer DSC `hl7:"TAG=DSC;ATR=optional" json:"ContinuationPointer,omitempty"`
 }

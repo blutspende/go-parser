@@ -676,7 +676,7 @@ func TestBuildLine_InvalidAttributeValue(t *testing.T) {
 func TestBuildLine_EscapedChars(t *testing.T) {
 	// Arrange
 	source := SimpleRecord{
-		First: "esc^ape",
+		Field: "esc^ape",
 	}
 	config.EscapeOutputStrings = true
 	// Act
@@ -690,7 +690,7 @@ func TestBuildLine_EscapedChars(t *testing.T) {
 func TestBuildLine_EscapedCharsNoEscape(t *testing.T) {
 	// Arrange
 	source := SimpleRecord{
-		First: "esc^ape",
+		Field: "esc^ape",
 	}
 	config.EscapeOutputStrings = false
 	// Act
@@ -704,7 +704,7 @@ func TestBuildLine_EscapedCharsNoEscape(t *testing.T) {
 func TestBuildLine_EscapedChars_HL7(t *testing.T) {
 	// Arrange
 	source := SimpleRecord{
-		First: "esc^ape",
+		Field: "esc^ape",
 	}
 	configHL7.EscapeOutputStrings = true
 	// Act

@@ -23,8 +23,7 @@ func Unmarshal(messageData []byte, targetStruct interface{}, config *parserconfi
 		return err
 	}
 	// Parse the lines into the target structure
-	lineIndex := 0
-	err = functions.ParseStruct(lines, targetStruct, &lineIndex, 1, 0, config)
+	err = functions.ParseStruct(lines, targetStruct, config)
 	if err != nil {
 		return err
 	}

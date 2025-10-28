@@ -59,7 +59,7 @@ type ThreeFieldRecord struct {
 	Third  string `astm:"POS=5" hl7:"POS=5"`
 }
 type SimpleRecord struct {
-	First string `astm:"POS=3" hl7:"POS=3"`
+	Field string `astm:"POS=3" hl7:"POS=3"`
 }
 type UnorderedRecord struct {
 	First  string `astm:"POS=3"`
@@ -257,24 +257,6 @@ type CompositeArrayMessage struct {
 type CompositeArrayAndSingleRecordMessage struct {
 	CompositeRecordArray []CompositeRecordStruct `astm:"GROUP"`
 	Ending               SimpleRecord            `astm:"TAG=E"`
-}
-type OptionalMessage struct {
-	First    SimpleRecord `astm:"TAG=F"`
-	Optional SimpleRecord `astm:"TAG=S;ATR=optional"`
-	Third    SimpleRecord `astm:"TAG=T"`
-}
-type OptionalArrayMessage struct {
-	First    SimpleRecord   `astm:"TAG=F"`
-	Optional []SimpleRecord `astm:"TAG=A;ATR=optional"`
-	Last     SimpleRecord   `astm:"TAG=L"`
-}
-type OptionalArrayAtTheEndMessage struct {
-	First    SimpleRecord   `astm:"TAG=F"`
-	Optional []SimpleRecord `astm:"TAG=A;ATR=optional"`
-}
-type OptionalAtTheEndMessage struct {
-	First    SimpleRecord `astm:"TAG=F"`
-	Optional SimpleRecord `astm:"TAG=O;ATR=optional"`
 }
 type SubnameMessage struct {
 	Record1 SubnameRecordType1 `astm:"TAG=R;ATR=subname:FIRST"`

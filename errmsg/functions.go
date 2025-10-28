@@ -40,9 +40,9 @@ var (
 
 // StructureParsing
 var (
-	ErrStructureParsingMaxDepthReached      = errors.New("max depth reached")
-	ErrStructureParsingInputLinesDepleted   = errors.New("input lines depleted")
-	ErrStructureParsingLineTypeNameMismatch = errors.New("line type name mismatch")
+	ErrStructureParsingMaxDepthReached    = errors.New("max depth reached")
+	ErrStructureParsingInputLinesDepleted = errors.New("input lines depleted")
+	ErrStructureParsingStructureMismatch  = errors.New("structure mismatch")
 )
 
 // LineBuilding
