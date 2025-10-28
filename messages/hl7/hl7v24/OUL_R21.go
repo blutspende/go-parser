@@ -9,17 +9,17 @@ type OUL_R21 struct {
 		PatientIdentification PID   `hl7:"TAG=PID;ATR=optional" json:"PatientIdentification,omitempty"`
 		PatientDemographics   PD1   `hl7:"TAG=PD1;ATR=optional" json:"PatientDemographics,omitempty"`
 		NotesAndComments      []NTE `hl7:"TAG=NTE;ATR=optional" json:"NotesAndComments,omitempty"`
-	} `hl7:"GROUP"`
+	} `hl7:"GROUP;ATR=optional"`
 	Visit struct {
 		PatientVisit          PV1 `hl7:"TAG=PV1;ATR=optional" json:"PatientVisit,omitempty"`
 		AdditionalInformation PV2 `hl7:"TAG=PV2;ATR=optional" json:"AdditionalInformation,omitempty"`
-	} `hl7:"GROUP"`
+	} `hl7:"GROUP;ATR=optional"`
 	OrderObservation []struct {
 		Container struct {
 			SpecimenAndContainerDetail SAC   `hl7:"TAG=SAC;ATR=optional" json:"SpecimenAndContainerDetail,omitempty"`
 			SubstanceIdentifier        SID   `hl7:"TAG=SID;ATR=optional" json:"SubstanceIdentifier,omitempty"`
 			ObservationResult          []OBX `hl7:"TAG=OBX;ATR=optional" json:"ObservationResult,omitempty"`
-		} `hl7:"GROUP"`
+		} `hl7:"GROUP;ATR=optional"`
 		CommonOrder        ORC   `hl7:"TAG=ORC;ATR=optional" json:"CommonOrder,omitempty"`
 		ObservationRequest OBR   `hl7:"TAG=OBR;ATR=optional" json:"ObservationRequest,omitempty"`
 		NotesAndComments   []NTE `hl7:"TAG=NTE;ATR=optional" json:"NotesAndComments,omitempty"`
@@ -28,8 +28,8 @@ type OUL_R21 struct {
 			TestCodeDetail      TCD   `hl7:"TAG=TCD;ATR=optional" json:"TestCodeDetail,omitempty"`
 			SubstanceIdentifier SID   `hl7:"TAG=SID;ATR=optional" json:"SubstanceIdentifier,omitempty"`
 			NotesAndComments    []NTE `hl7:"TAG=NTE;ATR=optional" json:"NotesAndComments,omitempty"`
-		} `hl7:"GROUP"`
+		} `hl7:"GROUP;ATR=optional"`
 		ClinicalTrialIdentification []CTI `hl7:"TAG=CTI;ATR=optional" json:"ClinicalTrialIdentification,omitempty"`
-	} `hl7:"GROUP"`
+	} `hl7:"GROUP;ATR=optional"`
 	ContinuationPointer DSC `hl7:"TAG=DSC;ATR=optional" json:"ContinuationPointer,omitempty"`
 }

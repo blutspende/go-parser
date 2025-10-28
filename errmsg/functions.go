@@ -36,13 +36,14 @@ var (
 	ErrLineParsingUnknownEscapeSequence         = errors.New("unknown escape sequence")
 	ErrLineParsingMaximumRecursionDepthExceeded = errors.New("line parsing maximum recursion depth exceeded")
 	ErrLineParsingInvalidRecursionDepth         = errors.New("invalid recursion depth")
+	ErrLineParsingLineTagMismatch               = errors.New("line tag mismatch") // Note: special error used in ParseStruct
 )
 
 // StructureParsing
 var (
 	ErrStructureParsingMaxDepthReached    = errors.New("max depth reached")
 	ErrStructureParsingInputLinesDepleted = errors.New("input lines depleted")
-	ErrStructureParsingStructureMismatch  = errors.New("structure mismatch")
+	ErrStructureParsingEmptyStructure     = errors.New("empty structure") //Note: special error for all optional array end find in ParseStruct
 )
 
 // LineBuilding

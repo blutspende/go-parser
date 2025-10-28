@@ -2,6 +2,7 @@ package functions
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -14,10 +15,10 @@ import (
 	"github.com/blutspende/go-parser/parserconfig"
 )
 
-func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation models.StructAnnotation, sequenceNumber int, config *parserconfig.Configuration) (nameOk bool, err error) {
+func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation models.StructAnnotation, sequenceNumber int, config *parserconfig.Configuration) (err error) {
 	// Check for input line length
 	if len(inputLine) == 0 {
-		return false, errmsg.ErrLineParsingEmptyInput
+		return errmsg.ErrLineParsingEmptyInput
 	}
 
 	// Setup inputFields variable to split the inputLine into and split start for header processing
@@ -29,7 +30,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	if config.Protocol == parserconfig.ASTM && inputLine[0] == 'H' {
 		// Check if the inputLine is long enough to contain delimiters
 		if len(inputLine) < 5 {
-			return false, errmsg.ErrLineParsingHeaderTooShort
+			return errmsg.ErrLineParsingHeaderTooShort
 		}
 		// Override delimiters
 		config.Delimiters.Field = string(inputLine[1])
@@ -43,7 +44,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	} else if config.Protocol == parserconfig.HL7 && inputLine[0:3] == "MSH" {
 		// Check if the inputLine is long enough to contain delimiters
 		if len(inputLine) < 8 {
-			return false, errmsg.ErrLineParsingHeaderTooShort
+			return errmsg.ErrLineParsingHeaderTooShort
 		}
 		config.Delimiters.Field = inputLine[3:4]        // Default |
 		config.Delimiters.Component = inputLine[4:5]    // Default ^
@@ -63,34 +64,34 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 
 	// Check for minimum number of input fields (first two fields are mandatory)
 	if len(inputFields) < 2 {
-		return false, errmsg.ErrLineParsingMandatoryInputFieldsMissing
+		return errmsg.ErrLineParsingMandatoryInputFieldsMissing
 	}
 
 	// Check for mach of name and subname
 	// Note: name checking is always enforced, but instead of error it is returned in the nameOk variable
 	if inputFields[0] != recordAnnotation.Tag {
-		return false, nil
+		return fmt.Errorf("%w: expected '%s', got '%s'", errmsg.ErrLineParsingLineTagMismatch, recordAnnotation.Tag, inputFields[0])
 	}
 	if subname, exists := recordAnnotation.Attributes[constants.AttributeSubname]; exists {
 		// If subname is given at least 3 fields are required
 		if len(inputFields) < 3 {
-			return false, errmsg.ErrLineParsingMandatoryInputFieldsMissing
+			return errmsg.ErrLineParsingMandatoryInputFieldsMissing
 		}
 		// Check for subname match
 		if inputFields[2] != subname {
-			return false, nil
+			return fmt.Errorf("%w for subname: expected '%s', got '%s'", errmsg.ErrLineParsingLineTagMismatch, subname, inputFields[2])
 		}
 	}
 
 	// Check for validity of the sequence number if enforced - ASTM case
 	if config.EnforceSequenceNumberCheck && config.Protocol == parserconfig.ASTM && inputFields[1] != strconv.Itoa(sequenceNumber) && !isHeader {
-		return true, errmsg.ErrLineParsingSequenceNumberMismatch
+		return errmsg.ErrLineParsingSequenceNumberMismatch
 	}
 
 	// Process the target structure
 	targetTypes, targetValues, _, err := ProcessStructReflection(targetStruct)
 	if err != nil {
-		return true, err
+		return err
 	}
 
 	// Iterate over the inputFields of the targetStruct struct
@@ -102,26 +103,26 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 				// If the annotation is missing, skip this field
 				continue
 			} else {
-				return true, err
+				return err
 			}
 		}
 
 		// ASTM reserved: 1-name, 2-sequence number; HL7 reserved: 1-name
 		if (config.Protocol == parserconfig.ASTM && targetFieldAnnotation.FieldPos < 3) || (config.Protocol == parserconfig.HL7 && targetFieldAnnotation.FieldPos < 2) {
-			return true, errmsg.ErrLineParsingReservedFieldPosReference
+			return errmsg.ErrLineParsingReservedFieldPosReference
 		}
 
 		// Check for validity of the sequence number if enforced - HL7 case
 		_, sequenceAnnotation := targetFieldAnnotation.Attributes[constants.AttributeSequence]
 		if config.EnforceSequenceNumberCheck && config.Protocol == parserconfig.HL7 && sequenceAnnotation && inputFields[targetFieldAnnotation.FieldPos-1] != strconv.Itoa(sequenceNumber) {
-			return true, errmsg.ErrLineParsingSequenceNumberMismatch
+			return errmsg.ErrLineParsingSequenceNumberMismatch
 		}
 
 		// Not enough inputFields or empty inputField
 		if len(inputFields) < targetFieldAnnotation.FieldPos || inputFields[targetFieldAnnotation.FieldPos-1] == "" {
 			// If the field is required it's an error, otherwise skip it
 			if _, exists := targetFieldAnnotation.Attributes[constants.AttributeRequired]; exists {
-				return true, errmsg.ErrLineParsingRequiredInputFieldMissing
+				return errmsg.ErrLineParsingRequiredInputFieldMissing
 			} else {
 				continue
 			}
@@ -141,14 +142,14 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 					// Substructures (with components) in the array: use parseSubstructure
 					err = parseSubstructure(repeat, arrayValue.Index(j).Addr().Interface(), 1, config)
 					if err != nil {
-						return true, err
+						return err
 					}
 				} else {
 					// |value1\value2\value3|
 					// Simple values in the array
 					err = setField(repeat, arrayValue.Index(j), targetFieldAnnotation, config)
 					if err != nil {
-						return true, err
+						return err
 					}
 				}
 
@@ -162,35 +163,35 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 			if len(components) < targetFieldAnnotation.ComponentPos {
 				// Error if the component is required, skip otherwise
 				if _, exists := targetFieldAnnotation.Attributes[constants.AttributeRequired]; exists {
-					return true, errmsg.ErrLineParsingInputComponentsMissing
+					return errmsg.ErrLineParsingInputComponentsMissing
 				} else {
 					continue
 				}
 			}
 			err = setField(components[targetFieldAnnotation.ComponentPos-1], targetValues[i], targetFieldAnnotation, config)
 			if err != nil {
-				return true, err
+				return err
 			}
 		} else if targetFieldAnnotation.IsSubstructure {
 			// |comp1^comp2^comp3|
 			// If the field is a substructure use parseSubstructure to process it
 			err = parseSubstructure(inputField, targetValues[i].Addr().Interface(), 1, config)
 			if err != nil {
-				return true, err
+				return err
 			}
 		} else {
 			// |field|
 			// Field is not an array or component (normal singular field)
 			err = setField(inputField, targetValues[i], targetFieldAnnotation, config)
 			if err != nil {
-				return true, err
+				return err
 			}
 		}
 		// Note: this could be a place to produce warnings about lost data
 		// if i == targetFieldCount-1 && len(inputFields) > targetFieldAnnotation.FieldPos
 	}
 	// Return no error if everything went well
-	return true, nil
+	return nil
 }
 
 func parseSubstructure(inputString string, targetStruct interface{}, depth int, config *parserconfig.Configuration) (err error) {

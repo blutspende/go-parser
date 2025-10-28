@@ -252,8 +252,7 @@ func TestParseStruct_EmptyArray(t *testing.T) {
 	// Act
 	err := ParseStruct(input, &target, config)
 	// Assert
-	assert.Nil(t, err)
-	assert.Len(t, target.Array, 0)
+	assert.ErrorIs(t, err, errmsg.ErrStructureParsingEmptyStructure)
 }
 func TestParseStruct_EmptyArrayAtEnd(t *testing.T) {
 	// Arrange
@@ -393,7 +392,7 @@ func TestParseStruct_MismatchedLine(t *testing.T) {
 	// Act
 	err := ParseStruct(input, &target, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrStructureParsingStructureMismatch)
+	assert.ErrorIs(t, err, errmsg.ErrLineParsingLineTagMismatch)
 }
 func TestParseStruct_GroupMissing(t *testing.T) {
 	// Arrange
@@ -411,7 +410,7 @@ func TestParseStruct_GroupMissing(t *testing.T) {
 	// Act
 	err := ParseStruct(input, &target, configHL7)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrStructureParsingStructureMismatch)
+	assert.ErrorIs(t, err, errmsg.ErrLineParsingLineTagMismatch)
 }
 func TestParseStruct_RecordInGroupMissing(t *testing.T) {
 	// Arrange
@@ -430,7 +429,7 @@ func TestParseStruct_RecordInGroupMissing(t *testing.T) {
 	// Act
 	err := ParseStruct(input, &target, configHL7)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrStructureParsingStructureMismatch)
+	assert.ErrorIs(t, err, errmsg.ErrLineParsingLineTagMismatch)
 }
 
 // ParseStruct tests - group arrays
