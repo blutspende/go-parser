@@ -50,6 +50,21 @@ func TestParseLine_MultitypeRecord(t *testing.T) {
 	expectedShortTime := time.Date(2006, 1, 2, 0, 0, 0, 0, config.TimeLocation)
 	assert.Equal(t, expectedShortTime, target.Time)
 }
+func TestParseLine_MultitypePointerRecord(t *testing.T) {
+	// Arrange
+	input := "T|1|string|3|3.14|3.14159265|20060102"
+	target := MultitypePointerRecord{}
+	// Act
+	err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "string", *target.String)
+	assert.Equal(t, 3, *target.Int)
+	assert.Equal(t, float32(3.14), *target.Float32)
+	assert.Equal(t, 3.14159265, *target.Float64)
+	expectedShortTime := time.Date(2006, 1, 2, 0, 0, 0, 0, config.TimeLocation)
+	assert.Equal(t, expectedShortTime, *target.Time)
+}
 func TestParseLine_ComponentedRecord(t *testing.T) {
 	// Arrange
 	input := "T|1|first|second1^second2|third1^third2^third3"

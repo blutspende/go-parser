@@ -266,6 +266,13 @@ func setField(value string, field reflect.Value, annotation models.FieldAnnotati
 		// Field is not settable
 		return errmsg.ErrLineParsingNonSettableField
 	}
+	// Handle pointer types by allocating and dereferencing
+	if field.Kind() == reflect.Ptr {
+		elemType := field.Type().Elem()
+		newElem := reflect.New(elemType)
+		field.Set(newElem)
+		field = field.Elem()
+	}
 	// Set the field value
 	switch field.Kind() {
 	case reflect.String:
