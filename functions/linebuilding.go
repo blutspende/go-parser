@@ -150,11 +150,14 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 	// Construct the result string based on the field map
 	result = constructResult(fieldMap, config.Delimiters.Field, config.Notation)
 
+	// Handle empty record dropping (empty lines will be filtered out later)
+	if config.DropEmptyOutputRecords && result == lineTypeName {
+		return "", nil
+	}
 	// Handle HL7 empty line mandatory field separator
 	if config.Protocol == parserconfig.HL7 && result == lineTypeName {
 		result += config.Delimiters.Field
 	}
-
 	// Return the result with no error
 	return result, nil
 }

@@ -24,6 +24,7 @@ type Configuration struct {
 	KeepShortDateTimeZone      bool
 	EscapeOutputStrings        bool
 	EnforceMessageCompleteness bool
+	DropEmptyOutputRecords     bool
 	Delimiters                 Delimiters
 	TimeLocation               *time.Location
 }
@@ -42,6 +43,7 @@ var DefaultConfigurationASTM = Configuration{
 	KeepShortDateTimeZone:      true,
 	EscapeOutputStrings:        false,
 	EnforceMessageCompleteness: true,
+	DropEmptyOutputRecords:     false,
 	Delimiters:                 DefaultDelimitersASTM,
 	TimeLocation:               nil,
 }
@@ -60,6 +62,7 @@ var DefaultConfigurationHL7 = Configuration{
 	KeepShortDateTimeZone:      true,
 	EscapeOutputStrings:        false,
 	EnforceMessageCompleteness: false,
+	DropEmptyOutputRecords:     true,
 	Delimiters:                 DefaultDelimitersHL7,
 	TimeLocation:               nil,
 }

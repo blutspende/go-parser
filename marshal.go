@@ -13,7 +13,7 @@ func Marshal(sourceStruct interface{}, config *parserconfig.Configuration) (resu
 		return nil, err
 	}
 	// Build the lines from the source structure
-	lines, err := functions.BuildStruct(sourceStruct, 1, 0, config)
+	lines, err := functions.BuildStruct(sourceStruct, config)
 	if err != nil {
 		return nil, err
 	}

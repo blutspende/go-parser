@@ -224,14 +224,26 @@ func TestBuildLine_MissingDataAtEndWithComponentsShortNotation(t *testing.T) {
 	// Teardown
 	teardown()
 }
-func TestBuildLine_EmptyRecord_HL7(t *testing.T) {
+func TestBuildLine_EmptyRecord(t *testing.T) {
 	// Arrange
 	source := ThreeFieldRecord{}
 	// Act
 	result, err := BuildLine(source, "REC", 1, configHL7)
 	// Assert
 	assert.Nil(t, err)
+	assert.Equal(t, "", result)
+}
+func TestBuildLine_EmptyRecord_NotDropped_HL7(t *testing.T) {
+	// Arrange
+	source := ThreeFieldRecord{}
+	configHL7.DropEmptyOutputRecords = false
+	// Act
+	result, err := BuildLine(source, "REC", 1, configHL7)
+	// Assert
+	assert.Nil(t, err)
 	assert.Equal(t, "REC|", result)
+	// Teardown
+	teardown()
 }
 
 // BuildLine tests - header and sequence

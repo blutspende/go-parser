@@ -6,7 +6,11 @@ import (
 	"github.com/blutspende/go-parser/parserconfig"
 )
 
-func BuildStruct(sourceStruct interface{}, sequenceNumber int, depth int, config *parserconfig.Configuration) (result []string, err error) {
+func BuildStruct(sourceStruct interface{}, config *parserconfig.Configuration) (result []string, err error) {
+	return buildStructRecursive(sourceStruct, 1, 0, config)
+}
+
+func buildStructRecursive(sourceStruct interface{}, sequenceNumber int, depth int, config *parserconfig.Configuration) (result []string, err error) {
 	// Check for maximum depth
 	if depth >= constants.MaxDepth {
 		return nil, errmsg.ErrStructureParsingMaxDepthReached
@@ -33,7 +37,7 @@ func BuildStruct(sourceStruct interface{}, sequenceNumber int, depth int, config
 			for j := 0; j < sourceValues[i].Len(); j++ {
 				if sourceStructAnnotation.IsGroup {
 					// Composite source: recursively build the composite structure
-					subResult, err := BuildStruct(sourceValues[i].Index(j).Addr().Interface(), j+1, depth+1, config)
+					subResult, err := buildStructRecursive(sourceValues[i].Index(j).Addr().Interface(), j+1, depth+1, config)
 					if err != nil {
 						return nil, err
 					}
@@ -51,7 +55,7 @@ func BuildStruct(sourceStruct interface{}, sequenceNumber int, depth int, config
 			// Source is a single element
 			if sourceStructAnnotation.IsGroup {
 				// Composite source: recursively build the composite structure
-				subResult, err := BuildStruct(sourceValue, sequenceNumber, depth+1, config)
+				subResult, err := buildStructRecursive(sourceValue, sequenceNumber, depth+1, config)
 				if err != nil {
 					return nil, err
 				}
@@ -71,7 +75,13 @@ func BuildStruct(sourceStruct interface{}, sequenceNumber int, depth int, config
 			}
 		}
 	}
-
-	// Return the result and no error if everything went well
-	return result, nil
+	// Filter empty lines
+	filteredResult := make([]string, 0, len(result))
+	for _, line := range result {
+		if line != "" {
+			filteredResult = append(filteredResult, line)
+		}
+	}
+	// Return the filtered result and no error if everything went well
+	return filteredResult, nil
 }

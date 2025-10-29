@@ -1,8 +1,9 @@
 package functions
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBuildStruct_SingleLineStruct(t *testing.T) {
@@ -15,13 +16,12 @@ func TestBuildStruct_SingleLineStruct(t *testing.T) {
 		},
 	}
 	// Act
-	result, err := BuildStruct(source, 1, 0, config)
+	result, err := BuildStruct(source, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, result, 1)
 	assert.Equal(t, "R|1|first|second|third", result[0])
 }
-
 func TestBuildStruct_RecordArrayStruct(t *testing.T) {
 	// Arrange
 	source := RecordArrayStruct{
@@ -39,14 +39,13 @@ func TestBuildStruct_RecordArrayStruct(t *testing.T) {
 		},
 	}
 	// Act
-	result, err := BuildStruct(source, 1, 0, config)
+	result, err := BuildStruct(source, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, result, 2)
 	assert.Equal(t, "R|1|first1|second1|third1", result[0])
 	assert.Equal(t, "R|2|first2|second2|third2", result[1])
 }
-
 func TestBuildStruct_CompositeMessage(t *testing.T) {
 	// Arrange
 	source := CompositeMessage{
@@ -62,14 +61,13 @@ func TestBuildStruct_CompositeMessage(t *testing.T) {
 		},
 	}
 	// Act
-	result, err := BuildStruct(source, 1, 0, config)
+	result, err := BuildStruct(source, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, result, 2)
 	assert.Equal(t, "F|1|r1 first|2", result[0])
 	assert.Equal(t, "S|1|1|r2 second", result[1])
 }
-
 func TestBuildStruct_CompositeArrayMessage(t *testing.T) {
 	// Arrange
 	source := CompositeArrayMessage{
@@ -97,7 +95,7 @@ func TestBuildStruct_CompositeArrayMessage(t *testing.T) {
 		},
 	}
 	// Act
-	result, err := BuildStruct(source, 1, 0, config)
+	result, err := BuildStruct(source, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, result, 4)
@@ -105,4 +103,27 @@ func TestBuildStruct_CompositeArrayMessage(t *testing.T) {
 	assert.Equal(t, "S|1|121|a1 r2 second", result[1])
 	assert.Equal(t, "F|2|a2 r1 first|212", result[2])
 	assert.Equal(t, "S|1|221|a2 r2 second", result[3])
+}
+func TestBuildStruct_EmptyLine_HL7(t *testing.T) {
+	// Arrange
+	type SourceType struct {
+		Record1 SimpleRecord `hl7:"TAG=SR1"`
+		Record2 SimpleRecord `hl7:"TAG=SR2"`
+		Record3 SimpleRecord `hl7:"TAG=SR3"`
+	}
+	source := SourceType{
+		Record1: SimpleRecord{
+			Field: "first",
+		},
+		Record3: SimpleRecord{
+			Field: "third",
+		},
+	}
+	// Act
+	result, err := BuildStruct(source, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, result, 2)
+	assert.Equal(t, "SR1||first", result[0])
+	assert.Equal(t, "SR3||third", result[1])
 }
