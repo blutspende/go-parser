@@ -225,7 +225,6 @@ func TestParseLine_MissingDataAtTheEnd(t *testing.T) {
 	assert.Equal(t, "", target.Second)
 	assert.Equal(t, "", target.Third)
 }
-
 func TestParseLine_RecordTypeNameMismatch(t *testing.T) {
 	// Arrange
 	input := "W|1|first|second|third"
@@ -310,6 +309,7 @@ func TestParseLine_MissingAnnotation(t *testing.T) {
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "field3", target.Field3)
+	assert.Equal(t, "", target.Missing)
 	assert.Equal(t, "field4", target.Field4)
 }
 

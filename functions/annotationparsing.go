@@ -14,27 +14,39 @@ import (
 	"github.com/blutspende/go-parser/parserconfig"
 )
 
-func getAnnotationKeyForProtocol(config *parserconfig.Configuration) (key string, err error) {
+func getAnnotationForProtocol(input reflect.StructField, config *parserconfig.Configuration) (annotation string, err error) {
+	// Setup annotation keys based on protocol
+	var actual, other string
 	switch config.Protocol {
 	case parserconfig.ASTM:
-		return "astm", nil
+		actual = "astm"
+		other = "hl7"
 	case parserconfig.HL7:
-		return "hl7", nil
+		actual = "hl7"
+		other = "astm"
 	default:
 		return "", errmsg.ErrAnnotationParsingInvalidProtocol
+	}
+	// Try to extract raw value or fallback to other protocol (error if nothing found)
+	annotation = input.Tag.Get(actual)
+	if annotation == "" {
+		annotation = input.Tag.Get(other)
+		if annotation == "" {
+			return "", errmsg.ErrAnnotationParsingMissingAnnotation
+		} else {
+			return "", fmt.Errorf("%w: expected '%s', got '%s'", errmsg.ErrAnnotationParsingWrongProtocol, actual, other)
+		}
+	} else {
+		// Return correct annotation if found
+		return annotation, nil
 	}
 }
 
 func ParseFieldAnnotation(input reflect.StructField, config *parserconfig.Configuration) (result models.FieldAnnotation, err error) {
-	// Get the correct annotation key for the protocol
-	key, err := getAnnotationKeyForProtocol(config)
+	// Extract annotation
+	result.Raw, err = getAnnotationForProtocol(input, config)
 	if err != nil {
 		return models.FieldAnnotation{}, err
-	}
-	// Extract and save the raw value
-	result.Raw = input.Tag.Get(key)
-	if result.Raw == "" {
-		return models.FieldAnnotation{}, errmsg.ErrAnnotationParsingMissingAnnotation
 	}
 	// Parse the annotation
 	elements, err := parseAnnotationElements(result.Raw, ";", "=", []string{
@@ -104,15 +116,10 @@ func ParseFieldAnnotation(input reflect.StructField, config *parserconfig.Config
 }
 
 func ParseStructAnnotation(input reflect.StructField, config *parserconfig.Configuration) (result models.StructAnnotation, err error) {
-	// Get the correct annotation key for the protocol
-	key, err := getAnnotationKeyForProtocol(config)
+	// Extract annotation
+	result.Raw, err = getAnnotationForProtocol(input, config)
 	if err != nil {
 		return models.StructAnnotation{}, err
-	}
-	// Extract and save the raw value
-	result.Raw = input.Tag.Get(key)
-	if result.Raw == "" {
-		return models.StructAnnotation{}, errmsg.ErrAnnotationParsingMissingAnnotation
 	}
 	// Parse the annotation
 	elements, err := parseAnnotationElements(result.Raw, ";", "=", []string{

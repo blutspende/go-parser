@@ -127,3 +127,26 @@ func TestBuildStruct_EmptyLine_HL7(t *testing.T) {
 	assert.Equal(t, "SR1||first", result[0])
 	assert.Equal(t, "SR3||third", result[1])
 }
+func TestBuildStruct_MissingAnnotation(t *testing.T) {
+	// Arrange
+	type SourceType struct {
+		First   SimpleRecord `astm:"TAG=F"`
+		Missing SimpleRecord
+		Third   SimpleRecord `astm:"TAG=T"`
+	}
+	source := SourceType{
+		First: SimpleRecord{
+			Field: "first",
+		},
+		Third: SimpleRecord{
+			Field: "third",
+		},
+	}
+	// Act
+	result, err := BuildStruct(source, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, result, 2)
+	assert.Equal(t, "F|1|first", result[0])
+	assert.Equal(t, "T|1|third", result[1])
+}

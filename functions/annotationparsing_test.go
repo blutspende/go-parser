@@ -335,18 +335,6 @@ func TestParseFieldAnnotation_ComplexHL7(t *testing.T) {
 	assert.Contains(t, result.Attributes, constants.AttributeLength)
 	assert.Equal(t, "4", result.Attributes[constants.AttributeLength])
 }
-func TestParseFieldAnnotation_WrongProtocol(t *testing.T) {
-	// Arrange
-	type inputType struct {
-		Field string `hl7:"POS=3"`
-	}
-	var input inputType
-	field, _ := reflect.TypeOf(input).FieldByName("Field")
-	// Act
-	_, err := ParseFieldAnnotation(field, config)
-	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingMissingAnnotation)
-}
 func TestParseFieldAnnotation_InvalidProtocol(t *testing.T) {
 	// Arrange
 	type inputType struct {
@@ -361,6 +349,30 @@ func TestParseFieldAnnotation_InvalidProtocol(t *testing.T) {
 	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidProtocol)
 	// Teardown
 	teardown()
+}
+func TestParseFieldAnnotation_WrongProtocol(t *testing.T) {
+	// Arrange
+	type inputType struct {
+		Field string `hl7:"POS=3"`
+	}
+	var input inputType
+	field, _ := reflect.TypeOf(input).FieldByName("Field")
+	// Act
+	_, err := ParseFieldAnnotation(field, config)
+	// Assert
+	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingWrongProtocol)
+}
+func TestParseFieldAnnotation_MissingAnnotation(t *testing.T) {
+	// Arrange
+	type inputType struct {
+		Field string
+	}
+	var input inputType
+	field, _ := reflect.TypeOf(input).FieldByName("Field")
+	// Act
+	_, err := ParseFieldAnnotation(field, config)
+	// Assert
+	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingMissingAnnotation)
 }
 
 // ParseStructAnnotation tests

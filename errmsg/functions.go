@@ -12,7 +12,8 @@ var (
 // AnnotationParsing
 var (
 	ErrAnnotationParsingInvalidProtocol    = errors.New("invalid protocol")
-	ErrAnnotationParsingMissingAnnotation  = errors.New("annotation missing")
+	ErrAnnotationParsingWrongProtocol      = errors.New("wrong protocol")
+	ErrAnnotationParsingMissingAnnotation  = errors.New("annotation missing") // Note: special error used to skip unannotated fields
 	ErrAnnotationParsingInvalidElement     = errors.New("invalid annotation element")
 	ErrAnnotationParsingInvalidElementKey  = errors.New("invalid annotation element key")
 	ErrAnnotationParsingIllegal            = errors.New("illegal annotation combination")

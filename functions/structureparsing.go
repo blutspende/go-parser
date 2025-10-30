@@ -34,7 +34,12 @@ func parseStructRecursive(inputLines []string, targetStruct interface{}, lineInd
 		// Parse the targetStruct field targetFieldAnnotation
 		targetStructAnnotation, err := ParseStructAnnotation(targetType, config)
 		if err != nil {
-			return err
+			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
+				// If the annotation is missing, skip this field
+				continue
+			} else {
+				return err
+			}
 		}
 		// Save the target value pointer
 		targetValue := targetValues[i].Addr().Interface()

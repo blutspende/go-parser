@@ -271,6 +271,26 @@ func TestParseStruct_EmptyArrayAtEnd(t *testing.T) {
 	assert.Equal(t, "line1", target.First.Field)
 	assert.Len(t, target.Array, 0)
 }
+func TestParseStruct_MissingAnnotation(t *testing.T) {
+	// Arrange
+	type TargetType struct {
+		First   SimpleRecord `astm:"TAG=F"`
+		Missing SimpleRecord
+		Third   SimpleRecord `astm:"TAG=T"`
+	}
+	target := TargetType{}
+	input := []string{
+		"F|1|line1",
+		"T|1|line2",
+	}
+	// Act
+	err := ParseStruct(input, &target, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "line1", target.First.Field)
+	assert.Equal(t, "", target.Missing.Field)
+	assert.Equal(t, "line2", target.Third.Field)
+}
 
 // ParseStruct tests - lines depleted
 func TestParseStruct_LinesDepleted(t *testing.T) {

@@ -1,6 +1,8 @@
 package functions
 
 import (
+	"errors"
+
 	"github.com/blutspende/go-parser/constants"
 	"github.com/blutspende/go-parser/errmsg"
 	"github.com/blutspende/go-parser/parserconfig"
@@ -27,7 +29,12 @@ func buildStructRecursive(sourceStruct interface{}, sequenceNumber int, depth in
 		// Parse the sourceStruct field sourceFieldAnnotation
 		sourceStructAnnotation, err := ParseStructAnnotation(sourceType, config)
 		if err != nil {
-			return nil, err
+			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
+				// If the annotation is missing, skip this field
+				continue
+			} else {
+				return nil, err
+			}
 		}
 		// Save the source value pointer
 		sourceValue := sourceValues[i].Addr().Interface()
