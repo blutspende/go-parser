@@ -94,11 +94,10 @@ func IdentifyMessageHL7(messageData []byte, config *parserconfig.Configuration) 
 	if headerMsg.Header.MessageType == "" {
 		return "", "", errmsg.ErrIdentifyMessageMissingMessageType
 	}
-	if headerMsg.Header.ProtocolVersion == "" {
-		return "", "", errmsg.ErrIdentifyMessageMissingProtocolVersion
-	}
-	// Save the protocol version to the config
-	config.ProtocolVersion = headerMsg.Header.ProtocolVersion
+	// Note: option to also error on missing protocol version
+	//if headerMsg.Header.ProtocolVersion == "" {
+	//	return "", "", errmsg.ErrIdentifyMessageMissingProtocolVersion
+	//}
 	// Return the extracted message type and protocol version from the header struct
 	return headerMsg.Header.MessageType, headerMsg.Header.ProtocolVersion, nil
 }

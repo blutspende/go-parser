@@ -36,8 +36,8 @@ func TestIdentifyMessage_MissingProtocolVersion(t *testing.T) {
 	// Act
 	messageType, protocolVersion, err := parser.IdentifyMessageHL7([]byte(data), config)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrIdentifyMessageMissingProtocolVersion.Error())
-	assert.Equal(t, "", messageType)
+	assert.Nil(t, err)
+	assert.Equal(t, "ORM^O01", messageType)
 	assert.Equal(t, "", protocolVersion)
 }
 func TestIdentifyMessage_WrongProtocol(t *testing.T) {

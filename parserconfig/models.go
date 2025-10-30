@@ -12,7 +12,6 @@ import (
 // Configuration struct for the whole process
 type Configuration struct {
 	Protocol                   Protocol
-	ProtocolVersion            string
 	Encoding                   encoding.Encoding
 	LineSeparator              string
 	AutoDetectLineSeparator    bool
@@ -31,7 +30,6 @@ type Configuration struct {
 
 var DefaultConfigurationASTM = Configuration{
 	Protocol:                   ASTM,
-	ProtocolVersion:            "",
 	Encoding:                   encoding.UTF8,
 	LineSeparator:              lineseparator.LF,
 	AutoDetectLineSeparator:    true,
@@ -50,7 +48,6 @@ var DefaultConfigurationASTM = Configuration{
 
 var DefaultConfigurationHL7 = Configuration{
 	Protocol:                   HL7,
-	ProtocolVersion:            "",
 	Encoding:                   encoding.UTF8,
 	LineSeparator:              lineseparator.CR,
 	AutoDetectLineSeparator:    true,
