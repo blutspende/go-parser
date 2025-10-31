@@ -250,7 +250,7 @@ func TestParseLine_MandatoryFieldsMissing(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingMandatoryInputFieldsMissing)
+	assert.ErrorIs(t, err, errmsg.ErrLineParsingNotEnoughFields)
 }
 func TestParseLine_MissingRequiredField(t *testing.T) {
 	// Arrange

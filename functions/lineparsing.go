@@ -62,9 +62,9 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		inputFields = append(inputFields, splitStringWithEscape(inputLine[splitStart:], config.Delimiters.Field, config)...)
 	}
 
-	// Check for minimum number of input fields (first two fields are mandatory)
-	if len(inputFields) < 2 {
-		return errmsg.ErrLineParsingMandatoryInputFieldsMissing
+	// First two fields are mandatory in ASTM
+	if config.Protocol == parserconfig.ASTM && len(inputFields) < 2 {
+		return fmt.Errorf("%w: %s", errmsg.ErrLineParsingNotEnoughFields, inputLine)
 	}
 
 	// Check for mach of name and subname
@@ -75,7 +75,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	if subname, exists := recordAnnotation.Attributes[constants.AttributeSubname]; exists {
 		// If subname is given at least 3 fields are required
 		if len(inputFields) < 3 {
-			return errmsg.ErrLineParsingMandatoryInputFieldsMissing
+			return fmt.Errorf("%w: %s", errmsg.ErrLineParsingNotEnoughFields, inputLine)
 		}
 		// Check for subname match
 		if inputFields[2] != subname {
