@@ -5,19 +5,19 @@ import (
 	"time"
 
 	"github.com/blutspende/go-parser/models"
-	"github.com/blutspende/go-parser/parserconfig"
+	"github.com/blutspende/go-parser/pconfig"
 )
 
 // Configuration structs for tests
-var config *parserconfig.Configuration
-var configHL7 *parserconfig.Configuration
+var config *pconfig.Configuration
+var configHL7 *pconfig.Configuration
 
 // Reset configs to default values
 func teardown() {
-	config = parserconfig.NewDefaultConfiguration(parserconfig.ASTM)
-	_ = parserconfig.InitConfig(config)
-	configHL7 = parserconfig.NewDefaultConfiguration(parserconfig.HL7)
-	_ = parserconfig.InitConfig(configHL7)
+	config = pconfig.NewDefaultConfiguration(pconfig.ASTM)
+	_ = pconfig.InitConfig(config)
+	configHL7 = pconfig.NewDefaultConfiguration(pconfig.HL7)
+	_ = pconfig.InitConfig(configHL7)
 }
 
 // Setup mock data for every test

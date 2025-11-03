@@ -5,14 +5,14 @@ import (
 
 	"github.com/blutspende/go-parser/constants"
 	"github.com/blutspende/go-parser/errmsg"
-	"github.com/blutspende/go-parser/parserconfig"
+	"github.com/blutspende/go-parser/pconfig"
 )
 
-func BuildStruct(sourceStruct interface{}, config *parserconfig.Configuration) (result []string, err error) {
+func BuildStruct(sourceStruct interface{}, config *pconfig.Configuration) (result []string, err error) {
 	return buildStructRecursive(sourceStruct, 1, 0, config)
 }
 
-func buildStructRecursive(sourceStruct interface{}, sequenceNumber int, depth int, config *parserconfig.Configuration) (result []string, err error) {
+func buildStructRecursive(sourceStruct interface{}, sequenceNumber int, depth int, config *pconfig.Configuration) (result []string, err error) {
 	// Check for maximum depth
 	if depth >= constants.MaxDepth {
 		return nil, errmsg.ErrStructureParsingMaxDepthReached

@@ -4,18 +4,18 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/blutspende/go-parser/parserconfig"
+	"github.com/blutspende/go-parser/pconfig"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
 )
 
 // Configuration struct for tests
-var config *parserconfig.Configuration
+var config *pconfig.Configuration
 
 // Reset config to default values
 func teardown() {
-	config = parserconfig.NewDefaultConfiguration(parserconfig.ASTM)
-	_ = parserconfig.InitConfig(config)
+	config = pconfig.NewDefaultConfiguration(pconfig.ASTM)
+	_ = pconfig.InitConfig(config)
 }
 
 // Setup default config and run all tests

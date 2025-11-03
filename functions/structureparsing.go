@@ -6,17 +6,17 @@ import (
 
 	"github.com/blutspende/go-parser/constants"
 	"github.com/blutspende/go-parser/errmsg"
-	"github.com/blutspende/go-parser/parserconfig"
+	"github.com/blutspende/go-parser/pconfig"
 
 	"reflect"
 )
 
-func ParseStruct(inputLines []string, targetStruct interface{}, config *parserconfig.Configuration) (err error) {
+func ParseStruct(inputLines []string, targetStruct interface{}, config *pconfig.Configuration) (err error) {
 	lineIndex := 0
 	return parseStructRecursive(inputLines, targetStruct, &lineIndex, 1, false, 0, config)
 }
 
-func parseStructRecursive(inputLines []string, targetStruct interface{}, lineIndex *int, sequenceNumber int, optional bool, depth int, config *parserconfig.Configuration) (err error) {
+func parseStructRecursive(inputLines []string, targetStruct interface{}, lineIndex *int, sequenceNumber int, optional bool, depth int, config *pconfig.Configuration) (err error) {
 	// Unless at leat one matching element is found the structure is empty
 	empty := true
 	// Check for maximum depth

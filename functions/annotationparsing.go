@@ -11,17 +11,17 @@ import (
 	"github.com/blutspende/go-parser/constants"
 	"github.com/blutspende/go-parser/errmsg"
 	"github.com/blutspende/go-parser/models"
-	"github.com/blutspende/go-parser/parserconfig"
+	"github.com/blutspende/go-parser/pconfig"
 )
 
-func getAnnotationForProtocol(input reflect.StructField, config *parserconfig.Configuration) (annotation string, err error) {
+func getAnnotationForProtocol(input reflect.StructField, config *pconfig.Configuration) (annotation string, err error) {
 	// Setup annotation keys based on protocol
 	var actual, other string
 	switch config.Protocol {
-	case parserconfig.ASTM:
+	case pconfig.ASTM:
 		actual = "astm"
 		other = "hl7"
-	case parserconfig.HL7:
+	case pconfig.HL7:
 		actual = "hl7"
 		other = "astm"
 	default:
@@ -42,7 +42,7 @@ func getAnnotationForProtocol(input reflect.StructField, config *parserconfig.Co
 	}
 }
 
-func ParseFieldAnnotation(input reflect.StructField, config *parserconfig.Configuration) (result models.FieldAnnotation, err error) {
+func ParseFieldAnnotation(input reflect.StructField, config *pconfig.Configuration) (result models.FieldAnnotation, err error) {
 	// Extract annotation
 	result.Raw, err = getAnnotationForProtocol(input, config)
 	if err != nil {
@@ -115,7 +115,7 @@ func ParseFieldAnnotation(input reflect.StructField, config *parserconfig.Config
 	return result, nil
 }
 
-func ParseStructAnnotation(input reflect.StructField, config *parserconfig.Configuration) (result models.StructAnnotation, err error) {
+func ParseStructAnnotation(input reflect.StructField, config *pconfig.Configuration) (result models.StructAnnotation, err error) {
 	// Extract annotation
 	result.Raw, err = getAnnotationForProtocol(input, config)
 	if err != nil {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/blutspende/go-parser"
 	"github.com/blutspende/go-parser/errmsg"
-	"github.com/blutspende/go-parser/parserconfig"
+	"github.com/blutspende/go-parser/pconfig"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -43,7 +43,7 @@ func TestIdentifyMessage_MissingProtocolVersion(t *testing.T) {
 func TestIdentifyMessage_WrongProtocol(t *testing.T) {
 	// Arrange
 	data := `MSH|^~\&|HL7_Host|HL7_Office|CIT|LAB|20110926125155||ORM^O01|20110926125155|P|2.3`
-	config.Protocol = parserconfig.ASTM
+	config.Protocol = pconfig.ASTM
 	// Act
 	messageType, protocolVersion, err := parser.IdentifyMessageHL7([]byte(data), config)
 	// Assert

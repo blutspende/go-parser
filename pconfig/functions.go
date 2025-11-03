@@ -1,4 +1,4 @@
-package parserconfig
+package pconfig
 
 import (
 	"errors"

@@ -7,17 +7,17 @@ import (
 	"github.com/blutspende/bloodlab-common/messagetype"
 	"github.com/blutspende/go-parser/errmsg"
 	"github.com/blutspende/go-parser/functions"
-	"github.com/blutspende/go-parser/parserconfig"
+	"github.com/blutspende/go-parser/pconfig"
 )
 
-func IdentifyMessageASTM(messageData []byte, config *parserconfig.Configuration) (messageType messagetype.MessageType, err error) {
+func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (messageType messagetype.MessageType, err error) {
 	// Init configuration
-	err = parserconfig.InitConfig(config)
+	err = pconfig.InitConfig(config)
 	if err != nil {
 		return "", err
 	}
 	// Check for correct protocol
-	if config.Protocol != parserconfig.ASTM {
+	if config.Protocol != pconfig.ASTM {
 		return "", errmsg.ErrIdentifyMessageWrongProtocol
 	}
 	// Convert encoding to UTF8
@@ -58,14 +58,14 @@ func IdentifyMessageASTM(messageData []byte, config *parserconfig.Configuration)
 	return messagetype.Unidentified, err
 }
 
-func IdentifyMessageHL7(messageData []byte, config *parserconfig.Configuration) (messageType string, protocolVersion string, err error) {
+func IdentifyMessageHL7(messageData []byte, config *pconfig.Configuration) (messageType string, protocolVersion string, err error) {
 	// Init configuration
-	err = parserconfig.InitConfig(config)
+	err = pconfig.InitConfig(config)
 	if err != nil {
 		return "", "", err
 	}
 	// Check for correct protocol
-	if config.Protocol != parserconfig.HL7 {
+	if config.Protocol != pconfig.HL7 {
 		return "", "", errmsg.ErrIdentifyMessageWrongProtocol
 	}
 	// Convert encoding to UTF8

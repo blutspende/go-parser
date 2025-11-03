@@ -3,12 +3,12 @@ package functions
 import (
 	"github.com/blutspende/go-parser/enums/lineseparator"
 	"github.com/blutspende/go-parser/errmsg"
-	"github.com/blutspende/go-parser/parserconfig"
+	"github.com/blutspende/go-parser/pconfig"
 
 	"strings"
 )
 
-func SliceLines(input string, config *parserconfig.Configuration) (output []string, err error) {
+func SliceLines(input string, config *pconfig.Configuration) (output []string, err error) {
 	// Check for empty input
 	if input == "" {
 		return nil, errmsg.ErrLineProcessingEmptyInput
@@ -64,7 +64,7 @@ func SliceLines(input string, config *parserconfig.Configuration) (output []stri
 	return output, nil
 }
 
-func BuildLines(input []string, config *parserconfig.Configuration) (output string) {
+func BuildLines(input []string, config *pconfig.Configuration) (output string) {
 	linebreak := lineseparator.LF
 	if config.LineSeparator != "" && !config.AutoDetectLineSeparator {
 		linebreak = config.LineSeparator

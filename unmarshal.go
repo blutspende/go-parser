@@ -3,12 +3,12 @@ package parser
 import (
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/go-parser/functions"
-	"github.com/blutspende/go-parser/parserconfig"
+	"github.com/blutspende/go-parser/pconfig"
 )
 
-func Unmarshal(messageData []byte, targetStruct interface{}, config *parserconfig.Configuration) (err error) {
+func Unmarshal(messageData []byte, targetStruct interface{}, config *pconfig.Configuration) (err error) {
 	// Init configuration
-	err = parserconfig.InitConfig(config)
+	err = pconfig.InitConfig(config)
 	if err != nil {
 		return err
 	}

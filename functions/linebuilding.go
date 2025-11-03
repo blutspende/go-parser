@@ -13,10 +13,10 @@ import (
 	notationconst "github.com/blutspende/go-parser/enums/notation"
 	"github.com/blutspende/go-parser/errmsg"
 	"github.com/blutspende/go-parser/models"
-	"github.com/blutspende/go-parser/parserconfig"
+	"github.com/blutspende/go-parser/pconfig"
 )
 
-func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int, config *parserconfig.Configuration) (result string, err error) {
+func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int, config *pconfig.Configuration) (result string, err error) {
 	// Process the target structure
 	sourceTypes, sourceValues, sourceTypesLength, err := ProcessStructReflection(sourceStruct)
 	if err != nil {
@@ -31,7 +31,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 
 	// Handle fixed values (line name, header delimiters, ASTM auto sequence)
 	fieldMap[1] = lineTypeName
-	if config.Protocol == parserconfig.ASTM {
+	if config.Protocol == pconfig.ASTM {
 		if lineTypeName == "H" {
 			fieldMap[2] = config.Delimiters.Repeat +
 				config.Delimiters.Component +
@@ -40,7 +40,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 			fieldMap[2] = strconv.Itoa(sequenceNumber)
 		}
 	}
-	if config.Protocol == parserconfig.HL7 && lineTypeName == "MSH" {
+	if config.Protocol == pconfig.HL7 && lineTypeName == "MSH" {
 		fieldMap[2] = config.Delimiters.Component +
 			config.Delimiters.Repeat +
 			config.Delimiters.Escape +
@@ -61,13 +61,13 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 		}
 
 		// ASTM reserved: 1-name, 2-sequence number; HL7 reserved: 1-name
-		if (config.Protocol == parserconfig.ASTM && sourceFieldAnnotation.FieldPos < 3) || (config.Protocol == parserconfig.HL7 && sourceFieldAnnotation.FieldPos < 2) {
+		if (config.Protocol == pconfig.ASTM && sourceFieldAnnotation.FieldPos < 3) || (config.Protocol == pconfig.HL7 && sourceFieldAnnotation.FieldPos < 2) {
 			return "", errmsg.ErrLineBuildingReservedFieldPosReference
 		}
 
 		// Copy the sequence number into the field with the sequence annotation - HL7 case
 		_, sequenceAnnotation := sourceFieldAnnotation.Attributes[constants.AttributeSequence]
-		if config.Protocol == parserconfig.HL7 && sequenceAnnotation {
+		if config.Protocol == pconfig.HL7 && sequenceAnnotation {
 			sourceValues[i] = reflect.ValueOf(sequenceNumber)
 		}
 
@@ -155,16 +155,16 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 		return "", nil
 	}
 	// Handle HL7 empty line mandatory field separator
-	if config.Protocol == parserconfig.HL7 && result == lineTypeName {
+	if config.Protocol == pconfig.HL7 && result == lineTypeName {
 		result += config.Delimiters.Field
 	}
 	// Return the result with no error
 	return result, nil
 }
 
-func buildSubstructure(sourceStruct interface{}, depth int, config *parserconfig.Configuration) (result string, err error) {
+func buildSubstructure(sourceStruct interface{}, depth int, config *pconfig.Configuration) (result string, err error) {
 	// Check depth limits
-	if (config.Protocol == parserconfig.ASTM && depth > 1) || (config.Protocol == parserconfig.HL7 && depth > 2) {
+	if (config.Protocol == pconfig.ASTM && depth > 1) || (config.Protocol == pconfig.HL7 && depth > 2) {
 		return "", errmsg.ErrLineBuildingMaximumRecursionDepthExceeded
 	}
 
@@ -249,7 +249,7 @@ func constructResult(fieldMap map[int]string, delimiter string, notation string)
 	return result
 }
 
-func convertField(field reflect.Value, annotation models.FieldAnnotation, config *parserconfig.Configuration) (result string, err error) {
+func convertField(field reflect.Value, annotation models.FieldAnnotation, config *pconfig.Configuration) (result string, err error) {
 	// Check if the field is a pointer, nil returns empty, otherwise dereference it
 	if field.Kind() == reflect.Ptr {
 		if field.IsNil() {
@@ -317,11 +317,11 @@ func convertField(field reflect.Value, annotation models.FieldAnnotation, config
 	return "", errmsg.ErrLineBuildingUsupportedDataType
 }
 
-func buildStringEscapeChars(input string, config *parserconfig.Configuration) string {
+func buildStringEscapeChars(input string, config *pconfig.Configuration) string {
 	var builder strings.Builder
 	inputRunes := []rune(input)
 	esc := string(config.Delimiters.Escape[0])
-	if config.Protocol == parserconfig.ASTM {
+	if config.Protocol == pconfig.ASTM {
 		for i := 0; i < len(inputRunes); i++ {
 			if inputRunes[i] == rune(config.Delimiters.Field[0]) ||
 				inputRunes[i] == rune(config.Delimiters.Repeat[0]) ||
@@ -331,7 +331,7 @@ func buildStringEscapeChars(input string, config *parserconfig.Configuration) st
 			}
 			builder.WriteRune(inputRunes[i])
 		}
-	} else if config.Protocol == parserconfig.HL7 {
+	} else if config.Protocol == pconfig.HL7 {
 		for i := 0; i < len(inputRunes); i++ {
 			switch inputRunes[i] {
 			case rune(config.Delimiters.Field[0]):

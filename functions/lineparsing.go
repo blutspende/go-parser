@@ -12,10 +12,10 @@ import (
 	"github.com/blutspende/go-parser/constants"
 	"github.com/blutspende/go-parser/errmsg"
 	"github.com/blutspende/go-parser/models"
-	"github.com/blutspende/go-parser/parserconfig"
+	"github.com/blutspende/go-parser/pconfig"
 )
 
-func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation models.StructAnnotation, sequenceNumber int, config *parserconfig.Configuration) (err error) {
+func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation models.StructAnnotation, sequenceNumber int, config *pconfig.Configuration) (err error) {
 	// Check for input line length
 	if len(inputLine) == 0 {
 		return errmsg.ErrLineParsingEmptyInput
@@ -27,7 +27,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 
 	// Handle header special case
 	isHeader := false
-	if config.Protocol == parserconfig.ASTM && inputLine[0] == 'H' {
+	if config.Protocol == pconfig.ASTM && inputLine[0] == 'H' {
 		// Check if the inputLine is long enough to contain delimiters
 		if len(inputLine) < 5 {
 			return errmsg.ErrLineParsingHeaderTooShort
@@ -41,7 +41,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		inputFields = []string{inputLine[0:1], inputLine[1:5]}
 		splitStart = 6
 		isHeader = true
-	} else if config.Protocol == parserconfig.HL7 && inputLine[0:3] == "MSH" {
+	} else if config.Protocol == pconfig.HL7 && inputLine[0:3] == "MSH" {
 		// Check if the inputLine is long enough to contain delimiters
 		if len(inputLine) < 8 {
 			return errmsg.ErrLineParsingHeaderTooShort
@@ -63,7 +63,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	}
 
 	// First two fields are mandatory in ASTM
-	if config.Protocol == parserconfig.ASTM && len(inputFields) < 2 {
+	if config.Protocol == pconfig.ASTM && len(inputFields) < 2 {
 		return fmt.Errorf("%w: %s", errmsg.ErrLineParsingNotEnoughFields, inputLine)
 	}
 
@@ -84,7 +84,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	}
 
 	// Check for validity of the sequence number if enforced - ASTM case
-	if config.EnforceSequenceNumberCheck && config.Protocol == parserconfig.ASTM && inputFields[1] != strconv.Itoa(sequenceNumber) && !isHeader {
+	if config.EnforceSequenceNumberCheck && config.Protocol == pconfig.ASTM && inputFields[1] != strconv.Itoa(sequenceNumber) && !isHeader {
 		return errmsg.ErrLineParsingSequenceNumberMismatch
 	}
 
@@ -108,13 +108,13 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		}
 
 		// ASTM reserved: 1-name, 2-sequence number; HL7 reserved: 1-name
-		if (config.Protocol == parserconfig.ASTM && targetFieldAnnotation.FieldPos < 3) || (config.Protocol == parserconfig.HL7 && targetFieldAnnotation.FieldPos < 2) {
+		if (config.Protocol == pconfig.ASTM && targetFieldAnnotation.FieldPos < 3) || (config.Protocol == pconfig.HL7 && targetFieldAnnotation.FieldPos < 2) {
 			return errmsg.ErrLineParsingReservedFieldPosReference
 		}
 
 		// Check for validity of the sequence number if enforced - HL7 case
 		_, sequenceAnnotation := targetFieldAnnotation.Attributes[constants.AttributeSequence]
-		if config.EnforceSequenceNumberCheck && config.Protocol == parserconfig.HL7 && sequenceAnnotation && inputFields[targetFieldAnnotation.FieldPos-1] != strconv.Itoa(sequenceNumber) {
+		if config.EnforceSequenceNumberCheck && config.Protocol == pconfig.HL7 && sequenceAnnotation && inputFields[targetFieldAnnotation.FieldPos-1] != strconv.Itoa(sequenceNumber) {
 			return errmsg.ErrLineParsingSequenceNumberMismatch
 		}
 
@@ -194,9 +194,9 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	return nil
 }
 
-func parseSubstructure(inputString string, targetStruct interface{}, depth int, config *parserconfig.Configuration) (err error) {
+func parseSubstructure(inputString string, targetStruct interface{}, depth int, config *pconfig.Configuration) (err error) {
 	// Check depth limits
-	if (config.Protocol == parserconfig.ASTM && depth > 1) || (config.Protocol == parserconfig.HL7 && depth > 2) {
+	if (config.Protocol == pconfig.ASTM && depth > 1) || (config.Protocol == pconfig.HL7 && depth > 2) {
 		return errmsg.ErrLineParsingMaximumRecursionDepthExceeded
 	}
 
@@ -260,7 +260,7 @@ func parseSubstructure(inputString string, targetStruct interface{}, depth int, 
 	return nil
 }
 
-func setField(value string, field reflect.Value, annotation models.FieldAnnotation, config *parserconfig.Configuration) (err error) {
+func setField(value string, field reflect.Value, annotation models.FieldAnnotation, config *pconfig.Configuration) (err error) {
 	// Ensure the field is settable
 	if !field.CanSet() {
 		// Field is not settable
@@ -277,9 +277,9 @@ func setField(value string, field reflect.Value, annotation models.FieldAnnotati
 	switch field.Kind() {
 	case reflect.String:
 		escaped := value
-		if config.Protocol == parserconfig.ASTM {
+		if config.Protocol == pconfig.ASTM {
 			escaped = filterStringEscapeChars(value, config.Delimiters.Escape)
-		} else if config.Protocol == parserconfig.HL7 {
+		} else if config.Protocol == pconfig.HL7 {
 			escaped, err = replaceHL7Escapes(value, config)
 			if err != nil {
 				return err
@@ -348,10 +348,10 @@ func setField(value string, field reflect.Value, annotation models.FieldAnnotati
 	return errmsg.ErrLineParsingUnsupportedDataType
 }
 
-func splitStringWithEscape(input string, delimiter string, config *parserconfig.Configuration) (result []string) {
+func splitStringWithEscape(input string, delimiter string, config *pconfig.Configuration) (result []string) {
 	inputRunes := []rune(input)
 	delimiterRune := rune(delimiter[0])
-	if config.Protocol == parserconfig.ASTM {
+	if config.Protocol == pconfig.ASTM {
 		escapeRune := rune(config.Delimiters.Escape[0])
 		start := 0
 		for i := 0; i < len(inputRunes); i++ {
@@ -367,7 +367,7 @@ func splitStringWithEscape(input string, delimiter string, config *parserconfig.
 				continue
 			}
 		}
-	} else if config.Protocol == parserconfig.HL7 {
+	} else if config.Protocol == pconfig.HL7 {
 		result = strings.Split(input, delimiter)
 	}
 	return result
@@ -390,7 +390,7 @@ func filterStringEscapeChars(input string, escape string) string {
 	return builder.String()
 }
 
-func replaceHL7Escapes(input string, config *parserconfig.Configuration) (result string, err error) {
+func replaceHL7Escapes(input string, config *pconfig.Configuration) (result string, err error) {
 	var builder strings.Builder
 	escapeRune := rune(config.Delimiters.Escape[0])
 	inputRunes := []rune(input)
