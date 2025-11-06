@@ -560,7 +560,7 @@ func TestParseStruct_GroupArrayMissing(t *testing.T) {
 	// Act
 	err := ParseStruct(input, &target, configHL7)
 	// Assert
-	assert.Nil(t, err) //TODO: should this be an error? 0 element non optional arrays are ok?
+	assert.Nil(t, err) //TODO: should this be an error? 0 element non-optional arrays are ok?
 	assert.Len(t, target.Group, 0)
 	assert.Equal(t, "line1", target.Record2.Field)
 }

@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/blutspende/go-parser"
-	"github.com/blutspende/go-parser/messages/hl7/hl7v23"
-	"github.com/blutspende/go-parser/messages/hl7/hl7v24"
+	"github.com/blutspende/go-parser/messageformat/hl7/hl7v23"
+	"github.com/blutspende/go-parser/messageformat/hl7/hl7v24"
 	"github.com/stretchr/testify/assert"
 )
 

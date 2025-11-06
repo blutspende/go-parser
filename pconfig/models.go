@@ -13,11 +13,11 @@ import (
 type Configuration struct {
 	Protocol                   Protocol
 	Encoding                   encoding.Encoding
+	TimeZone                   timezone.TimeZone
+	Notation                   string
 	LineSeparator              string
 	AutoDetectLineSeparator    bool
-	TimeZone                   timezone.TimeZone
 	EnforceSequenceNumberCheck bool
-	Notation                   string
 	DefaultDecimalPrecision    int
 	RoundLastDecimal           bool
 	KeepShortDateTimeZone      bool

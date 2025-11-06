@@ -9,7 +9,7 @@ import (
 	"github.com/blutspende/bloodlab-common/timezone"
 	"github.com/blutspende/go-parser"
 	"github.com/blutspende/go-parser/enums/notation"
-	"github.com/blutspende/go-parser/messages/astm/lis02a2"
+	"github.com/blutspende/go-parser/messageformat/astm/lis02a2"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/encoding/charmap"
 )

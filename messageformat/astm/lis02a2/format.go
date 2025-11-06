@@ -6,7 +6,7 @@ import "time"
 // These structures can be used directly or as a base for custom implementations
 // Basis for the protocol definition: https://samson-rus.com/wp-content/files/LIS2-A2.pdf
 // The commended section numbers below (eg: 5.6.1) refer to the document's sections above
-// Page 30-33 provides information about the logical structure of messages
+// Page 30-33 provides information about the logical structure of messageformat
 
 // Record substructures //
 

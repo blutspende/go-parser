@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blutspende/go-parser/messages/hl7/hl7v23"
+	"github.com/blutspende/go-parser/messageformat/hl7/hl7v23"
 	"github.com/stretchr/testify/assert"
 )
 
