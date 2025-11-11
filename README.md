@@ -271,7 +271,8 @@ If set to true, the output strings are [escaped](#escape-characters) according t
 If set to false, it is allowed - no error - for an input message to be incomplete and end prematurely with non-optional records or groups still unparsed in the target structure. This is only relevant for unmarshal.
 
 ## DropEmptyOutputRecords
-If set to true, records (lines) that have all data fields [empty](#pointers-and-empties) (the name tag of the line is set by annotation and is therefore not considered) are dropped from the output. If set to false, all records are outputted, and empty (tag only) records will have a single field separator character added at the end. This is only relevant for marshal, and only in HL7 (ASTM can not have empty lines because of the fixed sequence number).
+If set to true, records (lines) that have all informative data fields [empty](#pointers-and-empties) are dropped from the output. Fields are considered informative that are manually set in the source structure, so tag fields (field 1) and sequence number fields (usually field 2) are automatic and do not count.
+If set to false, all records are outputted no matter what. In this case a tag only record will have a single field separator character added at the end. This is only relevant for marshal, and only in HL7. ASTM does not allow empty records.
 
 ## Delimiters
 Used for building the record's internal structure. The defaults are part of the default config, set when calling `NewDefaultConfiguration`, but can be manually overridden if needed. Each field should contain exactly one character. This is mainly relevant for marshal, as Unmarshal automatically detects the delimiters in the header record and stores it in this structure for the processing. 

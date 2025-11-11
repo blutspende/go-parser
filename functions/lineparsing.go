@@ -70,7 +70,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	// Check for mach of name and subname
 	// Note: name checking is always enforced, but instead of error it is returned in the nameOk variable
 	if inputFields[0] != recordAnnotation.Tag {
-		return fmt.Errorf("%w: expected '%s', got '%s'", errmsg.ErrLineParsingLineTagMismatch, recordAnnotation.Tag, inputFields[0])
+		return fmt.Errorf("%w: expected '%s', got '%s', on line '%s'", errmsg.ErrLineParsingLineTagMismatch, recordAnnotation.Tag, inputFields[0], inputLine)
 	}
 	if subname, exists := recordAnnotation.Attributes[constants.AttributeSubname]; exists {
 		// If subname is given at least 3 fields are required
@@ -79,13 +79,13 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		}
 		// Check for subname match
 		if inputFields[2] != subname {
-			return fmt.Errorf("%w for subname: expected '%s', got '%s'", errmsg.ErrLineParsingLineTagMismatch, subname, inputFields[2])
+			return fmt.Errorf("%w for subname: expected '%s', got '%s', on line '%s'", errmsg.ErrLineParsingLineTagMismatch, subname, inputFields[2], inputLine)
 		}
 	}
 
 	// Check for validity of the sequence number if enforced - ASTM case
 	if config.EnforceSequenceNumberCheck && config.Protocol == pconfig.ASTM && inputFields[1] != strconv.Itoa(sequenceNumber) && !isHeader {
-		return errmsg.ErrLineParsingSequenceNumberMismatch
+		return fmt.Errorf("%w: expected '%s', got '%s', on line '%s'", errmsg.ErrLineParsingSequenceNumberMismatch, strconv.Itoa(sequenceNumber), inputFields[1], inputLine)
 	}
 
 	// Process the target structure
@@ -115,7 +115,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		// Check for validity of the sequence number if enforced - HL7 case
 		_, sequenceAnnotation := targetFieldAnnotation.Attributes[constants.AttributeSequence]
 		if config.EnforceSequenceNumberCheck && config.Protocol == pconfig.HL7 && sequenceAnnotation && inputFields[targetFieldAnnotation.FieldPos-1] != strconv.Itoa(sequenceNumber) {
-			return errmsg.ErrLineParsingSequenceNumberMismatch
+			return fmt.Errorf("%w: expected '%s', got '%s', on line '%s'", errmsg.ErrLineParsingSequenceNumberMismatch, strconv.Itoa(sequenceNumber), inputFields[targetFieldAnnotation.FieldPos-1], inputLine)
 		}
 
 		// Not enough inputFields or empty inputField

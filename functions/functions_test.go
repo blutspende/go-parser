@@ -61,6 +61,19 @@ type ThreeFieldRecord struct {
 type SimpleRecord struct {
 	Field string `astm:"POS=3" hl7:"POS=3"`
 }
+type SequencedRecord struct {
+	SetID int    `hl7:"POS=2;ATR=sequence"`
+	Field string `hl7:"POS=3"`
+}
+type SequencedLongRecord struct {
+	SetID       int    `hl7:"POS=2;ATR=sequence"`
+	Field3      string `hl7:"POS=3"`
+	Field4      string `hl7:"POS=4"`
+	Field5      *int   `hl7:"POS=5"`
+	Field5Comp1 string `hl7:"POS=5.1"`
+	Field5Comp2 string `hl7:"POS=5.2"`
+	Field6      string `hl7:"POS=6"`
+}
 type UnorderedRecord struct {
 	First  string `astm:"POS=3"`
 	Third  string `astm:"POS=5"`

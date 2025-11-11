@@ -3,9 +3,11 @@ package functions
 import (
 	"testing"
 
+	"github.com/blutspende/go-parser/enums/notation"
 	"github.com/stretchr/testify/assert"
 )
 
+// BuildStruct tests
 func TestBuildStruct_SingleLineStruct(t *testing.T) {
 	// Arrange
 	source := SingleRecordStruct{
@@ -104,6 +106,29 @@ func TestBuildStruct_CompositeArrayMessage(t *testing.T) {
 	assert.Equal(t, "F|2|a2 r1 first|212", result[2])
 	assert.Equal(t, "S|1|221|a2 r2 second", result[3])
 }
+func TestBuildStruct_MissingAnnotation(t *testing.T) {
+	// Arrange
+	type SourceType struct {
+		First   SimpleRecord `astm:"TAG=F"`
+		Missing SimpleRecord
+		Third   SimpleRecord `astm:"TAG=T"`
+	}
+	source := SourceType{
+		First: SimpleRecord{
+			Field: "first",
+		},
+		Third: SimpleRecord{
+			Field: "third",
+		},
+	}
+	// Act
+	result, err := BuildStruct(source, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, result, 2)
+	assert.Equal(t, "F|1|first", result[0])
+	assert.Equal(t, "T|1|third", result[1])
+}
 func TestBuildStruct_EmptyLine_HL7(t *testing.T) {
 	// Arrange
 	type SourceType struct {
@@ -127,26 +152,140 @@ func TestBuildStruct_EmptyLine_HL7(t *testing.T) {
 	assert.Equal(t, "SR1||first", result[0])
 	assert.Equal(t, "SR3||third", result[1])
 }
-func TestBuildStruct_MissingAnnotation(t *testing.T) {
+func TestBuildStruct_EmptyLinesWithSequenceNumber_HL7(t *testing.T) {
 	// Arrange
 	type SourceType struct {
-		First   SimpleRecord `astm:"TAG=F"`
-		Missing SimpleRecord
-		Third   SimpleRecord `astm:"TAG=T"`
+		Record1 SequencedRecord `hl7:"TAG=SR1"`
+		Record2 SequencedRecord `hl7:"TAG=SR2"`
+		Record3 SequencedRecord `hl7:"TAG=SR3"`
 	}
 	source := SourceType{
-		First: SimpleRecord{
+		Record1: SequencedRecord{
 			Field: "first",
 		},
-		Third: SimpleRecord{
+		Record3: SequencedRecord{
 			Field: "third",
 		},
 	}
 	// Act
-	result, err := BuildStruct(source, config)
+	result, err := BuildStruct(source, configHL7)
 	// Assert
 	assert.Nil(t, err)
 	assert.Len(t, result, 2)
+	assert.Equal(t, "SR1|1|first", result[0])
+	assert.Equal(t, "SR3|1|third", result[1])
+}
+func TestBuildStruct_EmptyLinesShortNotation_HL7(t *testing.T) {
+	// Arrange
+	type SourceType struct {
+		Record1 SequencedLongRecord `hl7:"TAG=SR1"`
+		Record2 SequencedLongRecord `hl7:"TAG=SR2"`
+		Record3 SequencedLongRecord `hl7:"TAG=SR3"`
+	}
+	source := SourceType{
+		Record1: SequencedLongRecord{
+			Field3: "first",
+		},
+		Record3: SequencedLongRecord{
+			Field3: "third",
+		},
+	}
+	configHL7.Notation = notation.Short
+	// Act
+	result, err := BuildStruct(source, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, result, 2)
+	assert.Equal(t, "SR1|1|first", result[0])
+	assert.Equal(t, "SR3|1|third", result[1])
+	// Teardown
+	teardown()
+}
+func TestBuildStruct_EmptyLinesStandardNotation_HL7(t *testing.T) {
+	// Arrange
+	type SourceType struct {
+		Record1 SequencedLongRecord `hl7:"TAG=SR1"`
+		Record2 SequencedLongRecord `hl7:"TAG=SR2"`
+		Record3 SequencedLongRecord `hl7:"TAG=SR3"`
+	}
+	source := SourceType{
+		Record1: SequencedLongRecord{
+			Field3: "first",
+		},
+		Record3: SequencedLongRecord{
+			Field3: "third",
+		},
+	}
+	configHL7.Notation = notation.Standard
+	// Act
+	result, err := BuildStruct(source, configHL7)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, result, 2)
+	assert.Equal(t, "SR1|1|first||^|", result[0])
+	assert.Equal(t, "SR3|1|third||^|", result[1])
+	// Teardown
+	teardown()
+}
+func TestBuildStruct_EmptyLine_ASTM(t *testing.T) {
+	// Arrange
+	type SourceType struct {
+		Record1 SimpleRecord `astm:"TAG=F"`
+		Record2 SimpleRecord `astm:"TAG=S"`
+		Record3 SimpleRecord `astm:"TAG=T"`
+	}
+	source := SourceType{
+		Record1: SimpleRecord{
+			Field: "first",
+		},
+		Record3: SimpleRecord{
+			Field: "third",
+		},
+	}
+	config.Notation = notation.Short
+	// Act
+	result, err := BuildStruct(source, config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Len(t, result, 3)
 	assert.Equal(t, "F|1|first", result[0])
-	assert.Equal(t, "T|1|third", result[1])
+	assert.Equal(t, "S|1", result[1])
+	assert.Equal(t, "T|1|third", result[2])
+	// Teardown
+	teardown()
+}
+
+// filterEmptyLines tests
+func TestFilterEmptyLines_RemovesEmptyLines(t *testing.T) {
+	// Arrange
+	lines := []string{
+		"REC|dt",
+		"REC|1",
+		"REC|12",
+		"SR1|1|||||",
+		"SR2||||^^||^^^|",
+		"R3C|1|134",
+	}
+	// Act
+	result := filterEmptyLines(lines, configHL7)
+	// Assert
+	assert.Len(t, result, 2)
+	assert.Equal(t, "REC|dt", result[0])
+	assert.Equal(t, "R3C|1|134", result[1])
+}
+func TestFilterEmptyLines_SpecialDelimiters(t *testing.T) {
+	// Arrange
+	lines := []string{
+		"REC*dt",
+		"SR1*1**ww**",
+	}
+	configHL7.Delimiters.Field = "*"
+	configHL7.Delimiters.Component = "w"
+	// Act
+	result := filterEmptyLines(lines, configHL7)
+	// Assert
+	assert.Len(t, result, 1)
+	assert.Equal(t, "REC*dt", result[0])
+	// Teardown
+	teardown()
 }

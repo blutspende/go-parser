@@ -62,7 +62,7 @@ func Test_Order_ORM_generic1(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, message.Patient)
 	assert.NotNil(t, message.Patient.PatientIdentification)
-	assert.Equal(t, 1, message.Patient.PatientIdentification.ID)
+	assert.Equal(t, 1, message.Patient.PatientIdentification.SetID)
 	assert.Equal(t, "a", message.Patient.PatientIdentification.ExternalID[0].Id)
 	assert.Equal(t, "b", message.Patient.PatientIdentification.ExternalID[0].CheckDigit)
 	assert.Equal(t, "", message.Patient.PatientIdentification.ExternalID[0].AssigningAuthority)
@@ -100,7 +100,7 @@ func Test_Order_ORM_generic1(t *testing.T) {
 	assert.Equal(t, "2011-09-26 10:00:55 +0000 UTC", message.Order[0].CommonOrderSegment.DateTimeOfTransaction.String())
 	assert.Nil(t, err)
 	assert.NotNil(t, message.Order[0].OrderDetail.OrderDetailSegment.ObservationRequestSegment)
-	assert.Equal(t, "1", message.Order[0].OrderDetail.OrderDetailSegment.ObservationRequestSegment.ObservationRequest)
+	assert.Equal(t, 1, message.Order[0].OrderDetail.OrderDetailSegment.ObservationRequestSegment.SetID)
 	assert.Equal(t, "000218T018", message.Order[0].OrderDetail.OrderDetailSegment.ObservationRequestSegment.PlacerOrderNumber.EntityIdentifier)
 	assert.Equal(t, "", message.Order[0].OrderDetail.OrderDetailSegment.ObservationRequestSegment.PlacerOrderNumber.NamespaceId)
 	assert.Equal(t, "", message.Order[0].OrderDetail.OrderDetailSegment.ObservationRequestSegment.PlacerOrderNumber.UniversalId)
@@ -116,17 +116,17 @@ func Test_Order_ORM_generic1(t *testing.T) {
 }
 
 // JSON serializer test with optional manual result observation
-func TestMSH(t *testing.T) {
+func TestJson(t *testing.T) {
 	// Arrange
 	messageString := `MSH|^~\&|SWISSLAB|FFM||FFM|20230203080903||ORM^O01|o3057937.000001|P|2.3|` + "\r"
-	messageString += `PID|||01077843||CL5AVA0N7K|||U|` + "\r"
-	messageString += `PV1||S|||||||||||||||||S01077843|` + "\r"
+	messageString += `PID|1||01077843||CL5AVA0N7K|||U|` + "\r"
+	messageString += `PV1|1|S|||||||||||||||||S01077843|` + "\r"
 	messageString += `ORC|NW||23071012||||||20230203080800|||BSD|` + "\r"
-	messageString += `OBR|||23071012|HINAET^HIV-1/2 PCR mit erhöhter Sensitivität|||20230203080900|||||||||BSD|||||||||P|` + "\r"
+	messageString += `OBR|1||23071012|HINAET^HIV-1/2 PCR mit erhöhter Sensitivität|||20230203080900|||||||||BSD|||||||||P|` + "\r"
 	messageString += `ORC|NW||23071013||||||20230203080800|||BSD|` + "\r"
-	messageString += `OBR|||23071013|HCNAET^HCV PCR mit erhöhter Sensitivität|||20230203080900|||||||||BSD|||||||||P|` + "\r"
+	messageString += `OBR|1||23071013|HCNAET^HCV PCR mit erhöhter Sensitivität|||20230203080900|||||||||BSD|||||||||P|` + "\r"
 	messageString += `ORC|NW||23071014||||||20230203080800|||BSD|` + "\r"
-	messageString += `OBR|||23071014|HBNAET^HBV PCR mit erhöhter Sensitivität|||20230203080900|||||||||BSD|||||||||P|` + "\r"
+	messageString += `OBR|1||23071014|HBNAET^HBV PCR mit erhöhter Sensitivität|||20230203080900|||||||||BSD|||||||||P|` + "\r"
 	message := hl7v23.ORM_O01{}
 	// Act
 	err := parser.Unmarshal([]byte(messageString), &message, config)
@@ -152,20 +152,20 @@ func Test_cITm_Result1(t *testing.T) {
 	var messageString string
 	messageString += "MSH|^~\\&|||||20110927155013||ORU^R01|68516|P|2.3|||NE|NE||8859/1\u000d"
 	messageString += "PID|1||4637463G66||Smith^John||19630101|M\u000d"
-	messageString += "NTE||L|1st·comment·on·patient·/·sample·20020604101\u000d"
-	messageString += "NTE||L|2nd·comment·on·patient·/·sample\u000d"
+	messageString += "NTE|1|L|1st·comment·on·patient·/·sample·20020604101\u000d"
+	messageString += "NTE|2|L|2nd·comment·on·patient·/·sample\u000d"
 	messageString += "ORC|RE|20020604101|||||^^^^^R||20110927150630\u000d"
 	messageString += "OBR|1|20020604101||ALL||20110927150629|||||||||S1^^^^^^P||||||||||||^^^^^|||||||\u000d"
 	messageString += "OBX|1||21||101,0|mmol/L||N|||F||23~N|20110927154723|^^^COBAS8K.200|System\u000d"
 	//messageString += "TCD|1|21|Dec\u000d"
-	messageString += "NTE|||L|R|G\u000d"
+	messageString += "NTE|1||L|R|G\u000d"
 	messageString += "OBX|2||82||5,7|mmol/L||H|||F||23~N|20110927154733|^^^COBAS8K.200|System\u000d"
 	//messageString += "TCD|1|82|1\u000d"
-	messageString += "NTE|||L|R|G\u000d"
+	messageString += "NTE|1||L|R|G\u000d"
 	messageString += "OBX|3||89||162,0|mmol/L||H|||F||23~N|20110927154734|^^^COBAS8K.200|System\u000d"
 	//messageString += "TCD|1|89|Inc\u000d"
-	messageString += "NTE||L|Comment·on·test·code·89\u000d"
-	messageString += "NTE|||L|R|G\u000d"
+	messageString += "NTE|1|L|Comment·on·test·code·89\u000d"
+	messageString += "NTE|2||L|R|G\u000d"
 	var message hl7v23.ORU_R01
 	// Act
 	err := parser.Unmarshal([]byte(messageString), &message, config)

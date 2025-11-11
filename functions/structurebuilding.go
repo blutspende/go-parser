@@ -2,6 +2,7 @@ package functions
 
 import (
 	"errors"
+	"regexp"
 
 	"github.com/blutspende/go-parser/constants"
 	"github.com/blutspende/go-parser/errmsg"
@@ -82,13 +83,28 @@ func buildStructRecursive(sourceStruct interface{}, sequenceNumber int, depth in
 			}
 		}
 	}
-	// Filter empty lines
-	filteredResult := make([]string, 0, len(result))
-	for _, line := range result {
-		if line != "" {
-			filteredResult = append(filteredResult, line)
+
+	// Filter empty lines if configured so (only in HL7)
+	if config.DropEmptyOutputRecords && config.Protocol == pconfig.HL7 {
+		return filterEmptyLines(result, config), nil
+	} else {
+		// Or return the raw result with all the lines
+		return result, nil
+	}
+}
+
+func filterEmptyLines(lines []string, config *pconfig.Configuration) (filteredLines []string) {
+	fieldSep := config.Delimiters.Field
+	if fieldSep == `\` {
+		fieldSep = `\\`
+	}
+	compSep := config.Delimiters.Component
+	emptyLine := regexp.MustCompile(`^[A-Z]([A-Z1-9]{2})?([` + fieldSep + `][1-9][0-9]?)?[` + fieldSep + compSep + `]*$`)
+	filteredLines = make([]string, 0, len(lines))
+	for _, line := range lines {
+		if !emptyLine.MatchString(line) {
+			filteredLines = append(filteredLines, line)
 		}
 	}
-	// Return the filtered result and no error if everything went well
-	return filteredResult, nil
+	return filteredLines
 }

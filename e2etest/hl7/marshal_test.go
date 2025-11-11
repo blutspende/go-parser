@@ -49,7 +49,6 @@ func TestMarshalFromStruct(t *testing.T) {
 				OrderDetail: hl7v23.OrderDetail{
 					OrderDetailSegment: hl7v23.OrderDetailSegment{
 						ObservationRequestSegment: hl7v23.OBR{
-							ObservationRequest: "1",
 							FillerOrderNumber: hl7v23.EI{
 								EntityIdentifier: "FIL4345",
 							},
@@ -76,7 +75,6 @@ func TestMarshalFromStruct(t *testing.T) {
 				OrderDetail: hl7v23.OrderDetail{
 					OrderDetailSegment: hl7v23.OrderDetailSegment{
 						ObservationRequestSegment: hl7v23.OBR{
-							ObservationRequest: "2",
 							FillerOrderNumber: hl7v23.EI{
 								EntityIdentifier: "FIL4345",
 							},
@@ -114,8 +112,8 @@ func TestMarshalFromStruct(t *testing.T) {
 		},
 	}
 	expected := `MSH|^~\&|HL7_Host|HL7_Office|CIT|LAB|20230203080903||ORM^O01|CID586246|P|2.3|||ER|SU||8859/1
-PID|0||01020304||Nachnamäh^Vörname|||U
-PV1||S|||||||||||||||||VID001
+PID|1||01020304||Nachnamäh^Vörname|||U
+PV1|1|S|||||||||||||||||VID001
 ORC|NW||23071012||||||20230203080903|||AKB
 OBR|1||FIL4345|DNA-A^Loki A am DNA Strang||20230203080903
 ORC|NW||23071012||||||20230203080903|||AKB
@@ -156,7 +154,6 @@ func TestMarshalPID(t *testing.T) {
 		},
 		Patient: hl7v23.Patient{
 			PatientIdentification: hl7v23.PID{
-				ID: 1,
 				InternalID: []hl7v23.CX{
 					{
 						Id:         "a",
