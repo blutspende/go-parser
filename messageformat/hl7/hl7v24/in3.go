@@ -5,7 +5,7 @@ import "time"
 // HL7 v2.4 - IN3 - Insurance Additional Information, Certification
 // https://hl7-definition.caristix.com/v2/HL7v2.4/Segments/IN3
 type IN3 struct {
-	SetID                              string    `hl7:"POS=2" json:"SetID,omitempty"`
+	SetID                              int       `hl7:"POS=2;ATR=sequence" json:"SetID,omitempty"`
 	CertificationNumber                CX        `hl7:"POS=3" json:"CertificationNumber,omitempty"`
 	CertifiedBy                        []XCN     `hl7:"POS=4" json:"CertifiedBy,omitempty"`
 	CertificationRequired              string    `hl7:"POS=5" json:"CertificationRequired,omitempty"`

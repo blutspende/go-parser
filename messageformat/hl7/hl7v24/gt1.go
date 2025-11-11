@@ -5,7 +5,7 @@ import "time"
 // HL7 v2.4 - GT1 - Guarantor
 // https://hl7-definition.caristix.com/v2/HL7v2.4/Segments/GT1
 type GT1 struct {
-	SetId                         string    `hl7:"POS=2" json:"SetId,omitempty"`
+	SetID                         int       `hl7:"POS=2;ATR=sequence" json:"SetId,omitempty"`
 	Number                        []CX      `hl7:"POS=3" json:"Number,omitempty"`
 	Name                          []XPN     `hl7:"POS=4" json:"Name,omitempty"`
 	SpouseName                    []XPN     `hl7:"POS=5" json:"SpouseName,omitempty"`

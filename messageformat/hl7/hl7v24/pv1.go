@@ -5,7 +5,7 @@ import "time"
 // PV1 - Patient visit
 // https://hl7-definition.caristix.com/v2/HL7v2.3/Segments/PV1
 type PV1 struct {
-	SetID                   string      `hl7:"POS=2" json:"SetID,omitempty"`
+	SetID                   int         `hl7:"POS=2;ATR=sequence" json:"SetID,omitempty"`
 	PatientClass            string      `hl7:"POS=3" json:"PatientClass,omitempty"`
 	AssignedPatientLocation PL          `hl7:"POS=4" json:"AssignedPatientLocation,omitempty"`
 	AdmissionType           string      `hl7:"POS=5" json:"AdmissionType,omitempty"`

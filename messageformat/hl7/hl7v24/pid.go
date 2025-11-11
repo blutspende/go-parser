@@ -5,7 +5,7 @@ import "time"
 // PID - Patient Identification
 // https://hl7-definition.caristix.com/v2/HL7v2.4/Segments/PID
 type PID struct {
-	ID                       int       `hl7:"POS=2" json:"ID,omitempty"`
+	SetID                    int       `hl7:"POS=2;ATR=sequence" json:"ID,omitempty"`
 	ExternalID               []CX      `hl7:"POS=3" json:"ExternalID,omitempty"`
 	InternalID               []CX      `hl7:"POS=4" json:"InternalID,omitempty"`
 	AlternateID              []CX      `hl7:"POS=5" json:"AlternateID,omitempty"`

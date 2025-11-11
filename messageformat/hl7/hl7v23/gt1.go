@@ -3,7 +3,7 @@ package hl7v23
 import "time"
 
 type GT1 struct {
-	SetId                         string    `hl7:"POS=2" json:"setId,omitempty"`
+	SetID                         int       `hl7:"POS=2;ATR=sequence" json:"setId,omitempty"`
 	Number                        CX        `hl7:"POS=3" json:"number,omitempty"`
 	Name                          []XPN     `hl7:"POS=4" json:"name,omitempty"`
 	SpouseName                    []XPN     `hl7:"POS=5" json:"spouseName,omitempty"`

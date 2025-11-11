@@ -3,7 +3,7 @@ package hl7v23
 import "time"
 
 type IN3 struct {
-	SetID                              string    `hl7:"POS=2" json:"setID,omitempty"`
+	SetID                              int       `hl7:"POS=2;ATR=sequence" json:"setID,omitempty"`
 	CertificationNumber                CX        `hl7:"POS=3" json:"certificationNumber,omitempty"`
 	CertifiedBy                        []XCN     `hl7:"POS=4" json:"certifiedBy,omitempty"`
 	CertificationRequired              string    `hl7:"POS=5" json:"certificationRequired,omitempty"`

@@ -5,7 +5,7 @@ import "time"
 // HL7 v2.4 - IN1 - Insurance
 // https://hl7-definition.caristix.com/v2/HL7v2.4/Segments/IN1
 type IN1 struct {
-	SetID                          string    `hl7:"POS=2" json:"SetID,omitempty"`
+	SetID                          int       `hl7:"POS=2;ATR=sequence" json:"SetID,omitempty"`
 	PlanID                         CE        `hl7:"POS=3" json:"PlanID,omitempty"`
 	CompanyID                      []CX      `hl7:"POS=4" json:"CompanyID,omitempty"`
 	CompanyName                    []XON     `hl7:"POS=5" json:"CompanyName,omitempty"`
