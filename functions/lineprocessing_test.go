@@ -1,10 +1,11 @@
 package functions
 
 import (
-	"github.com/blutspende/go-astm/v3/enums/lineseparator"
-	"github.com/blutspende/go-astm/v3/errmsg"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/blutspende/go-parser/enums/lineseparator"
+	"github.com/blutspende/go-parser/errmsg"
+	"github.com/stretchr/testify/assert"
 )
 
 // Default line separator config
@@ -131,7 +132,7 @@ func TestSliceLines_ExplicitCr(t *testing.T) {
 	teardown()
 }
 
-// Lines building
+// Line building
 func TestBuildLines_Default(t *testing.T) {
 	// Arrange
 	input := []string{"first", "second"}

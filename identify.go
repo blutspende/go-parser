@@ -1,18 +1,24 @@
-package astm
+package parser
 
 import (
+	"regexp"
+
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/bloodlab-common/messagetype"
-	"github.com/blutspende/go-astm/v3/functions"
-	"github.com/blutspende/go-astm/v3/models/astmmodels"
-	"regexp"
+	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/functions"
+	"github.com/blutspende/go-parser/pconfig"
 )
 
-func IdentifyMessage(messageData []byte, configuration ...astmmodels.Configuration) (messageType messagetype.MessageType, err error) {
-	// Load configuration
-	config, err := loadConfiguration(configuration...)
+func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (messageType messagetype.MessageType, err error) {
+	// Init configuration
+	err = pconfig.InitConfig(config)
 	if err != nil {
 		return "", err
+	}
+	// Check for correct protocol
+	if config.Protocol != pconfig.ASTM {
+		return "", errmsg.ErrIdentifyMessageWrongProtocol
 	}
 	// Convert encoding to UTF8
 	utf8Data, err := encoding.ConvertFromEncodingToUtf8(messageData, config.Encoding)
@@ -50,4 +56,48 @@ func IdentifyMessage(messageData []byte, configuration ...astmmodels.Configurati
 	}
 	// If no match was found return unknown
 	return messagetype.Unidentified, err
+}
+
+func IdentifyMessageHL7(messageData []byte, config *pconfig.Configuration) (messageType string, protocolVersion string, err error) {
+	// Init configuration
+	err = pconfig.InitConfig(config)
+	if err != nil {
+		return "", "", err
+	}
+	// Check for correct protocol
+	if config.Protocol != pconfig.HL7 {
+		return "", "", errmsg.ErrIdentifyMessageWrongProtocol
+	}
+	// Convert encoding to UTF8
+	utf8Data, err := encoding.ConvertFromEncodingToUtf8(messageData, config.Encoding)
+	if err != nil {
+		return "", "", err
+	}
+	// Split the message data into lines
+	lines, err := functions.SliceLines(utf8Data, config)
+	if err != nil {
+		return "", "", err
+	}
+	// Parse the MSH segment as a single header structure
+	type HeaderMessage struct {
+		Header struct {
+			MessageType     string `hl7:"POS=9"`
+			ProtocolVersion string `hl7:"POS=12"`
+		} `hl7:"TAG=MSH"`
+	}
+	var headerMsg HeaderMessage
+	err = functions.ParseStruct(lines, &headerMsg, config)
+	if err != nil {
+		return "", "", err
+	}
+	// Check for missing data
+	if headerMsg.Header.MessageType == "" {
+		return "", "", errmsg.ErrIdentifyMessageMissingMessageType
+	}
+	// Note: option to also error on missing protocol version
+	//if headerMsg.Header.ProtocolVersion == "" {
+	//	return "", "", errmsg.ErrIdentifyMessageMissingProtocolVersion
+	//}
+	// Return the extracted message type and protocol version from the header struct
+	return headerMsg.Header.MessageType, headerMsg.Header.ProtocolVersion, nil
 }

@@ -1,11 +1,12 @@
-package e2e
+package astm
 
 import (
+	"testing"
+
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/bloodlab-common/messagetype"
-	"github.com/blutspende/go-astm/v3"
+	"github.com/blutspende/go-parser"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestIdentifyOrderMessage(t *testing.T) {
@@ -15,7 +16,7 @@ func TestIdentifyOrderMessage(t *testing.T) {
 	message += "O|1|idk1||^^^Pool_Cell||||R|||N||||Blood^Product|||||||||||||||\n"
 	message += "L|1|N\n"
 	// Act
-	messageType, err := astm.IdentifyMessage([]byte(message), config)
+	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, messagetype.Order, messageType)
@@ -38,7 +39,7 @@ func TestIdentifyOrderMessageWithMultiHeader(t *testing.T) {
 	message += "L|1|N\n"
 	config.Encoding = encoding.UTF8
 	// Act
-	messageType, err := astm.IdentifyMessage([]byte(message), config)
+	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, messagetype.Order, messageType)
@@ -57,7 +58,7 @@ Q|5|VALI200305||ALL
 L|1|N`
 	config.Encoding = encoding.UTF8
 	// Act
-	messageType, err := astm.IdentifyMessage([]byte(message), config)
+	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, messagetype.Query, messageType)
@@ -84,7 +85,7 @@ Q|5|VALI200305||ALL
 L|1|N`
 	config.Encoding = encoding.UTF8
 	// Act
-	messageType, err := astm.IdentifyMessage([]byte(message), config)
+	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, messagetype.Query, messageType)
@@ -102,7 +103,7 @@ R|2|^^^Pool_Cell|Negative|||||F||immucor||20200226153444|5030100389|
 L|1|N`
 	config.Encoding = encoding.UTF8
 	// Act
-	messageType, err := astm.IdentifyMessage([]byte(message), config)
+	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, messagetype.Result, messageType)
@@ -130,7 +131,7 @@ R|2|^^^Pool_Cell|Negative|||||F||immucor||20200226153444|5030100389|
 L|1|N`
 	config.Encoding = encoding.UTF8
 	// Act
-	messageType, err := astm.IdentifyMessage([]byte(message), config)
+	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, messagetype.Result, messageType)
@@ -151,7 +152,7 @@ L|1|N
 `
 	config.Encoding = encoding.UTF8
 	// Act
-	messageType, err := astm.IdentifyMessage([]byte(message), config)
+	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, messagetype.Query, messageType)
@@ -181,7 +182,7 @@ func TestIdentifyHPORCOROCOROC(t *testing.T) {
 	message += "L|1|N\n"
 	config.Encoding = encoding.UTF8
 	// Act
-	messageType, err := astm.IdentifyMessage([]byte(message), config)
+	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, messagetype.Result, messageType)
@@ -203,7 +204,7 @@ R|4|^^^RDW-CV^788-0|23.0|%|11.0 - 17.0^REFERENCE_RANGE|H||F||LABOR^^USER|2024090
 L|1|N`
 	config.Encoding = encoding.UTF8
 	// Act
-	messageType, err := astm.IdentifyMessage([]byte(message), config)
+	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, messagetype.Result, messageType)
@@ -244,7 +245,7 @@ R|20|^^^EOS%^713-8|8.4|%|0.0-9.0^REFERENCE_RANGE|N||F||LABOR^^USER|2024091207034
 L|1|N`
 	config.Encoding = encoding.UTF8
 	// Act
-	messageType, err := astm.IdentifyMessage([]byte(message), config)
+	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, messagetype.Result, messageType)

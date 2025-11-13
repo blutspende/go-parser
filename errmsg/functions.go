@@ -2,11 +2,6 @@ package errmsg
 
 import "errors"
 
-// Encoding
-var (
-	ErrEncodingInvalidEncoding = errors.New("invalid encoding")
-)
-
 // Lining
 var (
 	ErrLineProcessingEmptyInput       = errors.New("empty input")
@@ -16,42 +11,48 @@ var (
 
 // AnnotationParsing
 var (
-	ErrAnnotationParsingMissingAstmAnnotation        = errors.New("astm annotation missing")
-	ErrAnnotationParsingInvalidAstmAnnotation        = errors.New("invalid astm annotation")
-	ErrAnnotationParsingInvalidAstmAttribute         = errors.New("invalid astm attribute")
-	ErrAnnotationParsingInvalidAstmAttributeFormat   = errors.New("invalid astm attribute format")
-	ErrAnnotationParsingInvalidInputStruct           = errors.New("invalid input struct")
-	ErrAnnotationParsingIllegalComponentArray        = errors.New("component array is not allowed")
-	ErrAnnotationParsingIllegalComponentSubstructure = errors.New("component substructure is not allowed")
+	ErrAnnotationParsingInvalidProtocol    = errors.New("invalid protocol")
+	ErrAnnotationParsingWrongProtocol      = errors.New("wrong protocol")
+	ErrAnnotationParsingMissingAnnotation  = errors.New("annotation missing") // Note: special error used to skip unannotated fields
+	ErrAnnotationParsingInvalidElement     = errors.New("invalid annotation element")
+	ErrAnnotationParsingInvalidElementKey  = errors.New("invalid annotation element key")
+	ErrAnnotationParsingIllegal            = errors.New("illegal annotation combination")
+	ErrAnnotationParsingInvalidInputStruct = errors.New("invalid input struct type")
 )
 
 // LineParsing
 var (
-	ErrLineParsingEmptyInput                  = errors.New("empty input")
-	ErrLineParsingHeaderTooShort              = errors.New("header too short")
-	ErrLineParsingMandatoryInputFieldsMissing = errors.New("mandatory input fields missing")
-	ErrLineParsingLineTypeNameMismatch        = errors.New("line type name mismatch")
-	ErrLineParsingSequenceNumberMismatch      = errors.New("sequence number mismatch")
-	ErrLineParsingRequiredInputFieldMissing   = errors.New("required input field missing")
-	ErrLineParsingInputComponentsMissing      = errors.New("input components missing")
-	ErrLineParsingNonSettableField            = errors.New("field is not settable")
-	ErrLineParsingDataParsingError            = errors.New("data parsing error")
-	ErrLineParsingInvalidDateFormat           = errors.New("invalid date format")
-	ErrLineParsingUnsupportedDataType         = errors.New("unsupported data type")
-	ErrLineParsingReservedFieldPosReference   = errors.New("field position 1 and 2 are reserved")
+	ErrLineParsingEmptyInput                    = errors.New("empty input")
+	ErrLineParsingHeaderTooShort                = errors.New("header too short")
+	ErrLineParsingNotEnoughFields               = errors.New("not enough input fields in line")
+	ErrLineParsingSequenceNumberMismatch        = errors.New("sequence number mismatch")
+	ErrLineParsingRequiredInputFieldMissing     = errors.New("required input field missing")
+	ErrLineParsingInputComponentsMissing        = errors.New("input components missing")
+	ErrLineParsingNonSettableField              = errors.New("field is not settable")
+	ErrLineParsingDataParsingError              = errors.New("data parsing error")
+	ErrLineParsingInvalidDateFormat             = errors.New("invalid date format")
+	ErrLineParsingUnsupportedDataType           = errors.New("unsupported data type")
+	ErrLineParsingReservedFieldPosReference     = errors.New("field position 1 and 2 are reserved")
+	ErrLineParsingUnterminatedEscapeSequence    = errors.New("unterminated escape sequence")
+	ErrLineParsingUnknownEscapeSequence         = errors.New("unknown escape sequence")
+	ErrLineParsingMaximumRecursionDepthExceeded = errors.New("line parsing maximum recursion depth exceeded")
+	ErrLineParsingInvalidRecursionDepth         = errors.New("invalid recursion depth")
+	ErrLineParsingLineTagMismatch               = errors.New("line tag mismatch") // Note: special error used in ParseStruct
 )
 
 // StructureParsing
 var (
-	ErrStructureParsingMaxDepthReached      = errors.New("max depth reached")
-	ErrStructureParsingInputLinesDepleted   = errors.New("input lines depleted")
-	ErrStructureParsingLineTypeNameMismatch = errors.New("line type name mismatch")
+	ErrStructureParsingMaxDepthReached    = errors.New("max depth reached")
+	ErrStructureParsingInputLinesDepleted = errors.New("input lines depleted")
+	ErrStructureParsingEmptyStructure     = errors.New("empty structure") //Note: special error for all optional array end find in ParseStruct
 )
 
 // LineBuilding
 var (
-	ErrLineBuildingInvalidDateFormat           = errors.New("invalid date format")
-	ErrLineBuildingUsupportedDataType          = errors.New("unsupported data type")
-	ErrLineBuildingReservedFieldPosReference   = errors.New("field position 1 and 2 are reserved")
-	ErrLineBuildingInvalidLengthAttributeValue = errors.New("invalid length attribute value")
+	ErrLineBuildingInvalidDateFormat             = errors.New("invalid date format")
+	ErrLineBuildingUsupportedDataType            = errors.New("unsupported data type")
+	ErrLineBuildingReservedFieldPosReference     = errors.New("field position 1 and 2 are reserved")
+	ErrLineBuildingInvalidLengthAttributeValue   = errors.New("invalid length attribute value")
+	ErrLineBuildingMaximumRecursionDepthExceeded = errors.New("line building maximum recursion depth exceeded")
+	ErrLineBuildingInvalidRecursionDepth         = errors.New("invalid recursion depth")
 )

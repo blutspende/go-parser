@@ -1,14 +1,14 @@
-package astm
+package parser
 
 import (
 	"github.com/blutspende/bloodlab-common/encoding"
-	"github.com/blutspende/go-astm/v3/functions"
-	"github.com/blutspende/go-astm/v3/models/astmmodels"
+	"github.com/blutspende/go-parser/functions"
+	"github.com/blutspende/go-parser/pconfig"
 )
 
-func Unmarshal(messageData []byte, targetStruct interface{}, configuration ...astmmodels.Configuration) (err error) {
-	// Load configuration
-	config, err := loadConfiguration(configuration...)
+func Unmarshal(messageData []byte, targetStruct interface{}, config *pconfig.Configuration) (err error) {
+	// Init configuration
+	err = pconfig.InitConfig(config)
 	if err != nil {
 		return err
 	}
@@ -23,8 +23,7 @@ func Unmarshal(messageData []byte, targetStruct interface{}, configuration ...as
 		return err
 	}
 	// Parse the lines into the target structure
-	lineIndex := 0
-	err = functions.ParseStruct(lines, targetStruct, &lineIndex, 1, 0, config)
+	err = functions.ParseStruct(lines, targetStruct, config)
 	if err != nil {
 		return err
 	}
