@@ -26,7 +26,7 @@ type OBR struct {
 	PlacerField2                        string    `hl7:"POS=20" json:"placerField2,omitempty"`
 	FillerField1                        string    `hl7:"POS=21" json:"fillerField1,omitempty"`
 	FillerField2                        string    `hl7:"POS=22" json:"fillerField2,omitempty"`
-	ResultsRptStatusChngDateTime        time.Time `hl7:"POS=23" json:"resultsRptStatusChngDateTime,omitempty"`
+	ResultsRptStatusChangeDateTime      time.Time `hl7:"POS=23" json:"resultsRptStatusChangeDateTime,omitempty"`
 	ChargeToPractice                    CM_MOC    `hl7:"POS=24" json:"chargeToPractice,omitempty"`
 	DiagnosticServiceSectionID          string    `hl7:"POS=25" json:"diagnosticServiceSectionID,omitempty"`
 	ResultStatus                        string    `hl7:"POS=26" json:"resultStatus,omitempty"`

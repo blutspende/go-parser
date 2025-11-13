@@ -208,7 +208,7 @@ func TestCit_OUL_R21(t *testing.T) {
 	assert.Equal(t, 1, message.OrderObservation[0].ObservationRequest.SetID)
 	assert.Equal(t, "AA4F1A1A6J", message.OrderObservation[0].CommonOrder.PlacerOrderNumber.EntityIdentifier)
 	assert.Equal(t, "ALL", message.OrderObservation[0].ObservationRequest.UniversalServiceIdentifier.Identifier)
-	assert.Equal(t, time.Time(time.Date(2022, time.July, 11, 5, 55, 20, 0, time.UTC)), message.OrderObservation[0].ObservationRequest.RequestedDateTime)
+	assert.Equal(t, time.Date(2022, time.July, 11, 5, 55, 20, 0, time.UTC), message.OrderObservation[0].ObservationRequest.RequestedDateTime)
 	assert.Equal(t, "1", message.OrderObservation[0].ObservationRequest.SpecimenSource.SourceNameOrCode.Identifier)
 	assert.Equal(t, "P", message.OrderObservation[0].ObservationRequest.SpecimenSource.Role.Identifier)
 	// field 1 missing
@@ -221,13 +221,13 @@ func TestCit_OUL_R21(t *testing.T) {
 	assert.Equal(t, "-1^2.14", message.OrderObservation[0].Observation[0].Observation.ObservationValue[0])
 	assert.Equal(t, "N", message.OrderObservation[0].Observation[0].Observation.AbnormalFlags[0])
 	assert.Equal(t, "F", message.OrderObservation[0].Observation[0].Observation.ResultStatus)
-	assert.Equal(t, time.Time(time.Date(2022, time.July, 11, 10, 27, 49, 0, time.UTC)), message.OrderObservation[0].Observation[0].Observation.DateTimeOfObservation)
+	assert.Equal(t, time.Date(2022, time.July, 11, 10, 27, 49, 0, time.UTC), message.OrderObservation[0].Observation[0].Observation.DateTimeOfObservation)
 	assert.Equal(t, "CCM2-c8k-5-1859-10#e801#2#2", message.OrderObservation[0].Observation[0].Observation.ProducersID.AlternateIdentifier)
 	assert.Equal(t, "bmserv^SYSTEM", message.OrderObservation[0].Observation[0].Observation.ResponsibleObserver.ID)
 	// Note: this no longer fails, as the "System" is properly parsed out
 	assert.Equal(t, "System", message.OrderObservation[0].Observation[0].Observation.ResponsibleObserver.FamilyName.Surname)
 	assert.Equal(t, "CCM2-c8k-5-1859-10#e801#2#2", message.OrderObservation[0].Observation[0].Observation.EquipmentInstanceIdentifier.EntityIdentifier)
-	assert.Equal(t, time.Time(time.Date(2022, time.July, 11, 10, 27, 49, 0, time.UTC)), message.OrderObservation[0].Observation[0].Observation.DateTimeOfTheAnalysis)
+	assert.Equal(t, time.Date(2022, time.July, 11, 10, 27, 49, 0, time.UTC), message.OrderObservation[0].Observation[0].Observation.DateTimeOfTheAnalysis)
 	// TCD
 	assert.Equal(t, "1", message.OrderObservation[0].Observation[0].TestCodeDetail.UniversalServiceIdentifier.Identifier)
 	assert.Equal(t, "AHBC2-R", message.OrderObservation[0].Observation[0].TestCodeDetail.AntiDilutionFactor.Comparator)

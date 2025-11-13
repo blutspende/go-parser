@@ -1,10 +1,11 @@
 package functions
 
 import (
+	"testing"
+
 	"github.com/blutspende/go-parser/enums/lineseparator"
 	"github.com/blutspende/go-parser/errmsg"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 // Default line separator config

@@ -14,7 +14,7 @@ type MSH struct {
 	MessageType                         string    `hl7:"POS=9.1" json:"MessageType,omitempty"`
 	MessageTriggerEvent                 string    `hl7:"POS=9.2" json:"MessageTriggerEvent,omitempty"`
 	MessageControlID                    string    `hl7:"POS=10" json:"MessageControlID,omitempty"`
-	ProccessingID                       string    `hl7:"POS=11" json:"ProccessingID,omitempty"`
+	ProcessingID                        string    `hl7:"POS=11" json:"ProcessingID,omitempty"`
 	VersionID                           string    `hl7:"POS=12" json:"VersionID,omitempty"`
 	SequenceNumber                      *int      `hl7:"POS=13" json:"SequenceNumber,omitempty"`
 	ContinuationPointer                 string    `hl7:"POS=14" json:"ContinuationPointer,omitempty"`

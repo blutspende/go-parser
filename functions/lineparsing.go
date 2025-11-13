@@ -147,7 +147,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 				} else {
 					// |value1\value2\value3|
 					// Simple values in the array
-					err = setField(repeat, arrayValue.Index(j), targetFieldAnnotation, config)
+					err = setField(repeat, arrayValue.Index(j), config)
 					if err != nil {
 						return err
 					}
@@ -168,7 +168,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 					continue
 				}
 			}
-			err = setField(components[targetFieldAnnotation.ComponentPos-1], targetValues[i], targetFieldAnnotation, config)
+			err = setField(components[targetFieldAnnotation.ComponentPos-1], targetValues[i], config)
 			if err != nil {
 				return err
 			}
@@ -182,7 +182,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		} else {
 			// |field|
 			// Field is not an array or component (normal singular field)
-			err = setField(inputField, targetValues[i], targetFieldAnnotation, config)
+			err = setField(inputField, targetValues[i], config)
 			if err != nil {
 				return err
 			}
@@ -249,7 +249,7 @@ func parseSubstructure(inputString string, targetStruct interface{}, depth int, 
 			err = parseSubstructure(inputField, targetValues[i].Addr().Interface(), depth+1, config)
 		} else {
 			// Field is single value: set it
-			err = setField(inputField, targetValues[i], targetFieldAnnotation, config)
+			err = setField(inputField, targetValues[i], config)
 		}
 		if err != nil {
 			return err
@@ -260,7 +260,7 @@ func parseSubstructure(inputString string, targetStruct interface{}, depth int, 
 	return nil
 }
 
-func setField(value string, field reflect.Value, annotation models.FieldAnnotation, config *pconfig.Configuration) (err error) {
+func setField(value string, field reflect.Value, config *pconfig.Configuration) (err error) {
 	// Ensure the field is settable
 	if !field.CanSet() {
 		// Field is not settable
@@ -322,7 +322,7 @@ func setField(value string, field reflect.Value, annotation models.FieldAnnotati
 				timeFormat = "20060102" // YYYYMMDD
 				isShort = true
 			case 14:
-				timeFormat = "20060102150405" // YYYYMMDDHHMMSS
+				timeFormat = "20060102150405" // YYYYMMDDhhmmss
 				isShort = false
 			default:
 				return errmsg.ErrLineParsingInvalidDateFormat

@@ -83,7 +83,7 @@ type XON struct {
 	CodeIdentifyingTheCheckDigitSchemeEmployed string   `hl7:"POS=5" json:"codeIdentifyingTheCheckDigitSchemeEmployed,omitempty"`
 	AssigningAuthority                         HD       `hl7:"POS=6" json:"assigningAuthority,omitempty"`
 	IdentifierTypeCode                         string   `hl7:"POS=7" json:"identifierTypeCode,omitempty"`
-	AssigningFAcilityId                        HD       `hl7:"POS=8" json:"assigningFAcilityId,omitempty"`
+	AssigningFacilityId                        HD       `hl7:"POS=8" json:"assigningFacilityId,omitempty"`
 	NameRepresentationCode                     string   `hl7:"POS=9" json:"nameRepresentationCode,omitempty"`
 }
 

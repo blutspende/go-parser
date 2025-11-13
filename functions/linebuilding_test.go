@@ -471,12 +471,12 @@ func TestBuildLine_SubstructureArrayRecord(t *testing.T) {
 	source := SubstructureArrayRecord{
 		First: "first",
 		Second: []SubstructureField{
-			SubstructureField{
+			{
 				FirstComponent:  "r1c1",
 				SecondComponent: "r1c2",
 				ThirdComponent:  "r1c3",
 			},
-			SubstructureField{
+			{
 				FirstComponent:  "r2c1",
 				SecondComponent: "r2c2",
 				ThirdComponent:  "r2c3",

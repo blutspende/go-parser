@@ -27,12 +27,12 @@ func TestMain(m *testing.M) {
 }
 
 // Encoding helper function
-func helperEncode(charmap *charmap.Charmap, data []byte) []byte {
-	e := charmap.NewEncoder()
+func helperEncode(charMap *charmap.Charmap, data []byte) []byte {
+	e := charMap.NewEncoder()
 	var b bytes.Buffer
 	writer := transform.NewWriter(&b, e)
-	writer.Write(data)
-	resultdata := b.Bytes()
-	writer.Close()
-	return resultdata
+	_, _ = writer.Write(data)
+	result := b.Bytes()
+	_ = writer.Close()
+	return result
 }

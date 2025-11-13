@@ -199,7 +199,7 @@ func TestCustomRecord(t *testing.T) {
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, float32(4.14159), message.CustomRecord.Float32Value)
-	assert.Equal(t, float64(2.172), message.CustomRecord.Float64Value)
+	assert.Equal(t, 2.172, message.CustomRecord.Float64Value)
 	// Teardown
 	teardown()
 }
@@ -342,9 +342,9 @@ func TestGermanLanguage_Windows1252(t *testing.T) {
 	messageString += "L|1|N\n"
 	var message MessageGermanLanguageTest
 	config.Encoding = encoding.Windows1252
-	encodedMessageString := helperEncode(charmap.Windows1252, []byte(messageString))
+	encodedMessageBytes := helperEncode(charmap.Windows1252, []byte(messageString))
 	// Act
-	err := parser.Unmarshal([]byte(encodedMessageString), &message, config)
+	err := parser.Unmarshal(encodedMessageBytes, &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "König", message.Patient.LastName)
@@ -360,9 +360,9 @@ func TestGermanLanguage_ISO8859_1(t *testing.T) {
 	messageString += "L|1|N\n"
 	var message MessageGermanLanguageTest
 	config.Encoding = encoding.ISO8859_1
-	encodedMessageString := helperEncode(charmap.ISO8859_1, []byte(messageString))
+	encodedMessageBytes := helperEncode(charmap.ISO8859_1, []byte(messageString))
 	// Act
-	err := parser.Unmarshal([]byte(encodedMessageString), &message, config)
+	err := parser.Unmarshal(encodedMessageBytes, &message, config)
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, "König", message.Patient.LastName)
@@ -662,7 +662,7 @@ func TestYumizenMultiTypeManufacturerInfo(t *testing.T) {
 func TestEncodingVeryLongCharsets(t *testing.T) {
 	// This test is for a bug reported in which the decodes message couldn't exceed 4096 bytes
 	// Arrange
-	veryLongMessage := []byte{}
+	var veryLongMessage []byte
 	for i := 0; i < 1000; i++ {
 		veryLongMessage = append(veryLongMessage, []byte("Ich bin ein sehr langer Text")...)
 	}

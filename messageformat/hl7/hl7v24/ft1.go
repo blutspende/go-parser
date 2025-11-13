@@ -18,7 +18,7 @@ type FT1 struct {
 	DepartmentCode            CE        `hl7:"POS=14" json:"DepartmentCode,omitempty"`
 	InsurancePlanID           CE        `hl7:"POS=15" json:"InsurancePlanID,omitempty"`
 	InsuranceAmount           CP        `hl7:"POS=16" json:"InsuranceAmount,omitempty"`
-	AssignedPatientLocaton    PL        `hl7:"POS=17" json:"AssignedPatientLocaton,omitempty"`
+	AssignedPatientLocation   PL        `hl7:"POS=17" json:"AssignedPatientLocation,omitempty"`
 	FeeSchedule               string    `hl7:"POS=18" json:"FeeSchedule,omitempty"`
 	PatientType               string    `hl7:"POS=19" json:"PatientType,omitempty"`
 	DiagnosisCodeFT1          []CE      `hl7:"POS=20" json:"DiagnosisCodeFT1,omitempty"`

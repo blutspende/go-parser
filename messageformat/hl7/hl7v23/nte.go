@@ -4,6 +4,6 @@ package hl7v23
 // https://hl7-definition.caristix.com/v2/HL7v2.3/Segments/NTE
 type NTE struct {
 	SetID           int    `hl7:"POS=2;ATR=sequence" json:"commentID,omitempty"`
-	SourceOfcomment string `hl7:"POS=3" json:"sourceOfcomment,omitempty"`
+	SourceOfComment string `hl7:"POS=3" json:"sourceOfComment,omitempty"`
 	Comment         string `hl7:"POS=4" json:"comment,omitempty"`
 }

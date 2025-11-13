@@ -2,7 +2,7 @@ package hl7v24
 
 import "time"
 
-// HL7 v2.4 - OBR - Observation Reques
+// HL7 v2.4 - OBR - Observation Request
 // https://hl7-definition.caristix.com/v2/HL7v2.4/Segments/OBR
 type OBR struct {
 	SetID                                int       `hl7:"POS=2;ATR=sequence" json:"SetID,omitempty"`
@@ -26,7 +26,7 @@ type OBR struct {
 	PlacerField2                         string    `hl7:"POS=20" json:"PlacerField2,omitempty"`
 	FillerField1                         string    `hl7:"POS=21" json:"FillerField1,omitempty"`
 	FillerField2                         string    `hl7:"POS=22" json:"FillerField2,omitempty"`
-	ResultsRptStatusChngDateTime         time.Time `hl7:"POS=23" json:"ResultsRptStatusChngDateTime,omitempty"`
+	ResultsRptStatusChangeDateTime       time.Time `hl7:"POS=23" json:"ResultsRptStatusChangeDateTime,omitempty"`
 	ChargeToPractice                     MOC       `hl7:"POS=24" json:"ChargeToPractice,omitempty"`
 	DiagnosticServiceSectionID           string    `hl7:"POS=25" json:"DiagnosticServiceSectionID,omitempty"`
 	ResultStatus                         string    `hl7:"POS=26" json:"ResultStatus,omitempty"`
@@ -51,5 +51,5 @@ type OBR struct {
 	ProcedureCode                        CE        `hl7:"POS=45" json:"ProcedureCode,omitempty"`
 	ProcedureCodeModifier                []CE      `hl7:"POS=46" json:"ProcedureCodeModifier,omitempty"`
 	PlacerSupplementalServiceInformation []CE      `hl7:"POS=47" json:"PlacerSupplementalServiceInformation,omitempty"`
-	FillerSupplementalSErviceInformation []CE      `hl7:"POS=48" json:"FillerSupplementalSErviceInformation,omitempty"`
+	FillerSupplementalServiceInformation []CE      `hl7:"POS=48" json:"FillerSupplementalServiceInformation,omitempty"`
 }

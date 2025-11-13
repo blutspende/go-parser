@@ -8,7 +8,7 @@ type PD1 struct {
 	LivingDependency                  []string  `hl7:"POS=2" json:"LivingDependency,omitempty"`
 	LivingArrangement                 string    `hl7:"POS=3" json:"LivingArrangement,omitempty"`
 	PrimaryFacility                   []XON     `hl7:"POS=4" json:"PrimaryFacility,omitempty"`
-	PrimaryCarePrvoider               []XCN     `hl7:"POS=5" json:"PrimaryCarePrvoider,omitempty"`
+	PrimaryCareProvider               []XCN     `hl7:"POS=5" json:"PrimaryCareProvider,omitempty"`
 	StudentIndicator                  string    `hl7:"POS=6" json:"StudentIndicator,omitempty"`
 	Handicap                          string    `hl7:"POS=7" json:"Handicap,omitempty"`
 	LivingWill                        string    `hl7:"POS=8" json:"LivingWill,omitempty"`

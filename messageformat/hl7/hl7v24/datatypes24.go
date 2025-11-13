@@ -172,8 +172,8 @@ type XON struct {
 	CheckDigit                                 string   `hl7:"POS=4" json:"CheckDigit,omitempty"`
 	CodeIdentifyingTheCheckDigitSchemeEmployed string   `hl7:"POS=5" json:"CodeIdentifyingTheCheckDigitSchemeEmployed,omitempty"`
 	AssigningAuthority                         HD       `hl7:"POS=6" json:"AssigningAuthority,omitempty"`
-	IdentifyerTypeCode                         string   `hl7:"POS=7" json:"IdentifyerTypeCode,omitempty"`
-	AssigningFAcilityId                        HD       `hl7:"POS=8" json:"AssigningFAcilityId,omitempty"`
+	IdentifierTypeCode                         string   `hl7:"POS=7" json:"IdentifierTypeCode,omitempty"`
+	AssigningFacilityId                        HD       `hl7:"POS=8" json:"AssigningFacilityId,omitempty"`
 	NameRepresentationCode                     string   `hl7:"POS=9" json:"NameRepresentationCode,omitempty"`
 }
 
@@ -361,18 +361,18 @@ type EIP struct {
 // HL7 v2.4 - TQ - Timing Quantity
 // https://hl7-definition.caristix.com/v2/HL7v2.4/DataTypes/TQ
 type TQ struct {
-	Quantity          CQ        `hl7:"POS=1" json:"Quantity,omitempty"`
-	Interval          RI        `hl7:"POS=2" json:"Interval,omitempty"`
-	Duration          string    `hl7:"POS=3" json:"Duration,omitempty"`
-	StartDatetime     time.Time `hl7:"POS=4" json:"StartDatetime,omitempty"`
-	EndDatetime       time.Time `hl7:"POS=5" json:"EndDatetime,omitempty"`
-	Priority          string    `hl7:"POS=6" json:"Priority,omitempty"`
-	Condition         string    `hl7:"POS=7" json:"Condition,omitempty"`
-	Text              string    `hl7:"POS=8" json:"Text,omitempty"`
-	Conjunction       string    `hl7:"POS=9" json:"Conjunction,omitempty"`
-	OrderSequencing   OSD       `hl7:"POS=10" json:"OrderSequencing,omitempty"`
-	OccurenceDuration CE        `hl7:"POS=11" json:"OccurenceDuration,omitempty"`
-	TotalOccurences   *float32  `hl7:"POS=12" json:"TotalOccurences,omitempty"`
+	Quantity           CQ        `hl7:"POS=1" json:"Quantity,omitempty"`
+	Interval           RI        `hl7:"POS=2" json:"Interval,omitempty"`
+	Duration           string    `hl7:"POS=3" json:"Duration,omitempty"`
+	StartDatetime      time.Time `hl7:"POS=4" json:"StartDatetime,omitempty"`
+	EndDatetime        time.Time `hl7:"POS=5" json:"EndDatetime,omitempty"`
+	Priority           string    `hl7:"POS=6" json:"Priority,omitempty"`
+	Condition          string    `hl7:"POS=7" json:"Condition,omitempty"`
+	Text               string    `hl7:"POS=8" json:"Text,omitempty"`
+	Conjunction        string    `hl7:"POS=9" json:"Conjunction,omitempty"`
+	OrderSequencing    OSD       `hl7:"POS=10" json:"OrderSequencing,omitempty"`
+	OccurrenceDuration CE        `hl7:"POS=11" json:"OccurrenceDuration,omitempty"`
+	TotalOccurrences   *float32  `hl7:"POS=12" json:"TotalOccurrences,omitempty"`
 }
 
 // CQ - Composite Quantity With Units

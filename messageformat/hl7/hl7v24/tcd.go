@@ -8,7 +8,7 @@ type TCD struct {
 	RerunDilutionFactor                   SN     `hl7:"POS=4" json:"RerunDilutionFactor,omitempty"`
 	PreDilutionFActor                     SN     `hl7:"POS=5" json:"PreDilutionFActor,omitempty"`
 	EndogenousContentOfPreDilutionDiluent SN     `hl7:"POS=6" json:"EndogenousContentOfPreDilutionDiluent,omitempty"`
-	AutomaticRepeatAlowwed                string `hl7:"POS=7" json:"AutomaticRepeatAlowwed,omitempty"`
+	AutomaticRepeatAllowed                string `hl7:"POS=7" json:"AutomaticRepeatAllowed,omitempty"`
 	ReflexAllowed                         string `hl7:"POS=8" json:"ReflexAllowed,omitempty"`
 	AnalyteRepeatStatus                   CE     `hl7:"POS=9" json:"AnalyteRepeatStatus,omitempty"`
 }

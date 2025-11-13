@@ -26,7 +26,7 @@ type IN1 struct {
 	InsuredAddress                 []XAD     `hl7:"POS=20" json:"insuredAddress,omitempty"`
 	AssignmentOfBenefits           string    `hl7:"POS=21" json:"assignmentOfBenefits,omitempty"`
 	CoordinationOfBenefits         string    `hl7:"POS=22" json:"coordinationOfBenefits,omitempty"`
-	CoordinationOfBenefitsPrio     string    `hl7:"POS=23" json:"coordinationOfBenefitsPrio,omitempty"`
+	CoordinationOfBenefitsPriority string    `hl7:"POS=23" json:"coordinationOfBenefitsPriority,omitempty"`
 	NoticeOfAdmissionCode          string    `hl7:"POS=24" json:"noticeOfAdmissionCode,omitempty"`
 	NoticeOfAdmissionDate          time.Time `hl7:"POS=25;ATR=date" json:"noticeOfAdmissionDate,omitempty"`
 	ReportOfEligibilityCode        string    `hl7:"POS=26" json:"reportOfEligibilityCode,omitempty"`

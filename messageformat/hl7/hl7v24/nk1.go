@@ -23,7 +23,7 @@ type NK1 struct {
 	DOB                                      time.Time `hl7:"POS=17" json:"DOB,omitempty"`
 	LivingDependency                         []string  `hl7:"POS=18" json:"LivingDependency,omitempty"`
 	AmbulatoryStatus                         []string  `hl7:"POS=19" json:"AmbulatoryStatus,omitempty"`
-	Citzenship                               []CE      `hl7:"POS=20" json:"Citzenship,omitempty"`
+	Citizenship                              []CE      `hl7:"POS=20" json:"Citizenship,omitempty"`
 	PrimaryLanguage                          CE        `hl7:"POS=21" json:"PrimaryLanguage,omitempty"`
 	LivingArrangement                        string    `hl7:"POS=22" json:"LivingArrangement,omitempty"`
 	PublicityCode                            CE        `hl7:"POS=23" json:"PublicityCode,omitempty"`
