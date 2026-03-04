@@ -1,0 +1,41 @@
+package hl7v26
+
+// ORN_O08_RESPONSE - Group struct
+type ORN_O08_RESPONSE struct {
+	Patient ORN_O08_RESPONSE_PATIENT `hl7:"GROUP;ATR=optional"`
+	Order []ORN_O08_RESPONSE_ORDER `hl7:"GROUP"`
+}
+
+// ORN_O08_RESPONSE_PATIENT - Group struct
+type ORN_O08_RESPONSE_PATIENT struct {
+	PatientIdentification PID `hl7:"TAG=PID"`
+	NotesAndComments []NTE `hl7:"TAG=NTE;ATR=optional"`
+}
+
+// ORN_O08_RESPONSE_ORDER - Group struct
+type ORN_O08_RESPONSE_ORDER struct {
+	CommonOrder ORC `hl7:"TAG=ORC"`
+	Timing []ORN_O08_RESPONSE_ORDER_TIMING `hl7:"GROUP;ATR=optional"`
+	RequisitionDetail RQD `hl7:"TAG=RQD"`
+	RequisitionDetail1 RQ1 `hl7:"TAG=RQ1;ATR=optional"`
+	NotesAndComments []NTE `hl7:"TAG=NTE;ATR=optional"`
+}
+
+// ORN_O08_RESPONSE_ORDER_TIMING - Group struct
+type ORN_O08_RESPONSE_ORDER_TIMING struct {
+	TimingQuantity TQ1 `hl7:"TAG=TQ1"`
+	TimingQuantityRelationship []TQ2 `hl7:"TAG=TQ2;ATR=optional"`
+}
+
+// ORN_O08 - Non-Stock Requisition Order Acknowledgement
+// https://hl7-definition.caristix.com/v2/HL7v2.6/TriggerEvents/ORN_O08
+type ORN_O08 struct {
+	MessageHeader MSH `hl7:"TAG=MSH"`
+	MessageAcknowledgment MSA `hl7:"TAG=MSA"`
+	Error []ERR `hl7:"TAG=ERR;ATR=optional"`
+	SoftwareSegment []SFT `hl7:"TAG=SFT;ATR=optional"`
+	UserAuthenticationCredential UAC `hl7:"TAG=UAC;ATR=optional"`
+	NotesAndComments []NTE `hl7:"TAG=NTE;ATR=optional"`
+	Response ORN_O08_RESPONSE `hl7:"GROUP;ATR=optional"`
+}
+

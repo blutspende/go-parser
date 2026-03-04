@@ -1,0 +1,33 @@
+package hl7v22
+
+import "time"
+
+// IN3 - Insurance Additional Info-certification
+// https://hl7-definition.caristix.com/v2/HL7v2.2/Segments/IN3
+type IN3 struct {
+	SetID                              int       `hl7:"POS=2;ATR=sequence"`
+	CertificationNumber                string    `hl7:"POS=3"`
+	CertifiedBy                        CN_PERSON `hl7:"POS=4"`
+	CertificationRequired              string    `hl7:"POS=5"`
+	Penalty                            CM_PEN    `hl7:"POS=6"`
+	CertificationDateTime              time.Time `hl7:"POS=7"`
+	CertificationModifyDateTime        time.Time `hl7:"POS=8"`
+	Operator                           CN_PERSON `hl7:"POS=9"`
+	CertificationBeginDate             time.Time `hl7:"POS=10;ATR=date"`
+	CertificationEndDate               time.Time `hl7:"POS=11;ATR=date"`
+	Days                               CM_DTN    `hl7:"POS=12"`
+	NonConcurCodeDescription           CE        `hl7:"POS=13"`
+	NonConcurEffectiveDateTime         time.Time `hl7:"POS=14"`
+	PhysicianReviewer                  CN_PERSON `hl7:"POS=15"`
+	CertificationContact               string    `hl7:"POS=16"`
+	CertificationContactPhoneNumber    []string  `hl7:"POS=17"`
+	AppealReason                       CE        `hl7:"POS=18"`
+	CertificationAgency                CE        `hl7:"POS=19"`
+	CertificationAgencyPhoneNumber     []string  `hl7:"POS=20"`
+	PreCertificationRequiredWindow     []CM_PCF  `hl7:"POS=21"`
+	CaseManager                        string    `hl7:"POS=22"`
+	SecondOpinionDate                  time.Time `hl7:"POS=23;ATR=date"`
+	SecondOpinionStatus                string    `hl7:"POS=24"`
+	SecondOpinionDocumentationReceived string    `hl7:"POS=25"`
+	SecondOpinionPractitioner          CN_PERSON `hl7:"POS=26"`
+}

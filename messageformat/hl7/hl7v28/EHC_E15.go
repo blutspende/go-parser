@@ -1,0 +1,51 @@
+package hl7v28
+
+// EHC_E15_PAYMENT_REMITTANCE_HEADER_INFO - Group struct
+type EHC_E15_PAYMENT_REMITTANCE_HEADER_INFO struct {
+	PaymentInformation []PMT `hl7:"TAG=PMT;ATR=optional"`
+	PayeeInformation PYE `hl7:"TAG=PYE"`
+}
+
+// EHC_E15_PAYMENT_REMITTANCE_DETAIL_INFO - Group struct
+type EHC_E15_PAYMENT_REMITTANCE_DETAIL_INFO struct {
+	InvoiceProcessingResults IPR `hl7:"TAG=IPR"`
+	InvoiceSegment IVC `hl7:"TAG=IVC"`
+	Product_service_section []EHC_E15_PAYMENT_REMITTANCE_DETAIL_INFO_PRODUCT_SERVICE_SECTION `hl7:"GROUP"`
+}
+
+// EHC_E15_PAYMENT_REMITTANCE_DETAIL_INFO_PRODUCT_SERVICE_SECTION - Group struct
+type EHC_E15_PAYMENT_REMITTANCE_DETAIL_INFO_PRODUCT_SERVICE_SECTION struct {
+	ProductServiceSection PSS `hl7:"TAG=PSS"`
+	Product_service_group []EHC_E15_PAYMENT_REMITTANCE_DETAIL_INFO_PRODUCT_SERVICE_SECTION_PRODUCT_SERVICE_GROUP `hl7:"GROUP"`
+}
+
+// EHC_E15_PAYMENT_REMITTANCE_DETAIL_INFO_PRODUCT_SERVICE_SECTION_PRODUCT_SERVICE_GROUP - Group struct
+type EHC_E15_PAYMENT_REMITTANCE_DETAIL_INFO_PRODUCT_SERVICE_SECTION_PRODUCT_SERVICE_GROUP struct {
+	ProductServiceGroup PSG `hl7:"TAG=PSG"`
+	Psl_item_info []EHC_E15_PAYMENT_REMITTANCE_DETAIL_INFO_PRODUCT_SERVICE_SECTION_PRODUCT_SERVICE_GROUP_PSL_ITEM_INFO `hl7:"GROUP"`
+}
+
+// EHC_E15_PAYMENT_REMITTANCE_DETAIL_INFO_PRODUCT_SERVICE_SECTION_PRODUCT_SERVICE_GROUP_PSL_ITEM_INFO - Group struct
+type EHC_E15_PAYMENT_REMITTANCE_DETAIL_INFO_PRODUCT_SERVICE_SECTION_PRODUCT_SERVICE_GROUP_PSL_ITEM_INFO struct {
+	ProductServiceLineItem PSL `hl7:"TAG=PSL"`
+	Adjustment []ADJ `hl7:"TAG=ADJ;ATR=optional"`
+}
+
+// EHC_E15_ADJUSTMENT_PAYEE - Group struct
+type EHC_E15_ADJUSTMENT_PAYEE struct {
+	Adjustment ADJ `hl7:"TAG=ADJ"`
+	ParticipationInformation PRT `hl7:"TAG=PRT;ATR=optional"`
+	Role ROL `hl7:"TAG=ROL;ATR=optional"`
+}
+
+// EHC_E15 - Payment/Remittance Advice
+// https://hl7-definition.caristix.com/v2/HL7v2.8/TriggerEvents/EHC_E15
+type EHC_E15 struct {
+	MessageHeader MSH `hl7:"TAG=MSH"`
+	SoftwareSegment []SFT `hl7:"TAG=SFT;ATR=optional"`
+	UserAuthenticationCredentialSegment []UAC `hl7:"TAG=UAC;ATR=optional"`
+	Payment_remittance_header_info EHC_E15_PAYMENT_REMITTANCE_HEADER_INFO `hl7:"GROUP"`
+	Payment_remittance_detail_info []EHC_E15_PAYMENT_REMITTANCE_DETAIL_INFO `hl7:"GROUP;ATR=optional"`
+	Adjustment_payee []EHC_E15_ADJUSTMENT_PAYEE `hl7:"GROUP;ATR=optional"`
+}
+

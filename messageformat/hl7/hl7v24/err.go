@@ -1,7 +1,8 @@
 package hl7v24
 
-// HL7 v2.4 - ERR - Error
+// ERR - Error
 // https://hl7-definition.caristix.com/v2/HL7v2.4/Segments/ERR
 type ERR struct {
-	ErrorCodeAndLocation ELD `hl7:"POS=2" json:"ErrorCodeAndLocation,omitempty"`
+	ErrorCodeAndLocation []ELD `hl7:"POS=2"`
 }
+

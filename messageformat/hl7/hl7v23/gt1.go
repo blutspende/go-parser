@@ -2,60 +2,62 @@ package hl7v23
 
 import "time"
 
+// GT1 - Guarantor
+// https://hl7-definition.caristix.com/v2/HL7v2.3/Segments/GT1
 type GT1 struct {
-	SetID                         int       `hl7:"POS=2;ATR=sequence" json:"setId,omitempty"`
-	Number                        CX        `hl7:"POS=3" json:"number,omitempty"`
-	Name                          []XPN     `hl7:"POS=4" json:"name,omitempty"`
-	SpouseName                    []XPN     `hl7:"POS=5" json:"spouseName,omitempty"`
-	Address                       []XAD     `hl7:"POS=6" json:"address,omitempty"`
-	PhoneNumberHome               []XTN     `hl7:"POS=7" json:"phoneNumberHome,omitempty"`
-	PhoneNumberBusiness           []XTN     `hl7:"POS=8" json:"phoneNumberBusiness,omitempty"`
-	DateTimeOfBirth               time.Time `hl7:"POS=9;ATR=date" json:"dateTimeOfBirth,omitempty"`
-	Sex                           string    `hl7:"POS=10" json:"sex,omitempty"`
-	Type                          string    `hl7:"POS=11" json:"type,omitempty"`
-	Relationship                  string    `hl7:"POS=12" json:"relationship,omitempty"`
-	SSN                           string    `hl7:"POS=13" json:"ssn,omitempty"`
-	DateBegin                     time.Time `hl7:"POS=14;ATR=date" json:"dateBegin,omitempty"`
-	DateEnd                       time.Time `hl7:"POS=15;ATR=date" json:"dateEnd,omitempty"`
-	Priority                      *float32  `hl7:"POS=16" json:"priority,omitempty"`
-	Employer                      []XPN     `hl7:"POS=17" json:"employer,omitempty"`
-	EmployerAddress               []XAD     `hl7:"POS=18" json:"employerAddress,omitempty"`
-	EmployerPhoneNumber           []XTN     `hl7:"POS=19" json:"employerPhoneNumber,omitempty"`
-	EmployeeID                    CX        `hl7:"POS=20" json:"employeeID,omitempty"`
-	EmploymentStatus              string    `hl7:"POS=21" json:"employmentStatus,omitempty"`
-	Organization                  []XON     `hl7:"POS=22" json:"organization,omitempty"`
-	BillingHoldFlag               string    `hl7:"POS=23" json:"billingHoldFlag,omitempty"`
-	CreditRatingCode              CE        `hl7:"POS=24" json:"creditRatingCode,omitempty"`
-	DeathDateAndTime              time.Time `hl7:"POS=25" json:"deathDateAndTime,omitempty"`
-	DeathFlag                     string    `hl7:"POS=26" json:"deathFlag,omitempty"`
-	ChargeAdjustmentCode          CE        `hl7:"POS=27" json:"chargeAdjustmentCode,omitempty"`
-	HouseholdAnnualIncome         CP        `hl7:"POS=28" json:"householdAnnualIncome,omitempty"`
-	HouseholdSize                 *float32  `hl7:"POS=29" json:"householdSize,omitempty"`
-	EmployerIDNumber              []CX      `hl7:"POS=30" json:"employerIDNumber,omitempty"`
-	MaritalStatusCode             string    `hl7:"POS=31" json:"maritalStatusCode,omitempty"`
-	HireEffectiveDate             time.Time `hl7:"POS=32;ATR=date" json:"hireEffectiveDate,omitempty"`
-	EmploymentStopDAte            time.Time `hl7:"POS=33;ATR=date" json:"employmentStopDAte,omitempty"`
-	LivingDependency              string    `hl7:"POS=34" json:"livingDependency,omitempty"`
-	AmbulatoryStatusCode          string    `hl7:"POS=35" json:"ambulatoryStatusCode,omitempty"`
-	Citizenship                   string    `hl7:"POS=36" json:"citizenship,omitempty"`
-	PrimaryLanguage               CE        `hl7:"POS=37" json:"primaryLanguage,omitempty"`
-	LivingArrangement             string    `hl7:"POS=38" json:"livingArrangement,omitempty"`
-	PublicityIndicator            CE        `hl7:"POS=39" json:"publicityIndicator,omitempty"`
-	ProtectionIndicator           string    `hl7:"POS=40" json:"protectionIndicator,omitempty"`
-	StudentIndicator              string    `hl7:"POS=41" json:"studentIndicator,omitempty"`
-	Religion                      string    `hl7:"POS=42" json:"religion,omitempty"`
-	MothersMaidenName             XPN       `hl7:"POS=43" json:"mothersMaidenName,omitempty"`
-	NationalityCode               CE        `hl7:"POS=44" json:"nationalityCode,omitempty"`
-	EthnicGroup                   string    `hl7:"POS=45" json:"ethnicGroup,omitempty"`
-	ContactPersonsName            []XPN     `hl7:"POS=46" json:"contactPersonsName,omitempty"`
-	ContactPersonsTelephoneNumber []XTN     `hl7:"POS=47" json:"contactPersonsTelephoneNumber,omitempty"`
-	ContactReason                 CE        `hl7:"POS=48" json:"contactReason,omitempty"`
-	ContactRelationshipCode       string    `hl7:"POS=49" json:"contactRelationshipCode,omitempty"`
-	JobTitle                      string    `hl7:"POS=50" json:"jobTitle,omitempty"`
-	JobCode                       JCC       `hl7:"POS=51" json:"jobCode,omitempty"`
-	EmployersOrganizationName     []XON     `hl7:"POS=52" json:"employersOrganizationName,omitempty"`
-	Handicap                      string    `hl7:"POS=53" json:"handicap,omitempty"`
-	JobStatus                     string    `hl7:"POS=54" json:"jobStatus,omitempty"`
-	FinancialClass                FC        `hl7:"POS=55" json:"financialClass,omitempty"`
-	GuarantorRace                 string    `hl7:"POS=56" json:"guarantorRace,omitempty"`
+	SetID                              int       `hl7:"POS=2;ATR=sequence"`
+	GuarantorNumber                    []CX      `hl7:"POS=3"`
+	GuarantorName                      []XPN     `hl7:"POS=4"`
+	GuarantorSpouseName                []XPN     `hl7:"POS=5"`
+	GuarantorAddress                   []XAD     `hl7:"POS=6"`
+	GuarantorPhNumHome                 []XTN     `hl7:"POS=7"`
+	GuarantorPhNumBusiness             []XTN     `hl7:"POS=8"`
+	GuarantorDateTimeOfBirth           time.Time `hl7:"POS=9"`
+	GuarantorSex                       string    `hl7:"POS=10"`
+	GuarantorType                      string    `hl7:"POS=11"`
+	GuarantorRelationship              string    `hl7:"POS=12"`
+	GuarantorSsn                       string    `hl7:"POS=13"`
+	GuarantorDateBegin                 time.Time `hl7:"POS=14;ATR=date"`
+	GuarantorDateEnd                   time.Time `hl7:"POS=15;ATR=date"`
+	GuarantorPriority                  *int      `hl7:"POS=16"`
+	GuarantorEmployerName              []XPN     `hl7:"POS=17"`
+	GuarantorEmployerAddress           []XAD     `hl7:"POS=18"`
+	GuarantorEmployPhoneNumber         []XTN     `hl7:"POS=19"`
+	GuarantorEmployeeIDNumber          []CX      `hl7:"POS=20"`
+	GuarantorEmploymentStatus          string    `hl7:"POS=21"`
+	GuarantorOrganization              []XON     `hl7:"POS=22"`
+	GuarantorBillingHoldFlag           string    `hl7:"POS=23"`
+	GuarantorCreditRatingCode          CE        `hl7:"POS=24"`
+	GuarantorDeathDateAndTime          time.Time `hl7:"POS=25"`
+	GuarantorDeathFlag                 string    `hl7:"POS=26"`
+	GuarantorChargeAdjustmentCode      CE        `hl7:"POS=27"`
+	GuarantorHouseholdAnnualIncome     CP        `hl7:"POS=28"`
+	GuarantorHouseholdSize             *int      `hl7:"POS=29"`
+	GuarantorEmployerIDNumber          []CX      `hl7:"POS=30"`
+	GuarantorMaritalStatusCode         string    `hl7:"POS=31"`
+	GuarantorHireEffectiveDate         time.Time `hl7:"POS=32;ATR=date"`
+	EmploymentStopDate                 time.Time `hl7:"POS=33;ATR=date"`
+	LivingDependency                   string    `hl7:"POS=34"`
+	AmbulatoryStatusCode               string    `hl7:"POS=35"`
+	Citizenship                        string    `hl7:"POS=36"`
+	PrimaryLanguage                    CE        `hl7:"POS=37"`
+	LivingArrangement                  string    `hl7:"POS=38"`
+	PublicityIndicator                 CE        `hl7:"POS=39"`
+	ProtectionIndicator                string    `hl7:"POS=40"`
+	StudentIndicator                   string    `hl7:"POS=41"`
+	Religion                           string    `hl7:"POS=42"`
+	MothersMaidenName                  XPN       `hl7:"POS=43"`
+	NationalityCode                    CE        `hl7:"POS=44"`
+	EthnicGroup                        string    `hl7:"POS=45"`
+	ContactPersonsName                 []XPN     `hl7:"POS=46"`
+	ContactPersonsTelephoneNumber      []XTN     `hl7:"POS=47"`
+	ContactReason                      CE        `hl7:"POS=48"`
+	ContactRelationshipCode            string    `hl7:"POS=49"`
+	JobTitle                           string    `hl7:"POS=50"`
+	JobCodeClass                       JCC       `hl7:"POS=51"`
+	GuarantorEmployersOrganizationName []XON     `hl7:"POS=52"`
+	Handicap                           string    `hl7:"POS=53"`
+	JobStatus                          string    `hl7:"POS=54"`
+	GuarantorFinancialClass            FC        `hl7:"POS=55"`
+	GuarantorRace                      string    `hl7:"POS=56"`
 }

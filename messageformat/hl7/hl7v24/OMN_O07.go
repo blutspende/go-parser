@@ -1,0 +1,51 @@
+package hl7v24
+
+// OMN_O07_PATIENT - Group struct
+type OMN_O07_PATIENT struct {
+	PatientIdentification PID `hl7:"TAG=PID"`
+	PatientAdditionalDemographic PD1 `hl7:"TAG=PD1;ATR=optional"`
+	NotesAndComments []NTE `hl7:"TAG=NTE;ATR=optional"`
+	PatientVisit OMN_O07_PATIENT_PATIENT_VISIT `hl7:"GROUP;ATR=optional"`
+	Insurance []OMN_O07_PATIENT_INSURANCE `hl7:"GROUP;ATR=optional"`
+	Guarantor GT1 `hl7:"TAG=GT1;ATR=optional"`
+	PatientAllergyInformation []AL1 `hl7:"TAG=AL1;ATR=optional"`
+}
+
+// OMN_O07_PATIENT_PATIENT_VISIT - Group struct
+type OMN_O07_PATIENT_PATIENT_VISIT struct {
+	PatientVisit PV1 `hl7:"TAG=PV1"`
+	PatientVisitAdditionalInformation PV2 `hl7:"TAG=PV2;ATR=optional"`
+}
+
+// OMN_O07_PATIENT_INSURANCE - Group struct
+type OMN_O07_PATIENT_INSURANCE struct {
+	Insurance IN1 `hl7:"TAG=IN1"`
+	InsuranceAdditionalInformation IN2 `hl7:"TAG=IN2;ATR=optional"`
+	InsuranceAdditionalInformationCertification IN3 `hl7:"TAG=IN3;ATR=optional"`
+}
+
+// OMN_O07_ORDER - Group struct
+type OMN_O07_ORDER struct {
+	CommonOrder ORC `hl7:"TAG=ORC"`
+	RequisitionDetail RQD `hl7:"TAG=RQD"`
+	RequisitionDetail1 RQ1 `hl7:"TAG=RQ1;ATR=optional"`
+	NotesAndComments []NTE `hl7:"TAG=NTE;ATR=optional"`
+	Observation []OMN_O07_ORDER_OBSERVATION `hl7:"GROUP;ATR=optional"`
+	Billing BLG `hl7:"TAG=BLG;ATR=optional"`
+}
+
+// OMN_O07_ORDER_OBSERVATION - Group struct
+type OMN_O07_ORDER_OBSERVATION struct {
+	ObservationResult OBX `hl7:"TAG=OBX"`
+	NotesAndComments []NTE `hl7:"TAG=NTE;ATR=optional"`
+}
+
+// OMN_O07 - Non-stock requisition order
+// https://hl7-definition.caristix.com/v2/HL7v2.4/TriggerEvents/OMN_O07
+type OMN_O07 struct {
+	MessageHeader MSH `hl7:"TAG=MSH"`
+	NotesAndComments []NTE `hl7:"TAG=NTE;ATR=optional"`
+	Patient OMN_O07_PATIENT `hl7:"GROUP;ATR=optional"`
+	Order []OMN_O07_ORDER `hl7:"GROUP"`
+}
+

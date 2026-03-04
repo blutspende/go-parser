@@ -1,0 +1,46 @@
+package hl7v231
+
+import "time"
+
+// PV2 - Patient visit - additional information segment
+// https://hl7-definition.caristix.com/v2/HL7v2.3.1/Segments/PV2
+type PV2 struct {
+	PriorPendingLocation PL `hl7:"POS=2"`
+	AccommodationCode CE `hl7:"POS=3"`
+	AdmitReason CE `hl7:"POS=4"`
+	TransferReason CE `hl7:"POS=5"`
+	PatientValuables []string `hl7:"POS=6"`
+	PatientValuablesLocation string `hl7:"POS=7"`
+	VisitUserCode string `hl7:"POS=8"`
+	ExpectedAdmitDateTime time.Time `hl7:"POS=9"`
+	ExpectedDischargeDateTime time.Time `hl7:"POS=10"`
+	EstimatedLengthOfInpatientStay *int `hl7:"POS=11"`
+	ActualLengthOfInpatientStay *int `hl7:"POS=12"`
+	VisitDescription string `hl7:"POS=13"`
+	ReferralSourceCode []XCN `hl7:"POS=14"`
+	PreviousServiceDate time.Time `hl7:"POS=15;ATR=date"`
+	EmploymentIllnessRelatedIndicator string `hl7:"POS=16"`
+	PurgeStatusCode string `hl7:"POS=17"`
+	PurgeStatusDate time.Time `hl7:"POS=18;ATR=date"`
+	SpecialProgramCode string `hl7:"POS=19"`
+	RetentionIndicator string `hl7:"POS=20"`
+	ExpectedNumberOfInsurancePlans *int `hl7:"POS=21"`
+	VisitPublicityCode string `hl7:"POS=22"`
+	VisitProtectionIndicator string `hl7:"POS=23"`
+	ClinicOrganizationName []XON `hl7:"POS=24"`
+	PatientStatusCode string `hl7:"POS=25"`
+	VisitPriorityCode string `hl7:"POS=26"`
+	PreviousTreatmentDate time.Time `hl7:"POS=27;ATR=date"`
+	ExpectedDischargeDisposition string `hl7:"POS=28"`
+	SignatureOnFileDate time.Time `hl7:"POS=29;ATR=date"`
+	FirstSimilarIllnessDate time.Time `hl7:"POS=30;ATR=date"`
+	PatientChargeAdjustmentCode CE `hl7:"POS=31"`
+	RecurringServiceCode string `hl7:"POS=32"`
+	BillingMediaCode string `hl7:"POS=33"`
+	ExpectedSurgeryDateTime time.Time `hl7:"POS=34"`
+	MilitaryPartnershipCode string `hl7:"POS=35"`
+	MilitaryNonAvailabilityCode string `hl7:"POS=36"`
+	NewbornBabyIndicator string `hl7:"POS=37"`
+	BabyDetainedIndicator string `hl7:"POS=38"`
+}
+

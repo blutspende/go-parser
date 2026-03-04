@@ -2,11 +2,14 @@ package hl7v23
 
 import "time"
 
+// AL1 - Patient Allergy Information
+// https://hl7-definition.caristix.com/v2/HL7v2.3/Segments/AL1
 type AL1 struct {
-	SetID              int       `hl7:"POS=2;ATR=sequence" json:"setId,omitempty"`
-	AllergyType        string    `hl7:"POS=3" json:"allergyType,omitempty"`
-	AllergyCode        CE        `hl7:"POS=4" json:"allergyCode,omitempty"`
-	AllergySeverity    string    `hl7:"POS=5" json:"allergySeverity,omitempty"`
-	AllergyReaction    string    `hl7:"POS=6" json:"allergyReaction,omitempty"`
-	IdentificationDate time.Time `hl7:"POS=7;ATR=date" json:"identificationDate,omitempty"`
+	SetID int `hl7:"POS=2;ATR=sequence"`
+	AllergyType string `hl7:"POS=3"`
+	AllergyCodeMnemonicDescription CE `hl7:"POS=4"`
+	AllergySeverity string `hl7:"POS=5"`
+	AllergyReaction string `hl7:"POS=6"`
+	IdentificationDate time.Time `hl7:"POS=7;ATR=date"`
 }
+

@@ -1,9 +1,10 @@
 package hl7v24
 
-// HL7 v2.4 - ACK - General acknowledgment message
+// ACK - General acknowledgment message
 // https://hl7-definition.caristix.com/v2/HL7v2.4/TriggerEvents/ACK
 type ACK struct {
-	MSH                    MSH `hl7:"TAG=MSH" json:"MSH,omitempty"`
-	MessageAcknowledgement MSA `hl7:"TAG=MSA" json:"MessageAcknowledgement,omitempty"`
-	Error                  ERR `hl7:"TAG=ERR" json:"Error,omitempty"`
+	MessageHeader MSH `hl7:"TAG=MSH"`
+	MessageAcknowledgment MSA `hl7:"TAG=MSA"`
+	Error ERR `hl7:"TAG=ERR;ATR=optional"`
 }
+

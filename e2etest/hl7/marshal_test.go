@@ -6,35 +6,37 @@ import (
 	"github.com/blutspende/bloodlab-common/utils"
 	"github.com/blutspende/go-parser"
 	"github.com/blutspende/go-parser/enums/notation"
-
-	"testing"
-	"time"
-
 	"github.com/blutspende/go-parser/messageformat/hl7/hl7v23"
 	"github.com/stretchr/testify/assert"
+	"testing"
+	"time"
 )
 
 func TestMarshalFromStruct(t *testing.T) {
 	// Arrange
 	dt, _ := time.Parse("20060102150405", "20230203080903")
 	source := hl7v23.ORM_O01{
-		MSH: hl7v23.MSH{
-			ReceivingApplication:           hl7v23.HD{NamespaceId: "CIT"},
-			ReceivingFacility:              hl7v23.HD{NamespaceId: "LAB"},
-			SendingApplication:             hl7v23.HD{NamespaceId: "HL7_Host"},
-			SendingFacility:                hl7v23.HD{NamespaceId: "HL7_Office"},
-			DateTimeOfMessage:              dt,
-			MessageType:                    "ORM",
-			MessageTriggerEvent:            "O01",
-			MessageControlID:               "CID586246",
-			ProcessingID:                   "P",
+		MessageHeaderSegment: hl7v23.MSH{
+			ReceivingApplication: hl7v23.HD{NamespaceID: "CIT"},
+			ReceivingFacility:    hl7v23.HD{NamespaceID: "LAB"},
+			SendingApplication:   hl7v23.HD{NamespaceID: "HL7_Host"},
+			SendingFacility:      hl7v23.HD{NamespaceID: "HL7_Office"},
+			DateTimeOfMessage:    dt,
+			MessageType: hl7v23.CM_MSG{
+				MessageType:  "ORM",
+				TriggerEvent: "O01",
+			},
+			MessageControlID: "CID586246",
+			ProcessingID: hl7v23.PT{
+				ProcessingID: "P",
+			},
 			VersionID:                      "2.3",
 			SequenceNumber:                 nil,
 			AcceptAcknowledgementType:      "ER",
 			ApplicationAcknowledgementType: "SU",
 			CharacterSet:                   []string{"8859/1"},
 		},
-		Order: []hl7v23.Order{
+		Order: []hl7v23.ORM_O01_ORDER{
 			{
 				CommonOrderSegment: hl7v23.ORC{
 					OrderControl: "NW",
@@ -43,11 +45,11 @@ func TestMarshalFromStruct(t *testing.T) {
 					},
 					DateTimeOfTransaction: dt,
 					OrderingProvider: hl7v23.XCN{
-						ID: "AKB",
+						IDNumber: "AKB",
 					},
 				},
-				OrderDetail: hl7v23.OrderDetail{
-					OrderDetailSegment: hl7v23.OrderDetailSegment{
+				OrderDetail: hl7v23.ORM_O01_ORDER_ORDER_DETAIL{
+					OrderDetailSegment: hl7v23.ORM_O01_ORDER_ORDER_DETAIL_ORDER_DETAIL_SEGMENT{
 						ObservationRequestSegment: hl7v23.OBR{
 							FillerOrderNumber: hl7v23.EI{
 								EntityIdentifier: "FIL4345",
@@ -69,11 +71,11 @@ func TestMarshalFromStruct(t *testing.T) {
 					},
 					DateTimeOfTransaction: dt,
 					OrderingProvider: hl7v23.XCN{
-						ID: "AKB",
+						IDNumber: "AKB",
 					},
 				},
-				OrderDetail: hl7v23.OrderDetail{
-					OrderDetailSegment: hl7v23.OrderDetailSegment{
+				OrderDetail: hl7v23.ORM_O01_ORDER_ORDER_DETAIL{
+					OrderDetailSegment: hl7v23.ORM_O01_ORDER_ORDER_DETAIL_ORDER_DETAIL_SEGMENT{
 						ObservationRequestSegment: hl7v23.OBR{
 							FillerOrderNumber: hl7v23.EI{
 								EntityIdentifier: "FIL4345",
@@ -88,23 +90,25 @@ func TestMarshalFromStruct(t *testing.T) {
 				},
 			},
 		},
-		Patient: hl7v23.Patient{
+		Patient: hl7v23.ORM_O01_PATIENT{
 			PatientIdentification: hl7v23.PID{
-				InternalID: []hl7v23.CX{
+				PatientIDInternalID: []hl7v23.CX{
 					{
-						Id: "01020304",
+						ID: "01020304",
 					},
 				},
-				Name: hl7v23.XPN{
-					FamilyName: "Nachnamäh",
-					GivenName:  "Vörname",
+				PatientName: []hl7v23.XPN{
+					{
+						FamilyName: "Nachnamäh",
+						GivenName:  "Vörname",
+					},
 				},
 				Sex: "U",
 			},
-			PatientVisit: hl7v23.PatientVisit{
+			PatientVisit: hl7v23.ORM_O01_PATIENT_PATIENT_VISIT{
 				PatientVisit: hl7v23.PV1{
 					VisitNumber: hl7v23.CX{
-						Id: "VID001",
+						ID: "VID001",
 					},
 					PatientClass: "S",
 				},
@@ -136,49 +140,55 @@ func TestMarshalPID(t *testing.T) {
 	dt, _ := time.Parse("20060102150405", "20110926125155")
 	dob, _ := time.Parse("20060102", "19500412")
 	source := hl7v23.ORM_O01{
-		MSH: hl7v23.MSH{
-			ReceivingApplication:           hl7v23.HD{NamespaceId: "CIT"},
-			ReceivingFacility:              hl7v23.HD{NamespaceId: "LAB"},
-			SendingApplication:             hl7v23.HD{NamespaceId: "HL7_Host"},
-			SendingFacility:                hl7v23.HD{NamespaceId: "HL7_Office"},
-			DateTimeOfMessage:              dt.UTC(),
-			MessageType:                    "ORM",
-			MessageTriggerEvent:            "O01",
-			MessageControlID:               "CID586246",
-			ProcessingID:                   "P",
+		MessageHeaderSegment: hl7v23.MSH{
+			ReceivingApplication: hl7v23.HD{NamespaceID: "CIT"},
+			ReceivingFacility:    hl7v23.HD{NamespaceID: "LAB"},
+			SendingApplication:   hl7v23.HD{NamespaceID: "HL7_Host"},
+			SendingFacility:      hl7v23.HD{NamespaceID: "HL7_Office"},
+			DateTimeOfMessage:    dt.UTC(),
+			MessageType: hl7v23.CM_MSG{
+				MessageType:  "ORM",
+				TriggerEvent: "O01",
+			},
+			MessageControlID: "CID586246",
+			ProcessingID: hl7v23.PT{
+				ProcessingID: "P",
+			},
 			VersionID:                      "2.3",
 			SequenceNumber:                 nil,
 			AcceptAcknowledgementType:      "ER",
 			ApplicationAcknowledgementType: "ER",
 			CharacterSet:                   []string{"8859/1"},
 		},
-		Patient: hl7v23.Patient{
+		Patient: hl7v23.ORM_O01_PATIENT{
 			PatientIdentification: hl7v23.PID{
-				InternalID: []hl7v23.CX{
+				PatientIDInternalID: []hl7v23.CX{
 					{
-						Id:         "a",
+						ID:         "a",
 						CheckDigit: "b",
 					},
 					{
 						CheckDigit: "c",
 					},
 				},
-				AlternateID: []hl7v23.CX{
+				AlternatePatientID: []hl7v23.CX{
 					{
-						Id: "00100M56016",
+						ID: "00100M56016",
 					},
 				},
-				Name: hl7v23.XPN{
-					FamilyName: "Smith",
-					GivenName:  "Harry",
+				PatientName: []hl7v23.XPN{
+					{
+						FamilyName: "Smith",
+						GivenName:  "Harry",
+					},
 				},
-				DOB: dob,
-				Sex: "M",
+				DateOfBirth: dob,
+				Sex:         "M",
 			},
 		},
 	}
 	expected0 := "MSH|^~\\&|HL7_Host|HL7_Office|CIT|LAB|20110926145155||ORM^O01|CID586246|P|2.3|||ER|ER||8859/1"
-	expected1 := "PID|1||a^b~^c|00100M56016|Smith^Harry||19500412|M"
+	expected1 := "PID|1||a^b~^c|00100M56016|Smith^Harry||19500412010000|M"
 	config.Encoding = encoding.ASCII
 	// Act
 	result, err := parser.Marshal(source, config)

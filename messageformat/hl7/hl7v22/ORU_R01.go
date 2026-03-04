@@ -1,0 +1,37 @@
+package hl7v22
+
+// ORU_R01_PATIENT_RESULT - Group struct
+type ORU_R01_PATIENT_RESULT struct {
+	Patient ORU_R01_PATIENT_RESULT_PATIENT `hl7:"GROUP;ATR=optional"`
+	Order_observation []ORU_R01_PATIENT_RESULT_ORDER_OBSERVATION `hl7:"GROUP"`
+}
+
+// ORU_R01_PATIENT_RESULT_PATIENT - Group struct
+type ORU_R01_PATIENT_RESULT_PATIENT struct {
+	PatientIdentification PID `hl7:"TAG=PID"`
+	NotesAndComments []NTE `hl7:"TAG=NTE;ATR=optional"`
+	PatientVisit PV1 `hl7:"TAG=PV1;ATR=optional"`
+}
+
+// ORU_R01_PATIENT_RESULT_ORDER_OBSERVATION - Group struct
+type ORU_R01_PATIENT_RESULT_ORDER_OBSERVATION struct {
+	CommonOrder ORC `hl7:"TAG=ORC;ATR=optional"`
+	ObservationRequest OBR `hl7:"TAG=OBR"`
+	NotesAndComments []NTE `hl7:"TAG=NTE;ATR=optional"`
+	Observation []ORU_R01_PATIENT_RESULT_ORDER_OBSERVATION_OBSERVATION `hl7:"GROUP"`
+}
+
+// ORU_R01_PATIENT_RESULT_ORDER_OBSERVATION_OBSERVATION - Group struct
+type ORU_R01_PATIENT_RESULT_ORDER_OBSERVATION_OBSERVATION struct {
+	ObservationResult OBX `hl7:"TAG=OBX;ATR=optional"`
+	NotesAndComments []NTE `hl7:"TAG=NTE;ATR=optional"`
+}
+
+// ORU_R01 - Unsolicited Transmission Of Requested Information
+// https://hl7-definition.caristix.com/v2/HL7v2.2/TriggerEvents/ORU_R01
+type ORU_R01 struct {
+	MessageHeader MSH `hl7:"TAG=MSH"`
+	Patient_result []ORU_R01_PATIENT_RESULT `hl7:"GROUP"`
+	ContinuationPointer DSC `hl7:"TAG=DSC;ATR=optional"`
+}
+

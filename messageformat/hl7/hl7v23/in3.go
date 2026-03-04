@@ -2,30 +2,32 @@ package hl7v23
 
 import "time"
 
+// IN3 - Insurance additional info - certification
+// https://hl7-definition.caristix.com/v2/HL7v2.3/Segments/IN3
 type IN3 struct {
-	SetID                              int       `hl7:"POS=2;ATR=sequence" json:"setID,omitempty"`
-	CertificationNumber                CX        `hl7:"POS=3" json:"certificationNumber,omitempty"`
-	CertifiedBy                        []XCN     `hl7:"POS=4" json:"certifiedBy,omitempty"`
-	CertificationRequired              string    `hl7:"POS=5" json:"certificationRequired,omitempty"`
-	Penalty                            CM_PEN    `hl7:"POS=6" json:"penalty,omitempty"`
-	CertificationDateTime              time.Time `hl7:"POS=7" json:"certificationDateTime,omitempty"`
-	CertificationModifyDateTime        time.Time `hl7:"POS=8" json:"certificationModifyDateTime,omitempty"`
-	Operator                           []XCN     `hl7:"POS=9" json:"operator,omitempty"`
-	CertificationBeginDate             time.Time `hl7:"POS=10;ATR=date" json:"certificationBeginDate,omitempty"`
-	CertificationEndDate               time.Time `hl7:"POS=11;ATR=date" json:"certificationEndDate,omitempty"`
-	Days                               CM_DTN    `hl7:"POS=12" json:"days,omitempty"`
-	NonConcurCode                      CE        `hl7:"POS=13" json:"nonConcurCode,omitempty"`
-	NonConcurEffectiveDateTime         time.Time `hl7:"POS=14" json:"nonConcurEffectiveDateTime,omitempty"`
-	PhysicianReviewer                  []XCN     `hl7:"POS=15" json:"physicianReviewer,omitempty"`
-	CertificationContact               string    `hl7:"POS=16" json:"certificationContact,omitempty"`
-	CertificationContactPhoneNumber    []XTN     `hl7:"POS=17" json:"certificationContactPhoneNumber,omitempty"`
-	AppealReason                       CE        `hl7:"POS=18" json:"appealReason,omitempty"`
-	CertificationAgency                CE        `hl7:"POS=19" json:"certificationAgency,omitempty"`
-	CertificationAgencyPhoneNumber     []XTN     `hl7:"POS=20" json:"certificationAgencyPhoneNumber,omitempty"`
-	PreCertificationRequired           []CM_PCF  `hl7:"POS=21" json:"preCertificationRequired,omitempty"`
-	CaseManager                        string    `hl7:"POS=22" json:"caseManager,omitempty"`
-	SecondOpinionDate                  time.Time `hl7:"POS=23" json:"secondOpinionDate,omitempty"`
-	SecondOpinionStatus                string    `hl7:"POS=24" json:"secondOpinionStatus,omitempty"`
-	SecondOpinionDocumentationReceived []string  `hl7:"POS=25" json:"secondOpinionDocumentationReceived,omitempty"`
-	SecondOptionPhysician              []XCN     `hl7:"POS=26" json:"secondOptionPhysician,omitempty"`
+	SetID                              int       `hl7:"POS=2;ATR=sequence"`
+	CertificationNumber                CX        `hl7:"POS=3"`
+	CertifiedBy                        []XCN     `hl7:"POS=4"`
+	CertificationRequired              string    `hl7:"POS=5"`
+	Penalty                            CM_PEN    `hl7:"POS=6"`
+	CertificationDateTime              time.Time `hl7:"POS=7"`
+	CertificationModifyDateTime        time.Time `hl7:"POS=8"`
+	Operator                           []XCN     `hl7:"POS=9"`
+	CertificationBeginDate             time.Time `hl7:"POS=10;ATR=date"`
+	CertificationEndDate               time.Time `hl7:"POS=11;ATR=date"`
+	Days                               CM_DTN    `hl7:"POS=12"`
+	NonConcurCodeDescription           CE        `hl7:"POS=13"`
+	NonConcurEffectiveDateTime         time.Time `hl7:"POS=14"`
+	PhysicianReviewer                  []XCN     `hl7:"POS=15"`
+	CertificationContact               string    `hl7:"POS=16"`
+	CertificationContactPhoneNumber    []XTN     `hl7:"POS=17"`
+	AppealReason                       CE        `hl7:"POS=18"`
+	CertificationAgency                CE        `hl7:"POS=19"`
+	CertificationAgencyPhoneNumber     []XTN     `hl7:"POS=20"`
+	PreCertificationRequiredWindow     []CM_PCF  `hl7:"POS=21"`
+	CaseManager                        string    `hl7:"POS=22"`
+	SecondOpinionDate                  time.Time `hl7:"POS=23;ATR=date"`
+	SecondOpinionStatus                string    `hl7:"POS=24"`
+	SecondOpinionDocumentationReceived []string  `hl7:"POS=25"`
+	SecondOpinionPhysician             []XCN     `hl7:"POS=26"`
 }
