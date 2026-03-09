@@ -668,7 +668,7 @@ func TestEncodingVeryLongCharsets(t *testing.T) {
 	}
 	config.Encoding = encoding.Windows1252
 	// Act
-	encoded, err := encoding.ConvertFromEncodingToUtf8(veryLongMessage, config.Encoding)
+	encoded, err := encoding.ConvertFromEncodingToUTF8(veryLongMessage, config.Encoding)
 	// Assert
 	assert.Nil(t, err)
 	// in this case the encoding should equal the original: no special characters

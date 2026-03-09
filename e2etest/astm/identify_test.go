@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/blutspende/bloodlab-common/encoding"
-	"github.com/blutspende/bloodlab-common/messagetype"
+	"github.com/blutspende/bloodlab-common/instrumentenum"
 	"github.com/blutspende/go-parser"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,7 +19,7 @@ func TestIdentifyOrderMessage(t *testing.T) {
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, messagetype.Order, messageType)
+	assert.Equal(t, instrumentenum.MessageTypeOrder, messageType)
 }
 
 func TestIdentifyOrderMessageWithMultiHeader(t *testing.T) {
@@ -42,7 +42,7 @@ func TestIdentifyOrderMessageWithMultiHeader(t *testing.T) {
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, messagetype.Order, messageType)
+	assert.Equal(t, instrumentenum.MessageTypeOrder, messageType)
 	// Teardown
 	teardown()
 }
@@ -61,7 +61,7 @@ L|1|N`
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, messagetype.Query, messageType)
+	assert.Equal(t, instrumentenum.MessageTypeQuery, messageType)
 	// Teardown
 	teardown()
 }
@@ -88,7 +88,7 @@ L|1|N`
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, messagetype.Query, messageType)
+	assert.Equal(t, instrumentenum.MessageTypeQuery, messageType)
 	// Teardown
 	teardown()
 }
@@ -106,7 +106,7 @@ L|1|N`
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, messagetype.Result, messageType)
+	assert.Equal(t, instrumentenum.MessageTypeResult, messageType)
 	// Teardown
 	teardown()
 }
@@ -134,7 +134,7 @@ L|1|N`
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, messagetype.Result, messageType)
+	assert.Equal(t, instrumentenum.MessageTypeResult, messageType)
 	// Teardown
 	teardown()
 }
@@ -155,7 +155,7 @@ L|1|N
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, messagetype.Query, messageType)
+	assert.Equal(t, instrumentenum.MessageTypeQuery, messageType)
 	// Teardown
 	teardown()
 }
@@ -185,7 +185,7 @@ func TestIdentifyHPORCOROCOROC(t *testing.T) {
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, messagetype.Result, messageType)
+	assert.Equal(t, instrumentenum.MessageTypeResult, messageType)
 	// Teardown
 	teardown()
 }
@@ -207,7 +207,7 @@ L|1|N`
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, messagetype.Result, messageType)
+	assert.Equal(t, instrumentenum.MessageTypeResult, messageType)
 	// Teardown
 	teardown()
 }
@@ -248,7 +248,7 @@ L|1|N`
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
 	assert.Nil(t, err)
-	assert.Equal(t, messagetype.Result, messageType)
+	assert.Equal(t, instrumentenum.MessageTypeResult, messageType)
 	// Teardown
 	teardown()
 }

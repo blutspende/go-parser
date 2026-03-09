@@ -123,7 +123,7 @@ OBR|2||FIL4345|DNA-DRQB^DRQB Loki||20230203080903`
 	config.Notation = notation.Short
 	// Act
 	marshaled, err := parser.Marshal(source, config)
-	result := string(utils.ConvertBytes2Dto1D(marshaled))
+	result := string(utils.JoinByteSlicesWithLF(marshaled))
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, expected, result)

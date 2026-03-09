@@ -21,7 +21,7 @@ Library for handling ASTM and HL7 protocols in Go.
 ``` go
 func Marshal(sourceStruct interface{}, config *pconfig.Configuration) (result [][]byte, err error) 
 func Unmarshal(messageData []byte, targetStruct interface{}, config *pconfig.Configuration) (err error)
-func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (messageType messagetype.MessageType, err error)
+func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (messageType instrumentenum.MessageType, err error)
 func IdentifyMessageHL7(messageData []byte, config *pconfig.Configuration) (messageType string, protocolVersion string, err error)
 func NewDefaultConfiguration(protocol pconfig.Protocol) *pconfig.Configuration
 ```
@@ -140,7 +140,7 @@ if err != nil {
     log.Fatal(err)
 }
 switch (messageType) {
-    case messagetype.Result:
+    case instrumentenum.Result:
       ...
     default:
       ...

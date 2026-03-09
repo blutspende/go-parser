@@ -1,11 +1,11 @@
 module github.com/blutspende/go-parser
 
-go 1.24.5
+go 1.26
 
 require (
-	github.com/blutspende/bloodlab-common v1.0.2
+	github.com/blutspende/bloodlab-common v1.1.4
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/text v0.31.0
+	golang.org/x/text v0.34.0
 )
 
 require (
