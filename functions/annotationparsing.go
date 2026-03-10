@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/blutspende/go-parser/constants"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/blutspende/go-parser/models"
 	"github.com/blutspende/go-parser/pconfig"
 )
@@ -25,16 +25,16 @@ func getAnnotationForProtocol(input reflect.StructField, config *pconfig.Configu
 		actual = "hl7"
 		other = "astm"
 	default:
-		return "", errmsg.ErrAnnotationParsingInvalidProtocol
+		return "", errdef.ErrAnnotationParsingInvalidProtocol
 	}
 	// Try to extract raw value or fallback to other protocol (error if nothing found)
 	annotation = input.Tag.Get(actual)
 	if annotation == "" {
 		annotation = input.Tag.Get(other)
 		if annotation == "" {
-			return "", errmsg.ErrAnnotationParsingMissingAnnotation
+			return "", errdef.ErrAnnotationParsingMissingAnnotation
 		} else {
-			return "", fmt.Errorf("%w: expected '%s', got '%s'", errmsg.ErrAnnotationParsingWrongProtocol, actual, other)
+			return "", fmt.Errorf("%w: expected '%s', got '%s'", errdef.ErrAnnotationParsingWrongProtocol, actual, other)
 		}
 	} else {
 		// Return correct annotation if found
@@ -59,7 +59,7 @@ func ParseFieldAnnotation(input reflect.StructField, config *pconfig.Configurati
 	// Extract and parse the position
 	if posString, hasPos := elements[constants.AnnotationElementPosition]; hasPos {
 		// Prepare the error for any parsing issue
-		errParse := fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingInvalidElement, posString)
+		errParse := fmt.Errorf("%w: %s", errdef.ErrAnnotationParsingInvalidElement, posString)
 		// Split field and component (if any)
 		segments := strings.Split(posString, ".")
 		if len(segments) > 2 {
@@ -79,7 +79,7 @@ func ParseFieldAnnotation(input reflect.StructField, config *pconfig.Configurati
 			return models.FieldAnnotation{}, errParse
 		}
 	} else {
-		return models.FieldAnnotation{}, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingIllegal, "field must have a position")
+		return models.FieldAnnotation{}, fmt.Errorf("%w: %s", errdef.ErrAnnotationParsingIllegal, "field must have a position")
 	}
 	// Determine if the field is an array or not
 	result.IsArray = input.Type.Kind() == reflect.Slice || input.Type.Kind() == reflect.Array
@@ -93,10 +93,10 @@ func ParseFieldAnnotation(input reflect.StructField, config *pconfig.Configurati
 	result.IsSubstructure = checkType.Kind() == reflect.Struct && checkType != reflect.TypeOf(time.Time{})
 	// Check illegal combinations
 	if result.IsComponent && result.IsArray {
-		return models.FieldAnnotation{}, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingIllegal, "field can not be component and array")
+		return models.FieldAnnotation{}, fmt.Errorf("%w: %s", errdef.ErrAnnotationParsingIllegal, "field can not be component and array")
 	}
 	if result.IsComponent && result.IsSubstructure {
-		return models.FieldAnnotation{}, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingIllegal, "field can not be component and substructure")
+		return models.FieldAnnotation{}, fmt.Errorf("%w: %s", errdef.ErrAnnotationParsingIllegal, "field can not be component and substructure")
 	}
 	// Extract attributes if any
 	if attributes, hasAttributes := elements[constants.AnnotationElementAttribute]; hasAttributes {
@@ -137,7 +137,7 @@ func ParseStructAnnotation(input reflect.StructField, config *pconfig.Configurat
 	result.Tag, hasTag = elements[constants.AnnotationElementTag]
 	// Check for illegal combinations
 	if result.IsGroup == hasTag {
-		return models.StructAnnotation{}, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingIllegal, "structure must be either a group or have a tag")
+		return models.StructAnnotation{}, fmt.Errorf("%w: %s", errdef.ErrAnnotationParsingIllegal, "structure must be either a group or have a tag")
 	}
 	// Determine if the field is an array or not
 	result.IsArray = input.Type.Kind() == reflect.Slice || input.Type.Kind() == reflect.Array
@@ -170,11 +170,11 @@ func parseAnnotationElements(input, elemSep, partSep string, valids []string) (r
 		// Split each attribute by the colon
 		attributeParts := strings.Split(attribute, partSep)
 		if len(attributeParts) > 2 {
-			return nil, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingInvalidElement, input)
+			return nil, fmt.Errorf("%w: %s", errdef.ErrAnnotationParsingInvalidElement, input)
 		}
 		// Check if the attribute is valid (empty valids means: anything goes)
 		if len(valids) > 0 && !slices.Contains(valids, attributeParts[0]) {
-			return nil, fmt.Errorf("%w: %s", errmsg.ErrAnnotationParsingInvalidElementKey, attributeParts[0])
+			return nil, fmt.Errorf("%w: %s", errdef.ErrAnnotationParsingInvalidElementKey, attributeParts[0])
 		}
 		// Save the attribute name and value (if present)
 		if len(attributeParts) == 2 {
@@ -197,7 +197,7 @@ func ProcessStructReflection(inputStruct interface{}) (outputTypes []reflect.Str
 	}
 	if targetPtrValue.Elem().Kind() != reflect.Struct {
 		// inputStruct must be a pointer to a struct
-		return nil, nil, 0, errmsg.ErrAnnotationParsingInvalidInputStruct
+		return nil, nil, 0, errdef.ErrAnnotationParsingInvalidInputStruct
 	}
 	// Get the underlying struct
 	targetValue := targetPtrValue.Elem()

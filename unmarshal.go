@@ -13,7 +13,7 @@ func Unmarshal(messageData []byte, targetStruct interface{}, config *pconfig.Con
 		return err
 	}
 	// Convert encoding to UTF8
-	utf8Data, err := encoding.ConvertFromEncodingToUtf8(messageData, config.Encoding)
+	utf8Data, err := encoding.ConvertFromEncodingToUTF8(messageData, config.Encoding)
 	if err != nil {
 		return err
 	}

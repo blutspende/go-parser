@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/blutspende/go-parser/enums/notation"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -343,7 +343,7 @@ func TestBuildLine_ReservedFieldRecord_HL7(t *testing.T) {
 	// Act
 	result, err := BuildLine(source, "T", 1, configHL7)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrLineBuildingReservedFieldPosReference.Error())
+	assert.EqualError(t, err, errdef.ErrLineBuildingReservedFieldPosReference.Error())
 	assert.Equal(t, "", result)
 }
 func TestBuildLine_ReservedFieldRecord_ASTM(t *testing.T) {
@@ -352,7 +352,7 @@ func TestBuildLine_ReservedFieldRecord_ASTM(t *testing.T) {
 	// Act
 	result, err := BuildLine(source, "T", 1, config)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrLineBuildingReservedFieldPosReference.Error())
+	assert.EqualError(t, err, errdef.ErrLineBuildingReservedFieldPosReference.Error())
 	assert.Equal(t, "", result)
 }
 
@@ -496,7 +496,7 @@ func TestBuildLine_SubSub_ASTM(t *testing.T) {
 	// Act
 	_, err := BuildLine(source, "SUB", 1, config)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrLineBuildingMaximumRecursionDepthExceeded.Error())
+	assert.EqualError(t, err, errdef.ErrLineBuildingMaximumRecursionDepthExceeded.Error())
 }
 func TestBuildLine_SubSub_HL7(t *testing.T) {
 	// Arrange
@@ -669,7 +669,7 @@ func TestBuildLine_InvalidAttributeValue(t *testing.T) {
 	// Act
 	_, err := BuildLine(source, "T", 1, config)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrLineBuildingInvalidLengthAttributeValue.Error())
+	assert.EqualError(t, err, errdef.ErrLineBuildingInvalidLengthAttributeValue.Error())
 }
 
 // BuildLine tests - escaped characters

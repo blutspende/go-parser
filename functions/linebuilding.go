@@ -11,7 +11,7 @@ import (
 
 	"github.com/blutspende/go-parser/constants"
 	notationconst "github.com/blutspende/go-parser/enums/notation"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/blutspende/go-parser/models"
 	"github.com/blutspende/go-parser/pconfig"
 )
@@ -52,7 +52,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 		// Parse the sourceStruct field sourceFieldAnnotation
 		sourceFieldAnnotation, err := ParseFieldAnnotation(sourceTypes[i], config)
 		if err != nil {
-			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
+			if errors.Is(err, errdef.ErrAnnotationParsingMissingAnnotation) {
 				// If the annotation is missing, skip this field
 				continue
 			} else {
@@ -62,7 +62,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 
 		// ASTM reserved: 1-name, 2-sequence number; HL7 reserved: 1-name
 		if (config.Protocol == pconfig.ASTM && sourceFieldAnnotation.FieldPos < 3) || (config.Protocol == pconfig.HL7 && sourceFieldAnnotation.FieldPos < 2) {
-			return "", errmsg.ErrLineBuildingReservedFieldPosReference
+			return "", errdef.ErrLineBuildingReservedFieldPosReference
 		}
 
 		// Copy the sequence number into the field with the sequence annotation - HL7 case
@@ -107,7 +107,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 				// Parse the targetStruct field targetFieldAnnotation
 				currentFieldAnnotation, err := ParseFieldAnnotation(sourceTypes[j], config)
 				if err != nil {
-					if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
+					if errors.Is(err, errdef.ErrAnnotationParsingMissingAnnotation) {
 						// If the annotation is missing, skip this field
 						continue
 					} else {
@@ -162,7 +162,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 func buildSubstructure(sourceStruct interface{}, depth int, config *pconfig.Configuration) (result string, err error) {
 	// Check depth limits
 	if (config.Protocol == pconfig.ASTM && depth > 1) || (config.Protocol == pconfig.HL7 && depth > 2) {
-		return "", errmsg.ErrLineBuildingMaximumRecursionDepthExceeded
+		return "", errdef.ErrLineBuildingMaximumRecursionDepthExceeded
 	}
 
 	// Process the target structure
@@ -179,7 +179,7 @@ func buildSubstructure(sourceStruct interface{}, depth int, config *pconfig.Conf
 		// Parse the sourceStruct field sourceFieldAnnotation
 		sourceFieldAnnotation, err := ParseFieldAnnotation(sourceTypes[i], config)
 		if err != nil {
-			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
+			if errors.Is(err, errdef.ErrAnnotationParsingMissingAnnotation) {
 				// If the annotation is missing, skip this field
 				continue
 			} else {
@@ -211,7 +211,7 @@ func buildSubstructure(sourceStruct interface{}, depth int, config *pconfig.Conf
 	case 2:
 		delimiter = config.Delimiters.SubComponent
 	default:
-		return "", errmsg.ErrLineBuildingInvalidRecursionDepth
+		return "", errdef.ErrLineBuildingInvalidRecursionDepth
 	}
 
 	// Construct the result string
@@ -264,7 +264,7 @@ func convertField(field reflect.Value, annotation models.FieldAnnotation, config
 				result = field.String()
 			}
 		} else {
-			return "", errmsg.ErrLineBuildingUsupportedDataType
+			return "", errdef.ErrLineBuildingUsupportedDataType
 		}
 		return result, nil
 	case reflect.Int:
@@ -275,7 +275,7 @@ func convertField(field reflect.Value, annotation models.FieldAnnotation, config
 		if value, exists := annotation.Attributes[constants.AttributeLength]; exists {
 			precision, err = strconv.Atoi(value)
 			if err != nil {
-				return "", errmsg.ErrLineBuildingInvalidLengthAttributeValue
+				return "", errdef.ErrLineBuildingInvalidLengthAttributeValue
 			}
 		}
 		result = strconv.FormatFloat(field.Float(), 'f', precision, field.Type().Bits())
@@ -295,7 +295,7 @@ func convertField(field reflect.Value, annotation models.FieldAnnotation, config
 			// Check if the field is a time.Time
 			timeValue, ok := field.Interface().(time.Time)
 			if !ok {
-				return "", errmsg.ErrLineBuildingInvalidDateFormat
+				return "", errdef.ErrLineBuildingInvalidDateFormat
 			}
 			// Return empty if the time is zero
 			if timeValue.IsZero() {
@@ -311,7 +311,7 @@ func convertField(field reflect.Value, annotation models.FieldAnnotation, config
 		}
 	}
 	// Return error if no type match was found (each successful conversion returns with nil)
-	return "", errmsg.ErrLineBuildingUsupportedDataType
+	return "", errdef.ErrLineBuildingUsupportedDataType
 }
 
 func buildStringEscapeChars(input string, config *pconfig.Configuration) string {

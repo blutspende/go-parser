@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/blutspende/go-parser/constants"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -113,7 +113,7 @@ func TestParseFieldAnnotation_InvalidAttribute(t *testing.T) {
 	// Act
 	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidElementKey)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidElementKey)
 }
 func TestParseFieldAnnotation_InvalidAttributeFormat(t *testing.T) {
 	// Arrange
@@ -125,7 +125,7 @@ func TestParseFieldAnnotation_InvalidAttributeFormat(t *testing.T) {
 	// Act
 	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidElement)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidElement)
 }
 func TestParseFieldAnnotation_TooManyPositionParts(t *testing.T) {
 	// Arrange
@@ -137,7 +137,7 @@ func TestParseFieldAnnotation_TooManyPositionParts(t *testing.T) {
 	// Act
 	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidElement)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidElement)
 }
 func TestParseFieldAnnotation_TooManyPositionPartsWithAttribute(t *testing.T) {
 	// Arrange
@@ -149,7 +149,7 @@ func TestParseFieldAnnotation_TooManyPositionPartsWithAttribute(t *testing.T) {
 	// Act
 	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidElement)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidElement)
 }
 func TestParseFieldAnnotation_InvalidNumber(t *testing.T) {
 	// Arrange
@@ -161,7 +161,7 @@ func TestParseFieldAnnotation_InvalidNumber(t *testing.T) {
 	// Act
 	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidElement)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidElement)
 }
 func TestParseFieldAnnotation_MultipleAttributes(t *testing.T) {
 	// Arrange
@@ -284,7 +284,7 @@ func TestParseFieldAnnotation_IllegalComponentArray(t *testing.T) {
 	// Act
 	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingIllegal)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingIllegal)
 }
 func TestParseFieldAnnotation_IllegalComponentSubstructure(t *testing.T) {
 	// Arrange
@@ -296,7 +296,7 @@ func TestParseFieldAnnotation_IllegalComponentSubstructure(t *testing.T) {
 	// Act
 	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingIllegal)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingIllegal)
 }
 func TestParseFieldAnnotation_Time(t *testing.T) {
 	// Arrange
@@ -346,7 +346,7 @@ func TestParseFieldAnnotation_InvalidProtocol(t *testing.T) {
 	// Act
 	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidProtocol)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidProtocol)
 	// Teardown
 	teardown()
 }
@@ -360,7 +360,7 @@ func TestParseFieldAnnotation_WrongProtocol(t *testing.T) {
 	// Act
 	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingWrongProtocol)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingWrongProtocol)
 }
 func TestParseFieldAnnotation_MissingAnnotation(t *testing.T) {
 	// Arrange
@@ -372,7 +372,7 @@ func TestParseFieldAnnotation_MissingAnnotation(t *testing.T) {
 	// Act
 	_, err := ParseFieldAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingMissingAnnotation)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingMissingAnnotation)
 }
 
 // ParseStructAnnotation tests
@@ -488,7 +488,7 @@ func TestParseStructAnnotation_InvalidKey(t *testing.T) {
 	// Act
 	_, err := ParseStructAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidElementKey)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidElementKey)
 }
 func TestParseStructAnnotation_EmptyKey(t *testing.T) {
 	// Arrange
@@ -500,7 +500,7 @@ func TestParseStructAnnotation_EmptyKey(t *testing.T) {
 	// Act
 	_, err := ParseStructAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidElementKey)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidElementKey)
 }
 func TestParseStructAnnotation_InvalidAttribute(t *testing.T) {
 	// Arrange
@@ -512,7 +512,7 @@ func TestParseStructAnnotation_InvalidAttribute(t *testing.T) {
 	// Act
 	_, err := ParseStructAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidElementKey)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidElementKey)
 }
 func TestParseStructAnnotation_IllegalCombination(t *testing.T) {
 	// Arrange
@@ -524,7 +524,7 @@ func TestParseStructAnnotation_IllegalCombination(t *testing.T) {
 	// Act
 	_, err := ParseStructAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingIllegal)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingIllegal)
 }
 func TestParseStructAnnotation_MissingTag(t *testing.T) {
 	// Arrange
@@ -536,7 +536,7 @@ func TestParseStructAnnotation_MissingTag(t *testing.T) {
 	// Act
 	_, err := ParseStructAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingIllegal)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingIllegal)
 }
 func TestParseStructAnnotation_AttributeValue(t *testing.T) {
 	// Arrange
@@ -566,7 +566,7 @@ func TestParseStructAnnotation_TooManyAttributeValues(t *testing.T) {
 	// Act
 	_, err := ParseStructAnnotation(field, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidElement)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidElement)
 }
 func TestParseStructAnnotation_SingleRecordHL7(t *testing.T) {
 	// Arrange
@@ -653,7 +653,7 @@ func TestParseAnnotationElements_InvalidKey(t *testing.T) {
 		constants.AnnotationElementGroup,
 	})
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidElementKey)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidElementKey)
 }
 func TestParseAnnotationElements_EmptyKey(t *testing.T) {
 	// Arrange
@@ -663,7 +663,7 @@ func TestParseAnnotationElements_EmptyKey(t *testing.T) {
 		constants.AnnotationElementAttribute,
 	})
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidElementKey)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidElementKey)
 }
 func TestParseAnnotationElements_InvalidFormat(t *testing.T) {
 	// Arrange
@@ -673,7 +673,7 @@ func TestParseAnnotationElements_InvalidFormat(t *testing.T) {
 		constants.AnnotationElementAttribute,
 	})
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrAnnotationParsingInvalidElement)
+	assert.ErrorIs(t, err, errdef.ErrAnnotationParsingInvalidElement)
 }
 
 // ProcessStructReflection tests

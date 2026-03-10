@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/blutspende/go-parser/constants"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/blutspende/go-parser/pconfig"
 
 	"reflect"
@@ -21,7 +21,7 @@ func parseStructRecursive(inputLines []string, targetStruct interface{}, lineInd
 	empty := true
 	// Check for maximum depth
 	if depth >= constants.MaxDepth {
-		return errmsg.ErrStructureParsingMaxDepthReached
+		return errdef.ErrStructureParsingMaxDepthReached
 	}
 	// Process the target structure
 	targetTypes, targetValues, _, err := ProcessStructReflection(targetStruct)
@@ -34,7 +34,7 @@ func parseStructRecursive(inputLines []string, targetStruct interface{}, lineInd
 		// Parse the targetStruct field targetFieldAnnotation
 		targetStructAnnotation, err := ParseStructAnnotation(targetType, config)
 		if err != nil {
-			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
+			if errors.Is(err, errdef.ErrAnnotationParsingMissingAnnotation) {
 				// If the annotation is missing, skip this field
 				continue
 			} else {
@@ -71,7 +71,7 @@ func parseStructRecursive(inputLines []string, targetStruct interface{}, lineInd
 				}
 				if err != nil {
 					// Line tag mismatch or empty structure means the array is over
-					if errors.Is(err, errmsg.ErrLineParsingLineTagMismatch) || errors.Is(err, errmsg.ErrStructureParsingEmptyStructure) {
+					if errors.Is(err, errdef.ErrLineParsingLineTagMismatch) || errors.Is(err, errdef.ErrStructureParsingEmptyStructure) {
 						break
 					} else {
 						// Any other error is returned as error
@@ -93,7 +93,7 @@ func parseStructRecursive(inputLines []string, targetStruct interface{}, lineInd
 				} else {
 					if config.EnforceMessageCompleteness {
 						// If not optional and completeness is enforced: error
-						return fmt.Errorf("%w: expected type '%s'", errmsg.ErrStructureParsingInputLinesDepleted, targetType.Name)
+						return fmt.Errorf("%w: expected type '%s'", errdef.ErrStructureParsingInputLinesDepleted, targetType.Name)
 					} else {
 						// Completeness is not enforced: just return (nothing more to parse)
 						return nil
@@ -121,7 +121,7 @@ func parseStructRecursive(inputLines []string, targetStruct interface{}, lineInd
 
 			if err != nil {
 				// If optional: line tag mismatch or empty structure can be skipped
-				if targetOptional && (errors.Is(err, errmsg.ErrLineParsingLineTagMismatch) || errors.Is(err, errmsg.ErrStructureParsingEmptyStructure)) {
+				if targetOptional && (errors.Is(err, errdef.ErrLineParsingLineTagMismatch) || errors.Is(err, errdef.ErrStructureParsingEmptyStructure)) {
 					continue
 				} else {
 					// Any other case: the error is returned as error
@@ -136,7 +136,7 @@ func parseStructRecursive(inputLines []string, targetStruct interface{}, lineInd
 
 	// Return the empty structure error if nothing matched
 	if empty {
-		return errmsg.ErrStructureParsingEmptyStructure
+		return errdef.ErrStructureParsingEmptyStructure
 	} else {
 		// Or no error if all ok
 		return nil

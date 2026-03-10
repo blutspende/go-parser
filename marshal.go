@@ -18,7 +18,7 @@ func Marshal(sourceStruct interface{}, config *pconfig.Configuration) (result []
 		return nil, err
 	}
 	// Convert UTF8 string array to encoding
-	result, err = encoding.ConvertArrayFromUtf8ToEncoding(lines, config.Encoding)
+	result, err = encoding.ConvertArrayFromUTF8ToEncoding(lines, config.Encoding)
 	if err != nil {
 		return nil, err
 	}

@@ -4,13 +4,13 @@ import (
 	"regexp"
 
 	"github.com/blutspende/bloodlab-common/encoding"
-	"github.com/blutspende/bloodlab-common/messagetype"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/bloodlab-common/instrumentenum"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/blutspende/go-parser/functions"
 	"github.com/blutspende/go-parser/pconfig"
 )
 
-func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (messageType messagetype.MessageType, err error) {
+func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (messageType instrumentenum.MessageType, err error) {
 	// Init configuration
 	err = pconfig.InitConfig(config)
 	if err != nil {
@@ -18,10 +18,10 @@ func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (mes
 	}
 	// Check for correct protocol
 	if config.Protocol != pconfig.ASTM {
-		return "", errmsg.ErrIdentifyMessageWrongProtocol
+		return "", errdef.ErrIdentifyMessageWrongProtocol
 	}
 	// Convert encoding to UTF8
-	utf8Data, err := encoding.ConvertFromEncodingToUtf8(messageData, config.Encoding)
+	utf8Data, err := encoding.ConvertFromEncodingToUTF8(messageData, config.Encoding)
 	if err != nil {
 		return "", err
 	}
@@ -46,16 +46,16 @@ func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (mes
 	// Check the first characters against the regexes and return the message type
 	switch {
 	case regexp.MustCompile(expressionQuery).MatchString(firstChars):
-		return messagetype.Query, nil
+		return instrumentenum.MessageTypeQuery, nil
 	case regexp.MustCompile(expressionOrder).MatchString(firstChars):
-		return messagetype.Order, nil
+		return instrumentenum.MessageTypeOrder, nil
 	case regexp.MustCompile(expressionOrderAndResult).MatchString(firstChars):
-		return messagetype.Result, nil
+		return instrumentenum.MessageTypeResult, nil
 	case regexp.MustCompile(expressionManyOrderAndResult).MatchString(firstChars):
-		return messagetype.Result, nil
+		return instrumentenum.MessageTypeResult, nil
 	}
-	// If no match was found return unknown
-	return messagetype.Unidentified, err
+	// If no match was found, return unknown
+	return instrumentenum.MessageTypeUnidentified, err
 }
 
 func IdentifyMessageHL7(messageData []byte, config *pconfig.Configuration) (messageType string, protocolVersion string, err error) {
@@ -66,10 +66,10 @@ func IdentifyMessageHL7(messageData []byte, config *pconfig.Configuration) (mess
 	}
 	// Check for correct protocol
 	if config.Protocol != pconfig.HL7 {
-		return "", "", errmsg.ErrIdentifyMessageWrongProtocol
+		return "", "", errdef.ErrIdentifyMessageWrongProtocol
 	}
 	// Convert encoding to UTF8
-	utf8Data, err := encoding.ConvertFromEncodingToUtf8(messageData, config.Encoding)
+	utf8Data, err := encoding.ConvertFromEncodingToUTF8(messageData, config.Encoding)
 	if err != nil {
 		return "", "", err
 	}
@@ -92,11 +92,11 @@ func IdentifyMessageHL7(messageData []byte, config *pconfig.Configuration) (mess
 	}
 	// Check for missing data
 	if headerMsg.Header.MessageType == "" {
-		return "", "", errmsg.ErrIdentifyMessageMissingMessageType
+		return "", "", errdef.ErrIdentifyMessageMissingMessageType
 	}
 	// Note: option to also error on missing protocol version
 	//if headerMsg.Header.ProtocolVersion == "" {
-	//	return "", "", errmsg.ErrIdentifyMessageMissingProtocolVersion
+	//	return "", "", errdef.ErrIdentifyMessageMissingProtocolVersion
 	//}
 	// Return the extracted message type and protocol version from the header struct
 	return headerMsg.Header.MessageType, headerMsg.Header.ProtocolVersion, nil
