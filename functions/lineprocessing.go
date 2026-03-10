@@ -2,7 +2,7 @@ package functions
 
 import (
 	"github.com/blutspende/go-parser/enums/lineseparator"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/blutspende/go-parser/pconfig"
 
 	"strings"
@@ -11,12 +11,12 @@ import (
 func SliceLines(input string, config *pconfig.Configuration) (output []string, err error) {
 	// Check for empty input
 	if input == "" {
-		return nil, errmsg.ErrLineProcessingEmptyInput
+		return nil, errdef.ErrLineProcessingEmptyInput
 	}
 
 	// A line separator has to be provided if auto-detect is disabled
 	if !config.AutoDetectLineSeparator && config.LineSeparator == "" {
-		return nil, errmsg.ErrLineProcessingNoLineSeparator
+		return nil, errdef.ErrLineProcessingNoLineSeparator
 	}
 
 	var lines []string
@@ -41,7 +41,7 @@ func SliceLines(input string, config *pconfig.Configuration) (output []string, e
 		} else {
 			if lfCnt > 0 && crCnt > 0 && lfCnt != crCnt {
 				// Mixed number of different line endings are not allowed
-				return nil, errmsg.ErrLineProcessingInvalidLinebreak
+				return nil, errdef.ErrLineProcessingInvalidLinebreak
 			}
 			if lfCnt == 0 {
 				// Only CR line endings: replace with LF

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/blutspende/go-parser/constants"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/blutspende/go-parser/models"
 	"github.com/blutspende/go-parser/pconfig"
 )
@@ -18,7 +18,7 @@ import (
 func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation models.StructAnnotation, sequenceNumber int, config *pconfig.Configuration) (err error) {
 	// Check for input line length
 	if len(inputLine) == 0 {
-		return errmsg.ErrLineParsingEmptyInput
+		return errdef.ErrLineParsingEmptyInput
 	}
 
 	// Setup inputFields variable to split the inputLine into and split start for header processing
@@ -30,7 +30,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	if config.Protocol == pconfig.ASTM && inputLine[0] == 'H' {
 		// Check if the inputLine is long enough to contain delimiters
 		if len(inputLine) < 5 {
-			return errmsg.ErrLineParsingHeaderTooShort
+			return errdef.ErrLineParsingHeaderTooShort
 		}
 		// Override delimiters
 		config.Delimiters.Field = string(inputLine[1])
@@ -44,7 +44,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 	} else if config.Protocol == pconfig.HL7 && inputLine[0:3] == "MSH" {
 		// Check if the inputLine is long enough to contain delimiters
 		if len(inputLine) < 8 {
-			return errmsg.ErrLineParsingHeaderTooShort
+			return errdef.ErrLineParsingHeaderTooShort
 		}
 		config.Delimiters.Field = inputLine[3:4]        // Default |
 		config.Delimiters.Component = inputLine[4:5]    // Default ^
@@ -64,28 +64,28 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 
 	// First two fields are mandatory in ASTM
 	if config.Protocol == pconfig.ASTM && len(inputFields) < 2 {
-		return fmt.Errorf("%w: %s", errmsg.ErrLineParsingNotEnoughFields, inputLine)
+		return fmt.Errorf("%w: %s", errdef.ErrLineParsingNotEnoughFields, inputLine)
 	}
 
 	// Check for mach of name and subname
 	// Note: name checking is always enforced, but instead of error it is returned in the nameOk variable
 	if inputFields[0] != recordAnnotation.Tag {
-		return fmt.Errorf("%w: expected '%s', got '%s', on line '%s'", errmsg.ErrLineParsingLineTagMismatch, recordAnnotation.Tag, inputFields[0], inputLine)
+		return fmt.Errorf("%w: expected '%s', got '%s', on line '%s'", errdef.ErrLineParsingLineTagMismatch, recordAnnotation.Tag, inputFields[0], inputLine)
 	}
 	if subname, exists := recordAnnotation.Attributes[constants.AttributeSubname]; exists {
 		// If subname is given at least 3 fields are required
 		if len(inputFields) < 3 {
-			return fmt.Errorf("%w: %s", errmsg.ErrLineParsingNotEnoughFields, inputLine)
+			return fmt.Errorf("%w: %s", errdef.ErrLineParsingNotEnoughFields, inputLine)
 		}
 		// Check for subname match
 		if inputFields[2] != subname {
-			return fmt.Errorf("%w for subname: expected '%s', got '%s', on line '%s'", errmsg.ErrLineParsingLineTagMismatch, subname, inputFields[2], inputLine)
+			return fmt.Errorf("%w for subname: expected '%s', got '%s', on line '%s'", errdef.ErrLineParsingLineTagMismatch, subname, inputFields[2], inputLine)
 		}
 	}
 
 	// Check for validity of the sequence number if enforced - ASTM case
 	if config.EnforceSequenceNumberCheck && config.Protocol == pconfig.ASTM && inputFields[1] != strconv.Itoa(sequenceNumber) && !isHeader {
-		return fmt.Errorf("%w: expected '%s', got '%s', on line '%s'", errmsg.ErrLineParsingSequenceNumberMismatch, strconv.Itoa(sequenceNumber), inputFields[1], inputLine)
+		return fmt.Errorf("%w: expected '%s', got '%s', on line '%s'", errdef.ErrLineParsingSequenceNumberMismatch, strconv.Itoa(sequenceNumber), inputFields[1], inputLine)
 	}
 
 	// Process the target structure
@@ -99,7 +99,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 		// Parse the targetStruct field targetFieldAnnotation
 		targetFieldAnnotation, err := ParseFieldAnnotation(targetType, config)
 		if err != nil {
-			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
+			if errors.Is(err, errdef.ErrAnnotationParsingMissingAnnotation) {
 				// If the annotation is missing, skip this field
 				continue
 			} else {
@@ -109,20 +109,20 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 
 		// ASTM reserved: 1-name, 2-sequence number; HL7 reserved: 1-name
 		if (config.Protocol == pconfig.ASTM && targetFieldAnnotation.FieldPos < 3) || (config.Protocol == pconfig.HL7 && targetFieldAnnotation.FieldPos < 2) {
-			return errmsg.ErrLineParsingReservedFieldPosReference
+			return errdef.ErrLineParsingReservedFieldPosReference
 		}
 
 		// Check for validity of the sequence number if enforced - HL7 case
 		_, sequenceAnnotation := targetFieldAnnotation.Attributes[constants.AttributeSequence]
 		if config.EnforceSequenceNumberCheck && config.Protocol == pconfig.HL7 && sequenceAnnotation && inputFields[targetFieldAnnotation.FieldPos-1] != strconv.Itoa(sequenceNumber) {
-			return fmt.Errorf("%w: expected '%s', got '%s', on line '%s'", errmsg.ErrLineParsingSequenceNumberMismatch, strconv.Itoa(sequenceNumber), inputFields[targetFieldAnnotation.FieldPos-1], inputLine)
+			return fmt.Errorf("%w: expected '%s', got '%s', on line '%s'", errdef.ErrLineParsingSequenceNumberMismatch, strconv.Itoa(sequenceNumber), inputFields[targetFieldAnnotation.FieldPos-1], inputLine)
 		}
 
 		// Not enough inputFields or empty inputField
 		if len(inputFields) < targetFieldAnnotation.FieldPos || inputFields[targetFieldAnnotation.FieldPos-1] == "" {
 			// If the field is required it's an error, otherwise skip it
 			if _, exists := targetFieldAnnotation.Attributes[constants.AttributeRequired]; exists {
-				return errmsg.ErrLineParsingRequiredInputFieldMissing
+				return errdef.ErrLineParsingRequiredInputFieldMissing
 			} else {
 				continue
 			}
@@ -163,7 +163,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 			if len(components) < targetFieldAnnotation.ComponentPos {
 				// Error if the component is required, skip otherwise
 				if _, exists := targetFieldAnnotation.Attributes[constants.AttributeRequired]; exists {
-					return errmsg.ErrLineParsingInputComponentsMissing
+					return errdef.ErrLineParsingInputComponentsMissing
 				} else {
 					continue
 				}
@@ -197,7 +197,7 @@ func ParseLine(inputLine string, targetStruct interface{}, recordAnnotation mode
 func parseSubstructure(inputString string, targetStruct interface{}, depth int, config *pconfig.Configuration) (err error) {
 	// Check depth limits
 	if (config.Protocol == pconfig.ASTM && depth > 1) || (config.Protocol == pconfig.HL7 && depth > 2) {
-		return errmsg.ErrLineParsingMaximumRecursionDepthExceeded
+		return errdef.ErrLineParsingMaximumRecursionDepthExceeded
 	}
 
 	// Determine depth dependent delimiter
@@ -208,7 +208,7 @@ func parseSubstructure(inputString string, targetStruct interface{}, depth int, 
 	case 2:
 		delimiter = config.Delimiters.SubComponent
 	default:
-		return errmsg.ErrLineParsingInvalidRecursionDepth
+		return errdef.ErrLineParsingInvalidRecursionDepth
 	}
 	// Split the input with the field delimiter
 	inputFields := splitStringWithEscape(inputString, delimiter, config)
@@ -224,7 +224,7 @@ func parseSubstructure(inputString string, targetStruct interface{}, depth int, 
 		// Parse the targetStruct field targetFieldAnnotation
 		targetFieldAnnotation, err := ParseFieldAnnotation(targetType, config)
 		if err != nil {
-			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
+			if errors.Is(err, errdef.ErrAnnotationParsingMissingAnnotation) {
 				// If the annotation is missing, skip this field
 				continue
 			} else {
@@ -236,7 +236,7 @@ func parseSubstructure(inputString string, targetStruct interface{}, depth int, 
 		if len(inputFields) < targetFieldAnnotation.FieldPos || inputFields[targetFieldAnnotation.FieldPos-1] == "" {
 			// If the field is required it's an error, otherwise skip it
 			if _, exists := targetFieldAnnotation.Attributes[constants.AttributeRequired]; exists {
-				return errmsg.ErrLineParsingRequiredInputFieldMissing
+				return errdef.ErrLineParsingRequiredInputFieldMissing
 			} else {
 				continue
 			}
@@ -264,7 +264,7 @@ func setField(value string, field reflect.Value, config *pconfig.Configuration) 
 	// Ensure the field is settable
 	if !field.CanSet() {
 		// Field is not settable
-		return errmsg.ErrLineParsingNonSettableField
+		return errdef.ErrLineParsingNonSettableField
 	}
 	// Handle pointer types by allocating and dereferencing
 	if field.Kind() == reflect.Ptr {
@@ -294,21 +294,21 @@ func setField(value string, field reflect.Value, config *pconfig.Configuration) 
 	case reflect.Int:
 		num, err := strconv.Atoi(value)
 		if err != nil {
-			return errmsg.ErrLineParsingDataParsingError
+			return errdef.ErrLineParsingDataParsingError
 		}
 		field.Set(reflect.ValueOf(num))
 		return nil
 	case reflect.Float32:
 		num, err := strconv.ParseFloat(value, 32)
 		if err != nil {
-			return errmsg.ErrLineParsingDataParsingError
+			return errdef.ErrLineParsingDataParsingError
 		}
 		field.Set(reflect.ValueOf(float32(num)))
 		return nil
 	case reflect.Float64:
 		num, err := strconv.ParseFloat(value, 64)
 		if err != nil {
-			return errmsg.ErrLineParsingDataParsingError
+			return errdef.ErrLineParsingDataParsingError
 		}
 		field.Set(reflect.ValueOf(num))
 		return nil
@@ -325,11 +325,11 @@ func setField(value string, field reflect.Value, config *pconfig.Configuration) 
 				timeFormat = "20060102150405" // YYYYMMDDhhmmss
 				isShort = false
 			default:
-				return errmsg.ErrLineParsingInvalidDateFormat
+				return errdef.ErrLineParsingInvalidDateFormat
 			}
 			timeInLocation, err := time.ParseInLocation(timeFormat, value, config.TimeLocation)
 			if err != nil {
-				return errmsg.ErrLineParsingDataParsingError
+				return errdef.ErrLineParsingDataParsingError
 			}
 			// Keep the short format in local time (if configured so) to preserve the actual day
 			if isShort && config.KeepShortDateTimeZone {
@@ -345,7 +345,7 @@ func setField(value string, field reflect.Value, config *pconfig.Configuration) 
 		}
 	}
 	// Return error if no type match was found (each successful parsing returns nil)
-	return errmsg.ErrLineParsingUnsupportedDataType
+	return errdef.ErrLineParsingUnsupportedDataType
 }
 
 func splitStringWithEscape(input string, delimiter string, config *pconfig.Configuration) (result []string) {
@@ -400,7 +400,7 @@ func replaceHL7Escapes(input string, config *pconfig.Configuration) (result stri
 			for end = i + 1; end < len(inputRunes) && inputRunes[end] != escapeRune; end++ {
 			}
 			if end == len(inputRunes) {
-				return "", errmsg.ErrLineParsingUnterminatedEscapeSequence
+				return "", errdef.ErrLineParsingUnterminatedEscapeSequence
 			}
 			escapeSeq := string(inputRunes[i+1 : end])
 			switch escapeSeq {
@@ -422,7 +422,7 @@ func replaceHL7Escapes(input string, config *pconfig.Configuration) (result stri
 					charInt, _ := strconv.ParseInt(charNumStr, 16, 32)
 					builder.WriteRune(rune(charInt))
 				} else {
-					return "", errmsg.ErrLineParsingUnknownEscapeSequence
+					return "", errdef.ErrLineParsingUnknownEscapeSequence
 				}
 			}
 			i = end

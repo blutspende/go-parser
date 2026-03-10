@@ -7,7 +7,7 @@ import (
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/bloodlab-common/timezone"
 	"github.com/blutspende/go-parser"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/blutspende/go-parser/messageformat/astm/lis02a2"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/encoding/charmap"
@@ -499,7 +499,7 @@ func TestNullValuesShouldGiveQualifiedError(t *testing.T) {
 	err := parser.Unmarshal(nil, &message, config)
 	// Assert
 	assert.NotNil(t, err)
-	assert.EqualError(t, err, errmsg.ErrLineProcessingEmptyInput.Error())
+	assert.EqualError(t, err, errdef.ErrLineProcessingEmptyInput.Error())
 }
 
 func TestUnmarshalMultipleOrdersAndResultsForOnePatient(t *testing.T) {

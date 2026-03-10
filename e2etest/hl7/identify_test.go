@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/blutspende/go-parser"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/blutspende/go-parser/pconfig"
 	"github.com/stretchr/testify/assert"
 )
@@ -26,7 +26,7 @@ func TestIdentifyMessage_MissingMessageType(t *testing.T) {
 	// Act
 	messageType, protocolVersion, err := parser.IdentifyMessageHL7([]byte(data), config)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrIdentifyMessageMissingMessageType.Error())
+	assert.EqualError(t, err, errdef.ErrIdentifyMessageMissingMessageType.Error())
 	assert.Equal(t, "", messageType)
 	assert.Equal(t, "", protocolVersion)
 }
@@ -47,7 +47,7 @@ func TestIdentifyMessage_WrongProtocol(t *testing.T) {
 	// Act
 	messageType, protocolVersion, err := parser.IdentifyMessageHL7([]byte(data), config)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrIdentifyMessageWrongProtocol.Error())
+	assert.EqualError(t, err, errdef.ErrIdentifyMessageWrongProtocol.Error())
 	assert.Equal(t, "", messageType)
 	assert.Equal(t, "", protocolVersion)
 	// Teardown

@@ -3,7 +3,7 @@ package functions
 import (
 	"testing"
 
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -252,7 +252,7 @@ func TestParseStruct_EmptyArray(t *testing.T) {
 	// Act
 	err := ParseStruct(input, &target, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrStructureParsingEmptyStructure)
+	assert.ErrorIs(t, err, errdef.ErrStructureParsingEmptyStructure)
 }
 func TestParseStruct_EmptyArrayAtEnd(t *testing.T) {
 	// Arrange
@@ -307,7 +307,7 @@ func TestParseStruct_LinesDepleted(t *testing.T) {
 	// Act
 	err := ParseStruct(input, &target, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrStructureParsingInputLinesDepleted)
+	assert.ErrorIs(t, err, errdef.ErrStructureParsingInputLinesDepleted)
 	// Teardown
 	teardown()
 }
@@ -349,7 +349,7 @@ func TestParseStruct_LinesDepletedInGroup(t *testing.T) {
 	// Act
 	err := ParseStruct(input, &target, configHL7)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrStructureParsingInputLinesDepleted)
+	assert.ErrorIs(t, err, errdef.ErrStructureParsingInputLinesDepleted)
 	// Teardown
 	teardown()
 }
@@ -394,7 +394,7 @@ func TestParseStruct_LinesDepletedAfterOptional(t *testing.T) {
 	// Act
 	err := ParseStruct(input, &target, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrStructureParsingInputLinesDepleted)
+	assert.ErrorIs(t, err, errdef.ErrStructureParsingInputLinesDepleted)
 }
 
 // ParseStruct tests - mismatches
@@ -412,7 +412,7 @@ func TestParseStruct_MismatchedLine(t *testing.T) {
 	// Act
 	err := ParseStruct(input, &target, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingLineTagMismatch)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingLineTagMismatch)
 }
 func TestParseStruct_GroupMissing(t *testing.T) {
 	// Arrange
@@ -430,7 +430,7 @@ func TestParseStruct_GroupMissing(t *testing.T) {
 	// Act
 	err := ParseStruct(input, &target, configHL7)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingLineTagMismatch)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingLineTagMismatch)
 }
 func TestParseStruct_RecordInGroupMissing(t *testing.T) {
 	// Arrange
@@ -449,7 +449,7 @@ func TestParseStruct_RecordInGroupMissing(t *testing.T) {
 	// Act
 	err := ParseStruct(input, &target, configHL7)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingLineTagMismatch)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingLineTagMismatch)
 }
 
 // ParseStruct tests - group arrays

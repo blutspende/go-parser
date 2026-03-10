@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -141,7 +141,7 @@ func TestParseLine_HeaderTooShort_ASTM(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("H"), 1, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingHeaderTooShort)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingHeaderTooShort)
 }
 func TestParseLine_Header_HL7(t *testing.T) {
 	// Arrange
@@ -176,7 +176,7 @@ func TestParseLine_HeaderTooShort_HL7(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("MSH"), 1, configHL7)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingHeaderTooShort)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingHeaderTooShort)
 }
 
 // ParseLine tests - missing data and errors
@@ -211,7 +211,7 @@ func TestParseLine_MissingRequiredComponent(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingInputComponentsMissing)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingInputComponentsMissing)
 }
 func TestParseLine_MissingDataAtTheEnd(t *testing.T) {
 	// Arrange
@@ -232,7 +232,7 @@ func TestParseLine_RecordTypeNameMismatch(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingLineTagMismatch)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingLineTagMismatch)
 }
 func TestParseLine_EmptyInput(t *testing.T) {
 	// Arrange
@@ -241,7 +241,7 @@ func TestParseLine_EmptyInput(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingEmptyInput)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingEmptyInput)
 }
 func TestParseLine_MandatoryFieldsMissing(t *testing.T) {
 	// Arrange
@@ -250,7 +250,7 @@ func TestParseLine_MandatoryFieldsMissing(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingNotEnoughFields)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingNotEnoughFields)
 }
 func TestParseLine_MissingRequiredField(t *testing.T) {
 	// Arrange
@@ -259,7 +259,7 @@ func TestParseLine_MissingRequiredField(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingRequiredInputFieldMissing)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingRequiredInputFieldMissing)
 }
 func TestParseLine_NotEnoughInputFields(t *testing.T) {
 	// Arrange
@@ -268,7 +268,7 @@ func TestParseLine_NotEnoughInputFields(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingRequiredInputFieldMissing)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingRequiredInputFieldMissing)
 }
 func TestParseLine_SequenceNumberMismatch(t *testing.T) {
 	// Arrange
@@ -277,7 +277,7 @@ func TestParseLine_SequenceNumberMismatch(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingSequenceNumberMismatch)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingSequenceNumberMismatch)
 }
 func TestParseLine_SequenceNumberMismatchWithoutEnforcing(t *testing.T) {
 	// Arrange
@@ -298,7 +298,7 @@ func TestParseLine_ReservedFieldRecord(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingReservedFieldPosReference)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingReservedFieldPosReference)
 }
 func TestParseLine_MissingAnnotation(t *testing.T) {
 	// Arrange
@@ -393,7 +393,7 @@ func TestParseLine_SubSub_ASTM(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("T"), 1, config)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingMaximumRecursionDepthExceeded)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingMaximumRecursionDepthExceeded)
 }
 func TestParseLine_SubSub_HL7(t *testing.T) {
 	// Arrange
@@ -514,7 +514,7 @@ func TestParseLine_ReservedFieldRecordHl7(t *testing.T) {
 	// Act
 	err := ParseLine(input, &target, createStructAnnotation("REC"), 1, configHL7)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingReservedFieldPosReference)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingReservedFieldPosReference)
 }
 func TestParseLine_NotReservedFieldRecordHl7(t *testing.T) {
 	// Arrange
@@ -668,7 +668,7 @@ func TestReplaceHL7Escapes_MissingTerminator(t *testing.T) {
 	// Act
 	result, err := replaceHL7Escapes(input, configHL7)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingUnterminatedEscapeSequence)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingUnterminatedEscapeSequence)
 	assert.Equal(t, "", result)
 }
 func TestReplaceHL7Escapes_UnknownSequence(t *testing.T) {
@@ -677,7 +677,7 @@ func TestReplaceHL7Escapes_UnknownSequence(t *testing.T) {
 	// Act
 	result, err := replaceHL7Escapes(input, configHL7)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingUnknownEscapeSequence)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingUnknownEscapeSequence)
 	assert.Equal(t, "", result)
 }
 func TestReplaceHL7Escapes_HexChar(t *testing.T) {
@@ -695,7 +695,7 @@ func TestReplaceHL7Escapes_InvalidHex(t *testing.T) {
 	// Act
 	result, err := replaceHL7Escapes(input, configHL7)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingUnknownEscapeSequence)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingUnknownEscapeSequence)
 	assert.Equal(t, "", result)
 }
 func TestReplaceHL7Escapes_InvalidLowercaseHex(t *testing.T) {
@@ -704,7 +704,7 @@ func TestReplaceHL7Escapes_InvalidLowercaseHex(t *testing.T) {
 	// Act
 	result, err := replaceHL7Escapes(input, configHL7)
 	// Assert
-	assert.ErrorIs(t, err, errmsg.ErrLineParsingUnknownEscapeSequence)
+	assert.ErrorIs(t, err, errdef.ErrLineParsingUnknownEscapeSequence)
 	assert.Equal(t, "", result)
 }
 func TestReplaceHL7Escapes_Br(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 	"regexp"
 
 	"github.com/blutspende/go-parser/constants"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/blutspende/go-parser/pconfig"
 )
 
@@ -16,7 +16,7 @@ func BuildStruct(sourceStruct interface{}, config *pconfig.Configuration) (resul
 func buildStructRecursive(sourceStruct interface{}, sequenceNumber int, depth int, config *pconfig.Configuration) (result []string, err error) {
 	// Check for maximum depth
 	if depth >= constants.MaxDepth {
-		return nil, errmsg.ErrStructureParsingMaxDepthReached
+		return nil, errdef.ErrStructureParsingMaxDepthReached
 	}
 
 	// Process the source structure
@@ -30,7 +30,7 @@ func buildStructRecursive(sourceStruct interface{}, sequenceNumber int, depth in
 		// Parse the sourceStruct field sourceFieldAnnotation
 		sourceStructAnnotation, err := ParseStructAnnotation(sourceType, config)
 		if err != nil {
-			if errors.Is(err, errmsg.ErrAnnotationParsingMissingAnnotation) {
+			if errors.Is(err, errdef.ErrAnnotationParsingMissingAnnotation) {
 				// If the annotation is missing, skip this field
 				continue
 			} else {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/bloodlab-common/instrumentenum"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/blutspende/go-parser/functions"
 	"github.com/blutspende/go-parser/pconfig"
 )
@@ -18,7 +18,7 @@ func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (mes
 	}
 	// Check for correct protocol
 	if config.Protocol != pconfig.ASTM {
-		return "", errmsg.ErrIdentifyMessageWrongProtocol
+		return "", errdef.ErrIdentifyMessageWrongProtocol
 	}
 	// Convert encoding to UTF8
 	utf8Data, err := encoding.ConvertFromEncodingToUTF8(messageData, config.Encoding)
@@ -66,7 +66,7 @@ func IdentifyMessageHL7(messageData []byte, config *pconfig.Configuration) (mess
 	}
 	// Check for correct protocol
 	if config.Protocol != pconfig.HL7 {
-		return "", "", errmsg.ErrIdentifyMessageWrongProtocol
+		return "", "", errdef.ErrIdentifyMessageWrongProtocol
 	}
 	// Convert encoding to UTF8
 	utf8Data, err := encoding.ConvertFromEncodingToUTF8(messageData, config.Encoding)
@@ -92,11 +92,11 @@ func IdentifyMessageHL7(messageData []byte, config *pconfig.Configuration) (mess
 	}
 	// Check for missing data
 	if headerMsg.Header.MessageType == "" {
-		return "", "", errmsg.ErrIdentifyMessageMissingMessageType
+		return "", "", errdef.ErrIdentifyMessageMissingMessageType
 	}
 	// Note: option to also error on missing protocol version
 	//if headerMsg.Header.ProtocolVersion == "" {
-	//	return "", "", errmsg.ErrIdentifyMessageMissingProtocolVersion
+	//	return "", "", errdef.ErrIdentifyMessageMissingProtocolVersion
 	//}
 	// Return the extracted message type and protocol version from the header struct
 	return headerMsg.Header.MessageType, headerMsg.Header.ProtocolVersion, nil

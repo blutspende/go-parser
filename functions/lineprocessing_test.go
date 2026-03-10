@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/blutspende/go-parser/enums/lineseparator"
-	"github.com/blutspende/go-parser/errmsg"
+	"github.com/blutspende/go-parser/errdef"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -94,7 +94,7 @@ func TestSliceLines_Empty(t *testing.T) {
 	// Act
 	_, err := SliceLines(input, config)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrLineProcessingEmptyInput.Error())
+	assert.EqualError(t, err, errdef.ErrLineProcessingEmptyInput.Error())
 }
 func TestSliceLines_Invalid(t *testing.T) {
 	// Arrange
@@ -102,7 +102,7 @@ func TestSliceLines_Invalid(t *testing.T) {
 	// Act
 	_, err := SliceLines(input, config)
 	// Assert
-	assert.EqualError(t, err, errmsg.ErrLineProcessingInvalidLinebreak.Error())
+	assert.EqualError(t, err, errdef.ErrLineProcessingInvalidLinebreak.Error())
 }
 func TestSliceLines_SingleLine(t *testing.T) {
 	// Arrange
