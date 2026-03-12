@@ -43,6 +43,7 @@ func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (mes
 	expressionOrder := "^(H(PM?C?M?OM?C?M?)+)+L?$"
 	expressionOrderAndResult := "^(H(PM*C?M*OM*C?M*(RM*C?M*)+)+)+L?$"
 	expressionManyOrderAndResult := "^(H(PM*C?M*(OM*C?M*(RM*C?M*)+)*)+)L?$"
+	expressionMultimessageResult := "^((H(PM*C?M*(OM*C?M*(RM*C?M*)+)*)+)L?)+$"
 	// Check the first characters against the regexes and return the message type
 	switch {
 	case regexp.MustCompile(expressionQuery).MatchString(firstChars):
@@ -52,6 +53,8 @@ func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (mes
 	case regexp.MustCompile(expressionOrderAndResult).MatchString(firstChars):
 		return instrumentenum.MessageTypeResult, nil
 	case regexp.MustCompile(expressionManyOrderAndResult).MatchString(firstChars):
+		return instrumentenum.MessageTypeResult, nil
+	case regexp.MustCompile(expressionMultimessageResult).MatchString(firstChars):
 		return instrumentenum.MessageTypeResult, nil
 	}
 	// If no match was found, return unknown
