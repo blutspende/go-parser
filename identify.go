@@ -8,6 +8,7 @@ import (
 	"github.com/blutspende/go-parser/errdef"
 	"github.com/blutspende/go-parser/functions"
 	"github.com/blutspende/go-parser/pconfig"
+	"github.com/rs/zerolog/log"
 )
 
 func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (messageType instrumentenum.MessageType, err error) {
@@ -16,7 +17,7 @@ func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (mes
 	if err != nil {
 		return "", err
 	}
-	// Check for correct protocol
+	// Verify protocol
 	if config.Protocol != pconfig.ASTM {
 		return "", errdef.ErrIdentifyMessageWrongProtocol
 	}
@@ -30,35 +31,38 @@ func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (mes
 	if err != nil {
 		return "", err
 	}
-	// Extract the first characters from each line
-	firstChars := ""
+	// Extract the signature of the message
+	signature := ""
 	for _, line := range lines {
 		if len(line) > 0 {
-			firstChars += string(line[0])
+			firstChar := string(line[0])
+			// Filter out comments and manufacturer records
+			if firstChar == "C" || firstChar == "M" {
+				continue
+			}
+			// Collect first chars
+			signature += firstChar
 		}
 	}
-	// TODO: verify these regexes to be correct
-	// Set up the possible message types regexes
-	expressionQuery := "^(HQ+)+L?$"
-	expressionOrder := "^(H(PM?C?M?OM?C?M?)+)+L?$"
-	expressionOrderAndResult := "^(H(PM*C?M*OM*C?M*(RM*C?M*)+)+)+L?$"
-	expressionManyOrderAndResult := "^(H(PM*C?M*(OM*C?M*(RM*C?M*)+)*)+)L?$"
-	expressionMultimessageResult := "^((H(PM*C?M*(OM*C?M*(RM*C?M*)+)*)+)L?)+$"
-	// Check the first characters against the regexes and return the message type
-	switch {
-	case regexp.MustCompile(expressionQuery).MatchString(firstChars):
-		return instrumentenum.MessageTypeQuery, nil
-	case regexp.MustCompile(expressionOrder).MatchString(firstChars):
-		return instrumentenum.MessageTypeOrder, nil
-	case regexp.MustCompile(expressionOrderAndResult).MatchString(firstChars):
-		return instrumentenum.MessageTypeResult, nil
-	case regexp.MustCompile(expressionManyOrderAndResult).MatchString(firstChars):
-		return instrumentenum.MessageTypeResult, nil
-	case regexp.MustCompile(expressionMultimessageResult).MatchString(firstChars):
-		return instrumentenum.MessageTypeResult, nil
+	// Set up the default ruleset and add custom rules from config
+	rules := []pconfig.ASTMIdentifyRule{
+		{"Query", "HQ+L", instrumentenum.MessageTypeQuery},
+		{"Order", "H(PO+)+L", instrumentenum.MessageTypeOrder},
+		{"Result", "H(P(OR+)+)+L", instrumentenum.MessageTypeResult},
+		{"Result (multimessage)", "(H(P(OR+)+)+L)+", instrumentenum.MessageTypeResult},
 	}
-	// If no match was found, return unknown
-	return instrumentenum.MessageTypeUnidentified, err
+	rules = append(rules, config.CustomASTMIdentifyRules...)
+	// Check the message signature with all the match rules to try to find a match
+	for _, rule := range rules {
+		regex := regexp.MustCompile("^" + rule.Regex + "$")
+		if regex.MatchString(signature) {
+			log.Debug().Str("signature", signature).Interface("rule", rule).Msg("message identified")
+			return rule.Type, nil
+		}
+	}
+	// Return the default message type unidentified with no error
+	log.Debug().Str("signature", signature).Msg("message could not be identified")
+	return instrumentenum.MessageTypeUnidentified, nil
 }
 
 func IdentifyMessageHL7(messageData []byte, config *pconfig.Configuration) (messageType string, protocolVersion string, err error) {
@@ -67,7 +71,7 @@ func IdentifyMessageHL7(messageData []byte, config *pconfig.Configuration) (mess
 	if err != nil {
 		return "", "", err
 	}
-	// Check for correct protocol
+	// Verify protocol
 	if config.Protocol != pconfig.HL7 {
 		return "", "", errdef.ErrIdentifyMessageWrongProtocol
 	}
@@ -102,5 +106,6 @@ func IdentifyMessageHL7(messageData []byte, config *pconfig.Configuration) (mess
 	//	return "", "", errdef.ErrIdentifyMessageMissingProtocolVersion
 	//}
 	// Return the extracted message type and protocol version from the header struct
+	log.Debug().Str("MessageType", headerMsg.Header.MessageType).Str("ProtocolVersion", headerMsg.Header.ProtocolVersion).Msg("message identified")
 	return headerMsg.Header.MessageType, headerMsg.Header.ProtocolVersion, nil
 }

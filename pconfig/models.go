@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/blutspende/bloodlab-common/encoding"
+	"github.com/blutspende/bloodlab-common/instrumentenum"
 	"github.com/blutspende/bloodlab-common/timezone"
 	"github.com/blutspende/go-parser/enums/lineseparator"
 	"github.com/blutspende/go-parser/enums/notation"
@@ -25,6 +26,7 @@ type Configuration struct {
 	EnforceMessageCompleteness bool
 	DropEmptyOutputRecords     bool
 	Delimiters                 Delimiters
+	CustomASTMIdentifyRules    []ASTMIdentifyRule
 	TimeLocation               *time.Location
 }
 
@@ -90,4 +92,10 @@ var DefaultDelimitersHL7 = Delimiters{
 	Repeat:       `~`,
 	Escape:       `\`,
 	SubComponent: `&`,
+}
+
+type ASTMIdentifyRule struct {
+	Name  string
+	Regex string
+	Type  instrumentenum.MessageType
 }
