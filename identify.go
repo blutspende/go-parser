@@ -15,7 +15,7 @@ func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (mes
 	// Init configuration
 	err = pconfig.InitConfig(config)
 	if err != nil {
-		return "", err
+		return
 	}
 	// Verify protocol
 	if config.Protocol != pconfig.ASTM {
@@ -24,12 +24,12 @@ func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (mes
 	// Convert encoding to UTF8
 	utf8Data, err := encoding.ConvertFromEncodingToUTF8(messageData, config.Encoding)
 	if err != nil {
-		return "", err
+		return
 	}
 	// Split the message data into lines
 	lines, err := functions.SliceLines(utf8Data, config)
 	if err != nil {
-		return "", err
+		return
 	}
 	// Extract the signature of the message
 	signature := ""
@@ -54,7 +54,11 @@ func IdentifyMessageASTM(messageData []byte, config *pconfig.Configuration) (mes
 	rules = append(rules, config.CustomASTMIdentifyRules...)
 	// Check the message signature with all the match rules to try to find a match
 	for _, rule := range rules {
-		regex := regexp.MustCompile("^" + rule.Regex + "$")
+		regex, err := regexp.Compile("^" + rule.Regex + "$")
+		if err != nil {
+			log.Error().Err(err).Interface("rule", rule).Msg(errdef.ErrIdentifyInvalidRegex.Error())
+			return "", errdef.ErrIdentifyInvalidRegex
+		}
 		if regex.MatchString(signature) {
 			log.Debug().Str("signature", signature).Interface("rule", rule).Msg("message identified")
 			return rule.Type, nil
