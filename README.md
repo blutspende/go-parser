@@ -5,15 +5,15 @@ Library for handling ASTM and HL7 protocols in Go.
 `go get github.com/blutspende/go-parser`
 
 # Features
-  - Marshalling and unmarshalling ASTM and HL7 messages
+  - Marshaling and unmarshalling ASTM and HL7 messages
   - Predefined message structures for ASTM LIS02-A2 and HL7 v2.3, v2.4
   - Robust annotation system for defining custom message types
-  - Wide range of behaviour customizations with a unified configuration parameter
+  - Wide range of behavior customizations with a unified configuration parameter
   - Identifying message types without decoding
   - Automatic detection of line break type and custom protocol delimiters
   - Converting from-to raw bytes supporting many encodings and automatic timezone conversion
 
-2 main functions and 2 utilities are provided:
+Two main functions and two utilities are provided:
 - `Unmarshal`: Converts a byte array to a Go structure
 - `Marshal`: Converts a Go structure to an array of byte arrays
 - `IdentifyMessage[ASTM/HL7]`: Identifies the type of message without decoding it
@@ -33,7 +33,7 @@ This section provides an overview as well as some specific details. This informa
 The messages are mapped to or from Go structures, these are called source and target structures depending on the parsing direction (marshal or unmarshal). These are also referred to as "annotated structures" throughout this document, which are regular Go struct type definitions with specific [annotations](#annotated-structures) for each field. These are the bases for the whole parsing, provided directly as a parameter to Marshal and as a pointer parameter to Unmarshal.
 
 ### Baseline
-The annotated structures can be specifically built for each user project, but a baseline is provided by this library following official protocol version documentations. They can be found in `messageformat/[protocol]/[version]` folders. They can be used directly as is, mixed with user defined structures, copied and modified, or taken as a guideline for creating completely user defined structures. Any of these approaches work.
+The annotated structures can be specifically built for each user project, but a baseline is provided by this library following official protocol version documentations. They can be found in `messageformat/[protocol]/[version]` folders. They can be used directly as is, mixed with user-defined structures, copied and modified, or taken as a guideline for creating completely user-defined structures. Any of these approaches work.
 
 ### Nesting
 These structures have a hierarchical nesting logic to mirror the complexities of an ASTM or HL7 message.
@@ -48,7 +48,7 @@ These are from top to bottom:
   - Content: Fields (matched to field separator separated actual primitive datatypes or substructures and/or arrays of them)
 - Substructure: a Field can also have components which can either be defined as fields in the record with special annotation, or by using a separate struct type definition (a substructure)
   - Content: component fields (any primitive data type or sub-substructure)
-- Sub-substructure (optional): in HL7 a substructure can have 1 more layer of substructure nested in it
+- Sub-substructure (optional): in HL7 a substructure can have one more layer of substructure nested in it
   - Content: component fields (any primitive data type)
 
 ### Recursion
@@ -119,7 +119,7 @@ In HL7 the escape sequences are more complex, and follow a specific pattern. The
 Description and examples of the 4 main functions provided by the library.
 
 ## Default configuration
-The `NewDefaultConfiguration` function returns a pointer to a new copy of the default configuration (including default delimiters) for the protocol selected by the only parameter to the function. This can then be used to modify the configuration for specific use cases while leaving the rest as default. This is the safe way to get a configuration instance, and it is not recommended to create a configuration instance manually. Defaults aim to keep behaviour backwards compatible even after version update with new functionalities introduced.
+The `NewDefaultConfiguration` function returns a pointer to a new copy of the default configuration (including default delimiters) for the protocol selected by the only parameter to the function. This can then be used to modify the configuration for specific use cases while leaving the rest as default. This is the safe way to get a configuration instance, and it is not recommended to create a configuration instance manually. Defaults aim to keep behavior backwards compatible even after version update with new functionalities introduced.
 ``` go
 config, err := pconfig.NewDefaultConfiguration(pconfig.PROTOCOL)
 if err != nil {
@@ -134,6 +134,8 @@ Identifies the type of message without fully decoding it. Message identification
 
 ### IdentifyMessageASTM
 Return values are options from `github.com/blutspende/bloodlab-common/messagetype` enum definitions, including the `Unidentified` which will be returned if the message doesn't fit any known type, but this will not produce an error. The type depends on the pattern of the records types in the message.
+
+The identifier extracts a signature of the message, which is the first character (the name tag) of each record line, with `C` and `M` records being filtered out. It is then matched as a whole string against a predefined set of regex patterns. It is possible to inject [custom rules](#CustomASTMIdentifyRules) for identifying messages, using the `CustomASTMIdentifyRules` array in the configuration parameter.
 ``` go
 messageType, err := parser.IdentifyMessageASTM(inputBytes, config)
 if err != nil {
@@ -191,7 +193,7 @@ for _, line := range lines {
 ```
 
 # Configuration structure
-For all three functions a configuration structure must be provided to determine behaviour.
+For all three functions a configuration structure must be provided to determine behavior.
 ``` go
 type Configuration struct {
     Protocol                   pconfig.Protocol
@@ -208,6 +210,7 @@ type Configuration struct {
     EnforceMessageCompleteness bool
     DropEmptyOutputRecords     bool
     Delimiters                 Delimiters
+    CustomASTMIdentifyRules    []ASTMIdentifyRule
     TimeLocation               *time.Location
 }
 ```
@@ -286,11 +289,24 @@ type Delimiters struct {
 }
 ```
 
+## CustomASTMIdentifyRules
+Can be used to inject custom rules for identifying ASTM messages. It is only used in the `IdentifyMessageASTM` [function](#IdentifyMessageASTM). `CustomASTMIdentifyRules` is an array of `ASTMIdentifyRule` structs, where each struct represents a match rule. This field is `nil` by default and can be left empty if there are no custom rules required.
+``` go
+type ASTMIdentifyRule struct {
+    Name  string
+    Regex string
+    Type  instrumentenum.MessageType
+}
+```
+- `Name` is used for logging and better readability.
+- `Regex` is a regular expression matched against the signature of the message as a whole string. The signature consists of the first character of each record line, with `C` and `M` records filtered out. Example: `(HQ+)+L?`.
+- `Type` is the common message type that will be returned if the regex matches the message signature.
+
 ## TimeLocation
 For internal use only. Should be ignored.
 
 # Annotated structures
-In order to read or write a message, an annotated structure is required. In a structure like this every field has to have an annotation. Fields without an annotation will be completely ignored. The annotation starts with the protocol name tag, then a colon and some information enclosed in quotation marks.
+In order to read or write a message, an annotated structure is required. In a structure like this every field has to have an annotation. Fields without an annotation will be completely ignored. The annotation starts with the protocol name tag, then a colon, and some information enclosed in quotation marks.
 ``` go
 type Structure struct {
     Field Type `astm:"information"`
@@ -456,7 +472,7 @@ R|1|comp1^comp2\comp1^comp2\comp1^comp2
 ```
 
 ## Message examples
-Here are a few messages, groups and arrays of them with annotations and their possible corresponding message lines.
+Here are a few messages, groups, and arrays of them with annotations and their possible corresponding message lines.
 
 ### Simple message
 ``` go
@@ -521,4 +537,4 @@ F|3|20251107|value2
 S|1|value1|42
 L|1|N
 ```
-Note that the sequence number is incremented for each instance of the nested structure, however only the first record of the nested structure takes the sequence number, and the rest is 1 (unless the nested structure has its own array inside).
+Note that the sequence number is incremented for each instance of the nested structure, however, only the first record of the nested structure takes the sequence number, and the rest is 1 (unless the nested structure has its own array inside).
