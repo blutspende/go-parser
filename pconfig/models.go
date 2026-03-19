@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/blutspende/bloodlab-common/encoding"
+	"github.com/blutspende/bloodlab-common/instrumentenum"
 	"github.com/blutspende/bloodlab-common/timezone"
 	"github.com/blutspende/go-parser/enums/lineseparator"
 	"github.com/blutspende/go-parser/enums/notation"
@@ -25,6 +26,7 @@ type Configuration struct {
 	EnforceMessageCompleteness bool
 	DropEmptyOutputRecords     bool
 	Delimiters                 Delimiters
+	CustomASTMIdentifyRules    []ASTMIdentifyRule
 	TimeLocation               *time.Location
 }
 
@@ -43,6 +45,7 @@ var DefaultConfigurationASTM = Configuration{
 	EnforceMessageCompleteness: true,
 	DropEmptyOutputRecords:     false,
 	Delimiters:                 DefaultDelimitersASTM,
+	CustomASTMIdentifyRules:    nil,
 	TimeLocation:               nil,
 }
 
@@ -61,15 +64,17 @@ var DefaultConfigurationHL7 = Configuration{
 	EnforceMessageCompleteness: false,
 	DropEmptyOutputRecords:     true,
 	Delimiters:                 DefaultDelimitersHL7,
+	CustomASTMIdentifyRules:    nil,
 	TimeLocation:               nil,
 }
 
+// Protocol types supported
 type Protocol string
 
 const ASTM Protocol = "ASTM"
 const HL7 Protocol = "HL7"
 
-// Delimiters used in ASTM parsing
+// Delimiters used in parsing
 type Delimiters struct {
 	Field        string
 	Repeat       string
@@ -90,4 +95,11 @@ var DefaultDelimitersHL7 = Delimiters{
 	Repeat:       `~`,
 	Escape:       `\`,
 	SubComponent: `&`,
+}
+
+// ASTMIdentifyRule to support custom rule injection
+type ASTMIdentifyRule struct {
+	Name  string
+	Regex string
+	Type  instrumentenum.MessageType
 }

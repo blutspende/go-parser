@@ -6,6 +6,7 @@ import (
 	"github.com/blutspende/bloodlab-common/encoding"
 	"github.com/blutspende/bloodlab-common/instrumentenum"
 	"github.com/blutspende/go-parser"
+	"github.com/blutspende/go-parser/pconfig"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,6 +39,9 @@ func TestIdentifyOrderMessageWithMultiHeader(t *testing.T) {
 	message += "O|1|idk1||^^^Pool_Cell||||R|||N||||Blood^Product|||||||||||||||\n"
 	message += "L|1|N\n"
 	config.Encoding = encoding.UTF8
+	config.CustomASTMIdentifyRules = []pconfig.ASTMIdentifyRule{
+		{"Order (multi header)", "(HPO)+L", instrumentenum.MessageTypeOrder},
+	}
 	// Act
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
@@ -84,6 +88,9 @@ Q|1|VALI200301||ALL
 Q|5|VALI200305||ALL
 L|1|N`
 	config.Encoding = encoding.UTF8
+	config.CustomASTMIdentifyRules = []pconfig.ASTMIdentifyRule{
+		{"Query (multi header)", "(HQ+)+L", instrumentenum.MessageTypeQuery},
+	}
 	// Act
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
@@ -130,6 +137,9 @@ R|1|^^^Pool_Cell 1|0^0^8.8|||||F||Immucor||20200226153444|5030100389|
 R|2|^^^Pool_Cell|Negative|||||F||immucor||20200226153444|5030100389|
 L|1|N`
 	config.Encoding = encoding.UTF8
+	config.CustomASTMIdentifyRules = []pconfig.ASTMIdentifyRule{
+		{"Result (multi header)", "(HPOR+)+L", instrumentenum.MessageTypeResult},
+	}
 	// Act
 	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
 	// Assert
@@ -249,6 +259,104 @@ L|1|N`
 	// Assert
 	assert.Nil(t, err)
 	assert.Equal(t, instrumentenum.MessageTypeResult, messageType)
+	// Teardown
+	teardown()
+}
+
+func TestIdentifyMultiMessageResult(t *testing.T) {
+	// Arrange
+	message := `H|\^&|||ARCHITECT^9.45^F3452430028^H1P1O1R1C1Q1L1|||||||P|1|20260311144224
+P|1|||||||U
+O|1|0179220008|0179220008^W483^5|^^^133^Anti-HBs 3^UNDILUTED^P|R||||||||||||||||||||F
+R|1|^^^133^Anti-HBs 3^UNDILUTED^P^81594FZ00^10662^^F|1.03|mIU/mL||||R||ADMIN^ADMIN||20260311084730|i1SR52842
+R|2|^^^133^Anti-HBs 3^UNDILUTED^P^81594FZ00^10662^^P|1897|RLU||||R||ADMIN^ADMIN||20260311084730|i1SR52842
+L|1
+H|\^&|||ARCHITECT^9.45^F3452430028^H1P1O1R1C1Q1L1|||||||P|1|20260311144224
+P|1|||||||U
+O|1|0179220008|0179220008^W483^5|^^^281^HBcAb-IgM^UNDILUTED^P|R||||||||||||||||||||F
+R|1|^^^281^HBcAb-IgM^UNDILUTED^P^81143BE00^01735^^F|0.07|S/CO||||R||ADMIN^ADMIN||20260311084842|i1SR52842
+R|2|^^^281^HBcAb-IgM^UNDILUTED^P^81143BE00^01735^^I|Nonreactive|||||R||ADMIN^ADMIN||20260311084842|i1SR52842
+R|3|^^^281^HBcAb-IgM^UNDILUTED^P^81143BE00^01735^^P|722|RLU||||R||ADMIN^ADMIN||20260311084842|i1SR52842
+L|1
+H|\^&|||ARCHITECT^9.45^F3452430028^H1P1O1R1C1Q1L1|||||||P|1|20260311144224
+P|1||||COI
+O|1|0179237208|0179237208^Z240^1|^^^380^SyphilisTP^UNDILUTED^P|R||||||||||||||||||||F
+R|1|^^^380^SyphilisTP^UNDILUTED^P^83314BE00^14283^^F|0.11|S/CO||||R||ADMIN^ADMIN||20260311102709|i1SR52842
+R|2|^^^380^SyphilisTP^UNDILUTED^P^83314BE00^14283^^I|Nonreactive|||||R||ADMIN^ADMIN||20260311102709|i1SR52842
+R|3|^^^380^SyphilisTP^UNDILUTED^P^83314BE00^14283^^P|1884|RLU||||R||ADMIN^ADMIN||20260311102709|i1SR52842
+L|1
+H|\^&|||ARCHITECT^9.45^F3452430028^H1P1O1R1C1Q1L1|||||||P|1|20260311144224
+P|1||||COI
+O|1|0179237307|0179237307^W504^4|^^^380^SyphilisTP^UNDILUTED^P|R||||||||||||||||||||F
+R|1|^^^380^SyphilisTP^UNDILUTED^P^83314BE00^14283^^F|0.11|S/CO||||R||ADMIN^ADMIN||20260311101845|i1SR52842
+R|2|^^^380^SyphilisTP^UNDILUTED^P^83314BE00^14283^^I|Nonreactive|||||R||ADMIN^ADMIN||20260311101845|i1SR52842
+R|3|^^^380^SyphilisTP^UNDILUTED^P^83314BE00^14283^^P|1975|RLU||||R||ADMIN^ADMIN||20260311101845|i1SR52842
+L|1
+H|\^&|||ARCHITECT^9.45^F3452430028^H1P1O1R1C1Q1L1|||||||P|1|20260311144224
+P|1||||COI
+O|1|0179242408|0179242408^W504^3|^^^380^SyphilisTP^UNDILUTED^P|R||||||||||||||||||||F
+R|1|^^^380^SyphilisTP^UNDILUTED^P^83314BE00^14283^^F|0.10|S/CO||||R||ADMIN^ADMIN||20260311101751|i1SR52842
+R|2|^^^380^SyphilisTP^UNDILUTED^P^83314BE00^14283^^I|Nonreactive|||||R||ADMIN^ADMIN||20260311101751|i1SR52842
+R|3|^^^380^SyphilisTP^UNDILUTED^P^83314BE00^14283^^P|1787|RLU||||R||ADMIN^ADMIN||20260311101751|i1SR52842
+L|1
+H|\^&|||ARCHITECT^9.45^F3452430028^H1P1O1R1C1Q1L1|||||||P|1|20260311144224
+P|1|||||||U
+O|1|26068485|26068485^U262^1|^^^531^CMV IgG^UNDILUTED^P|R||||||||||||||||||||F
+R|1|^^^531^CMV IgG^UNDILUTED^P^82393FZ00^00596^^F|> 250.0|AU/mL||>||R||ADMIN^ADMIN||20260311112822|i1SR52842
+R|2|^^^531^CMV IgG^UNDILUTED^P^82393FZ00^00596^^I|Reactive|||||R||ADMIN^ADMIN||20260311112822|i1SR52842
+R|3|^^^531^CMV IgG^UNDILUTED^P^82393FZ00^00596^^P|205976|RLU||||R||ADMIN^ADMIN||20260311112822|i1SR52842
+L|1
+H|\^&|||ARCHITECT^9.45^F3452430028^H1P1O1R1C1Q1L1|||||||P|1|20260311144224
+P|1|||||||U
+O|1|26068490|26068490^U262^2|^^^531^CMV IgG^UNDILUTED^P|R||||||||||||||||||||F
+R|1|^^^531^CMV IgG^UNDILUTED^P^82393FZ00^00596^^F|> 250.0|AU/mL||>||R||ADMIN^ADMIN||20260311112916|i1SR52842
+R|2|^^^531^CMV IgG^UNDILUTED^P^82393FZ00^00596^^I|Reactive|||||R||ADMIN^ADMIN||20260311112916|i1SR52842
+R|3|^^^531^CMV IgG^UNDILUTED^P^82393FZ00^00596^^P|146127|RLU||||R||ADMIN^ADMIN||20260311112916|i1SR52842
+L|1
+H|\^&|||ARCHITECT^9.45^F3452430028^H1P1O1R1C1Q1L1|||||||P|1|20260311144224
+P|1|||||||U
+O|1|26068491|26068491^U262^3|^^^531^CMV IgG^UNDILUTED^P|R||||||||||||||||||||F
+R|1|^^^531^CMV IgG^UNDILUTED^P^82393FZ00^00596^^F|0.4|AU/mL||||R||ADMIN^ADMIN||20260311113104|i1SR52842
+R|2|^^^531^CMV IgG^UNDILUTED^P^82393FZ00^00596^^I|Nonreactive|||||R||ADMIN^ADMIN||20260311113104|i1SR52842
+R|3|^^^531^CMV IgG^UNDILUTED^P^82393FZ00^00596^^P|513|RLU||||R||ADMIN^ADMIN||20260311113104|i1SR52842
+L|1
+H|\^&|||ARCHITECT^9.45^F3452430028^H1P1O1R1C1Q1L1|||||||P|1|20260311144224
+P|1|||||||U
+O|1|26205118|26205118^U262^4|^^^531^CMV IgG^UNDILUTED^P|R||||||||||||||||||||F
+R|1|^^^531^CMV IgG^UNDILUTED^P^82393FZ00^00596^^F|111.1|AU/mL||||R||ADMIN^ADMIN||20260311113140|i1SR52842
+R|2|^^^531^CMV IgG^UNDILUTED^P^82393FZ00^00596^^I|Reactive|||||R||ADMIN^ADMIN||20260311113140|i1SR52842
+R|3|^^^531^CMV IgG^UNDILUTED^P^82393FZ00^00596^^P|63858|RLU||||R||ADMIN^ADMIN||20260311113140|i1SR52842
+L|1
+H|\^&|||ARCHITECT^9.45^F3452430028^H1P1O1R1C1Q1L1|||||||P|1|20260311144224
+P|1|||||||U
+O|1|26205118|26205118^U262^4|^^^541^CMV IgM^UNDILUTED^P|R||||||||||||||||||||F
+R|1|^^^541^CMV IgM^UNDILUTED^P^82008FZ00^01097^^F|0.09|Index||||R||ADMIN^ADMIN||20260311113404|i1SR52842
+R|2|^^^541^CMV IgM^UNDILUTED^P^82008FZ00^01097^^I|Nonreactive|||||R||ADMIN^ADMIN||20260311113404|i1SR52842
+R|3|^^^541^CMV IgM^UNDILUTED^P^82008FZ00^01097^^P|124|RLU||||R||ADMIN^ADMIN||20260311113404|i1SR52842
+L|1`
+	config.Encoding = encoding.UTF8
+	// Act
+	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, instrumentenum.MessageTypeResult, messageType)
+	// Teardown
+	teardown()
+}
+
+func TestIdentifyUnidentified(t *testing.T) {
+	// Arrange
+	message := "H|\\^&|||LIS|||||NEO|||LIS2A2|20220928182311\n"
+	message += "Q|1|VALI200301||ALL\n"
+	message += "P|1||||^|||||||||||||||||||||||||||||\n"
+	message += "O|1|idk1||^^^Pool_Cell||||R|||N||||Blood^Product|||||||||||||||\n"
+	message += "L|1|N\n"
+	config.Encoding = encoding.UTF8
+	// Act
+	messageType, err := parser.IdentifyMessageASTM([]byte(message), config)
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, instrumentenum.MessageTypeUnidentified, messageType)
 	// Teardown
 	teardown()
 }
