@@ -25,6 +25,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 
 	// Create a map to store field values indexed by FieldPos
 	fieldMap := make(map[int]string)
+	fieldAnnotationsMap := make(map[int]models.FieldAnnotation)
 
 	// Create an array to store already processed component fields to allow any sparse placement
 	processedComponentFields := make([]int, 0)
@@ -102,6 +103,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 			}
 			// Create a map to store the component values indexed by ComponentPos
 			componentMap := make(map[int]string)
+			componentAnnotationsMap := make(map[int]models.FieldAnnotation)
 			// Iterate over the whole inputFields of the targetStruct struct to find the components anywhere
 			for j := 0; j < sourceTypesLength; j++ {
 				// Parse the targetStruct field targetFieldAnnotation
@@ -123,10 +125,11 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 					}
 					// Store the value in the component map
 					componentMap[currentFieldAnnotation.ComponentPos] = componentValue
+					componentAnnotationsMap[currentFieldAnnotation.ComponentPos] = currentFieldAnnotation
 				}
 			}
 			// Construct the result into the fieldValueString
-			fieldValueString = constructResult(componentMap, config.Delimiters.Component, config.Notation)
+			fieldValueString = constructResult(componentMap, componentAnnotationsMap, config.Delimiters.Component, config.Notation)
 			// Mark the field as processed
 			processedComponentFields = append(processedComponentFields, sourceFieldAnnotation.FieldPos)
 		} else if sourceFieldAnnotation.IsSubstructure {
@@ -145,10 +148,11 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 
 		// Store the field value in the map using FieldPos as the key
 		fieldMap[sourceFieldAnnotation.FieldPos] = fieldValueString
+		fieldAnnotationsMap[sourceFieldAnnotation.FieldPos] = sourceFieldAnnotation
 	}
 
 	// Construct the result string based on the field map
-	result = constructResult(fieldMap, config.Delimiters.Field, config.Notation)
+	result = constructResult(fieldMap, fieldAnnotationsMap, config.Delimiters.Field, config.Notation)
 
 	// Handle HL7 empty line mandatory field separator
 	if config.Protocol == pconfig.HL7 && result == lineTypeName {
@@ -173,6 +177,7 @@ func buildSubstructure(sourceStruct interface{}, depth int, config *pconfig.Conf
 
 	// Create a map to store component values indexed by FieldPos
 	componentMap := make(map[int]string)
+	componentAnnotationsMap := make(map[int]models.FieldAnnotation)
 
 	// Iterate over the inputFields of the targetStruct struct
 	for i := 0; i < sourceTypesLength; i++ {
@@ -201,6 +206,7 @@ func buildSubstructure(sourceStruct interface{}, depth int, config *pconfig.Conf
 
 		// Store the component value in the map using FieldPos as the key
 		componentMap[sourceFieldAnnotation.FieldPos] = componentValueString
+		componentAnnotationsMap[sourceFieldAnnotation.FieldPos] = sourceFieldAnnotation
 	}
 
 	// Determine depth dependent delimiter
@@ -215,21 +221,30 @@ func buildSubstructure(sourceStruct interface{}, depth int, config *pconfig.Conf
 	}
 
 	// Construct the result string
-	result = constructResult(componentMap, delimiter, config.Notation)
+	result = constructResult(componentMap, componentAnnotationsMap, delimiter, config.Notation)
 
 	// Return result with no error
 	return result, nil
 }
 
-func constructResult(fieldMap map[int]string, delimiter string, notation string) (result string) {
+func constructResult(fieldMap map[int]string, fieldAnnotationsMap map[int]models.FieldAnnotation, delimiter string, notation string) (result string) {
 	// Determine how many fields to include by finding the biggest index
 	lastIndex := 0
 	for key := range fieldMap {
 		// In short notation only non-empty fields are included at the end
-		if key > lastIndex && (!(notation == notationconst.Short) || fieldMap[key] != "") {
+		if key <= lastIndex {
+			continue
+		}
+
+		if _, ok := fieldAnnotationsMap[key].Attributes[constants.AttributeRequired]; ok {
+			lastIndex = key
+			continue
+		}
+		if notation != notationconst.Short || fieldMap[key] != "" {
 			lastIndex = key
 		}
 	}
+
 	// Iterate from one to the last index, building the result string
 	result = ""
 	for i := 1; i <= lastIndex; i++ {
