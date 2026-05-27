@@ -379,7 +379,7 @@ The ATR attributes have the value of a whole nested key-value list, as detailed 
 |-----------|--------|-------------------------|---------------|----------------------------------------------------------------|
 | optional  |        | Messages, Groups        | Record, Group | input record or section can be skipped if not found in message |
 | subname   | name   | Messages, Groups        | Record        | additional identifier of the Record in the third field         |
-| required  |        | Records, Substructures  | Field         | input is mandatory                                             |
+| required  |        | Records, Substructures  | Field         | input can not be empty, output place is preserved              |
 | date      |        | Records, Substructures  | time.Time     | output as date only                                            |
 | length    | number | Records, Substructures  | float         | output decimal length                                          |
 | sequence  |        | Records, Substructures  | int           | marked as sequence number in HL7                               |
@@ -398,10 +398,12 @@ Matrices   []Stream `astm:"TAG=M;ATR=subname:MATRIX"`
 ```
 
 ### required
-By default, at the record field level all fields are optional, so the `required` attribute has to be added to make it mandatory, and thus produce an error if the field is empty.
+By default, at the record field level all fields are optional, so the `required` attribute has to be added to make it mandatory, and thus produce an error while unmashalling if the field is empty.
+
+It can also be used in output (marshal) to preserve the place of the field even in short notation if the field is empty.
 
 ### date
-The `date` attribute can be used on time.Time fields to signify that only the date part is relevant, and the time part should be ignored. In Marshal, it will be outputted in short date format (YYYYMMDD). It also has different behaviour with time zones as explained in the [Date and time](#date-and-time) section.
+The `date` attribute can be used on time.Time fields to signify that only the date part is relevant, and the time part should be ignored. In Marshal, it will be outputted in short date format (YYYYMMDD). It also has different behavior with time zones as explained in the [Date and time](#date-and-time) section.
 ``` go
 PlanEffectiveDate time.Time `hl7:"POS=13;ATR=date"
 ```
