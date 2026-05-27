@@ -23,7 +23,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 		return "", err
 	}
 
-	// Create a map to store field values indexed by FieldPos
+	// Create a map to store field values and attributes indexed by FieldPos
 	fieldMap := make(map[int]string)
 	fieldAnnotationsMap := make(map[int]models.FieldAnnotation)
 
@@ -146,7 +146,7 @@ func BuildLine(sourceStruct interface{}, lineTypeName string, sequenceNumber int
 			}
 		}
 
-		// Store the field value in the map using FieldPos as the key
+		// Store the field value and annotation in the map using FieldPos as the key
 		fieldMap[sourceFieldAnnotation.FieldPos] = fieldValueString
 		fieldAnnotationsMap[sourceFieldAnnotation.FieldPos] = sourceFieldAnnotation
 	}
@@ -231,11 +231,10 @@ func constructResult(fieldMap map[int]string, fieldAnnotationsMap map[int]models
 	// Determine how many fields to include by finding the biggest index
 	lastIndex := 0
 	for key := range fieldMap {
-		// In short notation only non-empty fields are included at the end
+		// In short notation only non-empty or required fields are included at the end
 		if key <= lastIndex {
 			continue
 		}
-
 		if _, ok := fieldAnnotationsMap[key].Attributes[constants.AttributeRequired]; ok {
 			lastIndex = key
 			continue
@@ -244,7 +243,6 @@ func constructResult(fieldMap map[int]string, fieldAnnotationsMap map[int]models
 			lastIndex = key
 		}
 	}
-
 	// Iterate from one to the last index, building the result string
 	result = ""
 	for i := 1; i <= lastIndex; i++ {

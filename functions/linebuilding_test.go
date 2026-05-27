@@ -661,6 +661,21 @@ func TestBuildLine_MissingAnnotation(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "T|1|field3|field4", result)
 }
+func TestBuildLine_RequiredAttribute(t *testing.T) {
+	// Arrange
+	type RequiredAttributeRecord struct {
+		Field3 string `astm:"POS=3;ATR=required" hl7:"POS=3;ATR=required"`
+	}
+	source := RequiredAttributeRecord{}
+	// Act
+	astmLine, astmErr := BuildLine(source, "P", 1, config)
+	hl7Line, hl7Err := BuildLine(source, "PID", 1, configHL7)
+	// Assert
+	assert.Nil(t, astmErr)
+	assert.Nil(t, hl7Err)
+	assert.Equal(t, "P|1|", astmLine)
+	assert.Equal(t, "PID||", hl7Line)
+}
 func TestBuildLine_InvalidAttributeValue(t *testing.T) {
 	// Arrange
 	source := InvalidAttributeValueRecord{
@@ -670,22 +685,6 @@ func TestBuildLine_InvalidAttributeValue(t *testing.T) {
 	_, err := BuildLine(source, "T", 1, config)
 	// Assert
 	assert.EqualError(t, err, errdef.ErrLineBuildingInvalidLengthAttributeValue.Error())
-}
-
-func TestBuildLine_RequiredAttribute(t *testing.T) {
-	// Arrange
-	type RequiredAttributeRecord struct {
-		Field3 string `astm:"POS=3;ATR=required" hl7:"POS=3;ATR=required"`
-	}
-	record := RequiredAttributeRecord{}
-	// Act
-	astmLine, astmErr := BuildLine(record, "P", 1, config)
-	hl7Line, hl7Err := BuildLine(record, "PID", 1, configHL7)
-	// Assert
-	assert.Nil(t, astmErr)
-	assert.Nil(t, hl7Err)
-	assert.Equal(t, "P|1|", astmLine)
-	assert.Equal(t, "PID||", hl7Line)
 }
 
 // BuildLine tests - escaped characters
